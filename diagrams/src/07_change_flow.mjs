@@ -1,0 +1,30 @@
+// 變更處理 — framework/04 §4.6
+export default {
+  id: "glados_change_flow",
+  title: "變更處理",
+  subtitle: "改到哪個產出物，就從哪裡重走",
+  direction: "DOWN",
+  uniform: false,
+  nodes: [
+    { id: "CR", kind: "ext", title: "變更 CR", sub: "T0 之後進來" },
+    { id: "SF", kind: "ext", title: "S 版本同步發現", sub: "需要範圍或需求決策" },
+    { id: "C", tag: "C", title: "變更分析", sub: "產出影響報告" },
+    { id: "GC", kind: "gate", title: "GC 變更核准", sub: "這一版接不接？" },
+    { id: "DEFER", kind: "record", title: "記錄：延後或拒絕" },
+    { id: "K", kind: "decision", title: "改到哪一種產出物？" },
+    { id: "E0", kind: "ext", title: "從 P0／P1 重走", sub: ["所有證據過期", "重開 G0"] },
+    { id: "E2", kind: "ext", title: "P2 追加模組", sub: ["新模組從 M1 開始", "重開 G1"] },
+    { id: "E3", kind: "ext", title: "從 P3 重走", sub: ["依賴的模組從 M3 重走", "重開 G2"] },
+    { id: "E4", kind: "ext", title: "該模組從 M1 重走", sub: ["只重走改動條目的鏈", "H1 審差異"] },
+    { id: "E5", kind: "ext", title: "該模組在 M2 補 case", sub: ["重現 bug", "再走 M3 → M4"] },
+  ],
+  edges: [
+    ["CR", "C"], ["SF", "C"], ["C", "GC"],
+    ["GC", "DEFER", "不接"], ["GC", "K", "接"],
+    ["K", "E0", "專案設定\n（基底、平台、toolchain）"],
+    ["K", "E2", "差異分析\n（全新功能）"],
+    ["K", "E3", "架構\n（介面或記憶體預算）"],
+    ["K", "E4", "spec 條目\n（需求改了）"],
+    ["K", "E5", "case\n（既有行為的 bug）"],
+  ],
+};

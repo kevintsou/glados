@@ -8,45 +8,12 @@
 
 ## 2.1 專案層流程
 
-**圖：專案層流程**
+![專案層流程](../diagrams/glados_project_flow.svg)
 
-```mermaid
-%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
-flowchart TD
-  P0["P0 專案啟動<br/>定範圍、T0、起點、知識庫快照"]:::exec
-  G0{{"G0 啟動核准"}}:::human
-  P1["P1 基線建立<br/>確認起點能 build、能跑，留下對照基準"]:::exec
-  P2["P2 差異分析<br/>範圍 CR → code → 切成模組"]:::exec
-  G1{{"G1 範圍核准"}}:::human
-  P3["P3 架構與介面<br/>介面合約、記憶體預算"]:::exec
-  G2{{"G2 架構審查"}}:::human
-  M["每個模組各跑一次 M1–M7<br/>（見模組流程圖）"]:::exec
-  P4["P4 整合<br/>合入所有模組，驗端到端 boot flow"]:::exec
-  P5["P5 全量驗收<br/>regression、靜態分析、安全審查"]:::exec
-  G3{{"G3 最終交付核准"}}:::human
-  P6["P6 交付<br/>release／ROM tapeout"]:::exec
-  P7["P7 回寫<br/>知識庫、規則、skill、hook"]:::exec
-  G4{{"人確認回寫提案"}}:::human
-  P0 --> G0 --> P1 --> P2 --> G1 --> P3 --> G2 --> M --> P4 --> P5 --> G3 --> P6 --> P7 --> G4
-  P2 -. "資訊不足" .-> P0
-  P3 -. "範圍有誤" .-> P2
-  M -. "介面衝突" .-> P3
-  P4 -. "失敗：回對應的模組" .-> M
-  P5 -. "失敗：回對應的模組" .-> M
-  P6 -. "交付內容和核准版本不符" .-> P5
-  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
-  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
-  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
-  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
-  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
-```
-
-[可編輯 Mermaid 圖源](../diagrams/glados_project_flow.mmd)
-
-圖例：藍＝節點；橘＝需要人；紫＝串接層的判斷；綠＝紀錄；灰＝圖外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。
+<sub>圖源：[`diagrams/src/01_project_flow.mjs`](../diagrams/src/01_project_flow.mjs)</sub>
 
 - **主流程**（實線，由上往下）：P0 → G0 → P1 → P2 → G1 → P3 → G2 → 各模組跑 M1–M7 → P4 → P5 → G3 → P6 → P7 → 人確認。
-- **失敗退回**（虛線）：P2 資訊不足回 P0；P3 範圍有誤回 P2；模組遇到介面衝突回 P3；P4、P5 失敗回對應的模組；P6 交付內容和核准版本不符回 P5。
+- **失敗退回**（紅色虛線）：P2 資訊不足回 P0；P3 範圍有誤回 P2；模組遇到介面衝突回 P3；P4、P5 失敗回對應的模組；P6 交付內容和核准版本不符回 P5。
 - **圖上沒畫的**：關卡不核准時退回關卡前的那一站；超過迴圈上限或遇到環境問題時交給人；變更 CR 與新 commit 的處理見 §2.5。
 
 ---
@@ -76,62 +43,14 @@ flowchart TD
 
 ## 2.3 模組流程
 
-**圖：模組流程**
+![模組流程](../diagrams/glados_module_flow.svg)
 
-```mermaid
-%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
-flowchart TD
-  IN1(["P3 展開，或需求變更"]):::ext
-  IN2(["bug 型 CR"]):::ext
-  IN3(["介面或記憶體預算變更"]):::ext
-  M1["M1 需求釐清<br/>寫成有編號的 spec 條目"]:::exec
-  WAIT["等待外部回覆<br/>問題寫進 Jira"]:::route
-  H1{{"H1 需求核准"}}:::human
-  M2["M2 驗收定義<br/>驗收合約、case、判別能力證據"]:::exec
-  Q2{"驗收合約有新增<br/>或變更嗎？"}:::route
-  H2{{"H2 驗收合約核准"}}:::human
-  M3["M3 實作計畫<br/>另一個 session 審查計畫<br/>↻ 審查有阻擋項目：在 M3 內修計畫重審"]:::exec
-  M4["M4 實作與 build<br/>只改計畫列出的檔案<br/>↻ build 不過、有 warning、超預算：重做，最多 3 輪"]:::exec
-  M5["M5 驗證<br/>跑驗收合約的必要 case"]:::exec
-  M6["M6 獨立審查<br/>審查 diff"]:::exec
-  M7["M7 完成交接<br/>串接層核對全部紀錄"]:::exec
-  P4(["P4 整合（專案層）"]):::ext
-  R["R 失敗分類<br/>決定退回哪裡（見失敗分類圖）"]:::route
-  IN1 --> M1
-  M1 -. "有問題要問客戶、SOC、HW" .-> WAIT
-  WAIT -. "答案回來" .-> M1
-  M1 --> H1 --> M2
-  IN2 --> M2
-  M2 --> Q2
-  Q2 -->|"有"| H2 --> M3
-  Q2 -->|"沒有，只在合約內補 case"| M3
-  IN3 --> M3
-  M3 --> M4
-  M4 --> M5
-  M5 -->|"必要 case 全部 PASS"| M6
-  M6 -->|"沒有未處置的阻擋項目"| M7
-  M7 --> P4
-  M2 -. "spec 條目轉不成 case、<br/>平台觀察不到" .-> R
-  M3 -. "需求或架構爭議" .-> R
-  M4 -. "需要改計畫以外的檔案" .-> R
-  M5 -. "case FAIL、環境錯誤、驗證缺口" .-> R
-  M6 -. "需要修正" .-> R
-  M7 -. "紀錄不齊或對不上目前版本" .-> R
-  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
-  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
-  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
-  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
-  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
-```
-
-[可編輯 Mermaid 圖源](../diagrams/glados_module_flow.mmd)
-
-圖例：藍＝節點；橘＝需要人；紫＝串接層的判斷；綠＝紀錄；灰＝圖外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。
+<sub>圖源：[`diagrams/src/02_module_flow.mjs`](../diagrams/src/02_module_flow.mjs)</sub>
 
 - **主流程**（實線，由上往下）：M1 → H1 → M2 →（合約有新增或變更才經 H2）→ M3 → M4 → M5 → M6 → M7 → P4 整合。
 - **M1 有問題要問外部**時，節點轉為「等待外部回覆」，答案回來再從 M1 接續。
 - **在節點內重做**（框裡標 ↻）：M3 審查有阻擋項目就在 M3 內修計畫重審；M4 build 不過、有 warning 或超出預算就重做，最多 3 輪。
-- **其他問題一律交給 R 失敗分類**（虛線），由它決定退回哪裡（[04 §4.5](04_rules.md#45-r-失敗分類)）。
+- **其他問題一律交給 R 失敗分類**（紅色虛線），由它決定退回哪裡（[04 §4.5](04_rules.md#45-r-失敗分類)）。
 
 **模組流程從哪裡進來**：
 

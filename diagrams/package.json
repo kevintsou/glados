@@ -1,0 +1,8 @@
+{
+  "name": "glados-diagrams",
+  "private": true,
+  "type": "module",
+  "description": "Renders GLADOS diagrams from src/*.mjs to SVG",
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": { "elkjs": "^0.9.3" }
+}

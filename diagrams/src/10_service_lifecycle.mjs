@@ -1,0 +1,32 @@
+// 服務生命週期 — impl/service.md I6.1
+export default {
+  id: "glados_service_lifecycle",
+  title: "服務生命週期",
+  subtitle: "每次啟動都先核對上次留下的紀錄",
+  direction: "DOWN",
+  uniform: false,
+  nodes: [
+    { id: "OPEN", kind: "ext", title: "開啟 openBCT GLADOS 分頁" },
+    { id: "MANUAL", kind: "ext", title: "使用者手動啟動服務" },
+    { id: "CHECK", kind: "decision", title: "服務狀態？" },
+    { id: "UNKNOWN", kind: "ext", title: "顯示「無法連線」", sub: "不重複啟動" },
+    { id: "START", title: "啟動服務", sub: "同時只會有一個" },
+    { id: "RECOVER", kind: "rule", title: "先核對上次留下的紀錄", sub: "執行、設備、待同步" },
+    { id: "CONNECT", title: "連線既有服務" },
+    { id: "RUN", title: "服務在背景執行", sub: "派工仍依專案規則與關卡" },
+    { id: "BG", title: "服務繼續執行" },
+    { id: "DRAIN", title: "一般停止", sub: ["停止新派工、顯示「停止中」", "等目前的執行回收並保存"] },
+    { id: "CANCEL", title: "立即停止", sub: ["要求取消", "保存產出、log 與中斷狀態"] },
+    { id: "UNCONF", kind: "human", title: "標示「待核對」", sub: "沒能確認停止的執行端或設備" },
+    { id: "STOP", title: "服務退出", sub: "已開啟的分頁不會自動重啟它" },
+  ],
+  edges: [
+    ["OPEN", "CHECK"],
+    ["CHECK", "CONNECT", "運行中"], ["CHECK", "START", "已停止"], ["CHECK", "UNKNOWN", "無法確認"],
+    ["MANUAL", "START"],
+    ["START", "RECOVER"], ["RECOVER", "CONNECT"], ["CONNECT", "RUN"],
+    ["RUN", "BG", "關閉分頁或 openBCT"], ["RUN", "DRAIN", "使用者一般停止"], ["RUN", "CANCEL", "使用者立即停止"],
+    ["CANCEL", "UNCONF", "", "wait"],
+    ["DRAIN", "STOP"], ["CANCEL", "STOP"],
+  ],
+};

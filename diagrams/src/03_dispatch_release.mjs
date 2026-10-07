@@ -1,0 +1,31 @@
+// 一次派工到放行 — framework/04 §4.2
+export default {
+  id: "glados_dispatch_release",
+  title: "一次派工到放行",
+  subtitle: "節點交出的只是申請；放行看串接層留下的證據",
+  direction: "DOWN",
+  nodes: [
+    { id: "A", kind: "rule", title: "派工前檢查", sub: ["版本同步、輸入已通過且有效、", "核准齊全、沒有其他執行中、環境可用"] },
+    { id: "B", kind: "rule", title: "固定輸入版本，派工", sub: "每次都開新的 session" },
+    { id: "N", title: "節點執行", sub: "AI、人、工具或 script 都可以" },
+    { id: "H", title: "交出產出物與交接清單", sub: "只是申請" },
+    { id: "S2", kind: "decision", title: "放行前檢查：輸入有被改嗎？" },
+    { id: "OLD", kind: "ext", title: "結果保留但不放行", sub: "依版本同步判斷重跑或重走" },
+    { id: "CK", kind: "rule", title: "串接層執行出口檢查", sub: "自行核對、工具執行、獨立審查" },
+    { id: "EV", kind: "record", title: "證據紀錄", sub: "綁定目前的版本與 hash" },
+    { id: "Q", kind: "decision", title: "出口檢查都通過？" },
+    { id: "R", kind: "ext", title: "交給 R 失敗分類" },
+    { id: "G", kind: "gate", title: "出口關卡：等人核准" },
+    { id: "REC", kind: "record", title: "寫入正式紀錄：已通過", sub: "決定下一站" },
+  ],
+  edges: [
+    ["A", "B"], ["B", "N"], ["N", "H"], ["H", "S2"],
+    ["S2", "OLD", "有", "back"],
+    ["S2", "CK", "沒有"], ["CK", "EV"], ["EV", "Q"],
+    ["Q", "R", "沒有", "back"],
+    ["Q", "G", "通過，這站有關卡"],
+    ["Q", "REC", "通過，這站沒有關卡"],
+    ["G", "REC", "核准"],
+    ["G", "A", "不核准：回本節點修正", "back"],
+  ],
+};
