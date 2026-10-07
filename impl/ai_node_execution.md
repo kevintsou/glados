@@ -1,6 +1,6 @@
-# AI 節點怎麼啟動與回收（v0.7 討論稿）
+# AI 節點怎麼啟動與回收
 
-> 原 v0.6《平台 spec》A9.2–A9.4，屬於實作：用 Claude Code 執行 AI 節點的方式。框架只要求「每個節點一個全新的 session、只認證據」（[03 §3.1、§3.2](../framework/03_rules.md)），換成 Codex、Agent SDK 或人來執行都可以。
+> **這份文件回答**：用 Claude Code 執行 AI 節點時，怎麼啟動與回收。屬於實作；框架只要求「每個節點一個全新的 session」（[framework/04 §4.1](../framework/04_rules.md#41-串接層是什麼)）與「只認證據」（[framework/05 §5.1](../framework/05_checks.md#51-只認證據)），換成 Codex、Agent SDK 或人來執行都可以。
 
 ---
 

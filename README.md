@@ -1,37 +1,38 @@
 # GLADOS
 
-bootcode FW 開發流程平台，目前是 **v0.7 討論稿**。這個 repo 保存平台的框架、節點定義與實作設計。
+bootcode FW 開發流程平台。目前是 **v0.7 討論稿**：先把框架定好，節點實作之後個別展開；**文件確認後才開始實作**。
 
-**這一版的方向**：先把框架做好，也就是串接層的規則、交接文件的格式、流程怎麼走、每個節點的介面。每個節點怎麼實作，之後再個別展開。**先完成文件並確認沒問題，再開始實作。**
+**GLADOS 在做什麼**：從需求（spec、CR）出發，經過需求釐清、驗收定義、實作、驗證、整合與全量驗收，產出一版功能正常的 bootcode FW。工作由 AI、工具與人分工：每一站交出固定格式的交接清單，由確定性的「串接層」執行檢查、決定放行或退回；人只在關卡核准。
 
 ---
+
+## 文件怎麼讀
+
+第一次讀，照 01 → 02 → 04 的順序就能掌握全貌；其他文件需要時再查。
+
+| 想知道 | 讀這份 |
+| :---- | :---- |
+| GLADOS 的目標、六個核心概念、設計原則、建置路線 | [framework/01 總覽](framework/01_overview.md) |
+| 流程怎麼走、有哪些節點、哪裡要人核准 | [framework/02 流程](framework/02_workflow.md) |
+| 每一站交什麼、交接清單與紀錄長什麼樣子、誰能寫 | [framework/03 產出物與紀錄](framework/03_artifacts.md) |
+| 串接層怎麼派工、放行、退回、處理變更與新 commit | [framework/04 串接層規則](framework/04_rules.md) |
+| 怎樣才算通過（所有檢查的定義） | [framework/05 檢查](framework/05_checks.md) |
+| 串接層服務必須做到的事 | [framework/06 串接層服務的要求](framework/06_service.md) |
+| 專案要填哪些設定 | [framework/07 專案設定](framework/07_project_profile.md) |
+| 還沒決定的事、已經決定的事 | [framework/08 待決事項](framework/08_open_questions.md) |
+| 每個節點的介面與實作構想 | [nodes/](nodes/README.md) |
+| E39 怎麼套用 GLADOS | [projects/E39](projects/E39.md) |
+| 實作設計（框架確認後才開始） | [impl/service](impl/service.md)、[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/tools](impl/tools.md) |
+| 討論筆記 | [notes/](notes/playbook_kit_review.md) |
+| 版本紀錄、和 v0.6 的章節對照 | [CHANGELOG](CHANGELOG.md) |
 
 ## 文件分三層
 
 | 層 | 內容 | 位置 |
 | :---- | :---- | :---- |
-| **框架** | 流程、節點介面、交接與紀錄格式、檢查清單、串接層規則。對所有專案都一樣 | [`framework/`](framework/)、[`nodes/`](nodes/) 每張卡的「介面」段 |
-| **節點實作** | 誰執行、用什麼模型與工具、怎麼接 openBCT、串接層服務怎麼寫。可以替換 | [`nodes/`](nodes/) 每張卡的「實作」段、[`impl/`](impl/) |
-| **專案** | 專案設定、範圍、試點 | [`projects/`](projects/) |
-
-## 閱讀順序
-
-1. [framework/01_overview.md](framework/01_overview.md)：目標、三層、用語、設計原則、建置路線、**待決事項**
-2. [framework/02_workflow.md](framework/02_workflow.md)：流程圖、節點總表、人工關卡、產出物相依
-3. [framework/03_rules.md](framework/03_rules.md)：串接層怎麼派工、放行、判定過期與退回；狀態轉換
-4. [framework/04_records.md](framework/04_records.md)：交接清單與各種紀錄的格式
-5. [framework/05_checks.md](framework/05_checks.md)：所有出口檢查的定義
-6. [framework/06_project_profile.md](framework/06_project_profile.md)：專案設定欄位
-7. [nodes/](nodes/README.md)：16 個節點卡（P0–P7、C、M1–M7）
-8. [projects/E39.md](projects/E39.md)：第一個驗收專案
-9. [impl/service.md](impl/service.md)、[impl/ai_node_execution.md](impl/ai_node_execution.md)：實作設計（框架確認後才開始）
-
-## 寫作約定
-
-- 用一般人讀得懂的中文寫，不自創縮寫。節點與關卡代號（P0、M4、G1、H2…）是流程圖上的名字，出現時一律附上名稱，例如「M4 實作與 build」「G1 範圍核准」。
-- 檢查用中文名稱（例如「build 零警告」「只寫在允許範圍內」），定義集中在 [05](framework/05_checks.md)；轉成機器可讀格式時再配代號。
-- 格式範例裡的欄位名稱用英文（它們是檔案格式的一部分），旁邊附中文說明。
-- 標「v0.7 新增，待確認」的內容是這一版提出、還沒定案的；彙整在 [01 §1.8 待決事項](framework/01_overview.md)。
+| **框架** | 流程、節點介面、產出物與紀錄、檢查、串接層規則與服務要求。對所有專案都一樣 | `framework/`、`nodes/` 每張卡的「介面」段 |
+| **節點實作** | 誰執行、用什麼模型與工具、怎麼接 openBCT、串接層服務怎麼寫。可以替換 | `nodes/` 每張卡的「實作」段、`impl/` |
+| **專案** | 專案設定、範圍、試點 | `projects/` |
 
 ## 流程圖
 
@@ -39,49 +40,23 @@ bootcode FW 開發流程平台，目前是 **v0.7 討論稿**。這個 repo 保�
 
 | 圖 | 在哪裡 | 回答什麼問題 |
 | :---- | :---- | :---- |
-| 專案層流程 | [02 §2.2](framework/02_workflow.md) | 一個專案從頭到尾怎麼走、哪裡要人核准、失敗退回哪裡 |
-| 模組流程 | [02 §2.3](framework/02_workflow.md) | 一個模組的 M1–M7 怎麼走、哪些問題交給 R 失敗分類 |
-| 一次派工到放行 | [03 §3.3](framework/03_rules.md) | 串接層怎麼派工、回收、檢查、放行 |
-| 節點狀態 | [03 §3.4.3](framework/03_rules.md) | 一個節點會處在哪些狀態、什麼事件讓它轉換 |
-| 追溯與過期 | [03 §3.5](framework/03_rules.md) | 上游改版時，哪些東西會過期 |
-| R 失敗分類的去處 | [03 §3.6](framework/03_rules.md) | 每一種失敗退回哪裡、要不要人 |
-| 變更處理 | [03 §3.7](framework/03_rules.md) | 變更 CR 進來後，依改到的東西從哪裡重走 |
-| 版本同步 | [03 §3.8](framework/03_rules.md) | 發現新 commit 時，各種變更怎麼處理 |
-| 串接層服務架構 | [impl/service.md I2](impl/service.md) | 服務、入口、紀錄、執行端之間怎麼連 |
-| 服務生命週期 | [impl/service.md I6.1](impl/service.md) | 服務怎麼啟動、停止、恢復 |
+| 專案層流程 | [02 §2.1](framework/02_workflow.md#21-專案層流程) | 一個專案從頭到尾怎麼走、哪裡要人核准、失敗退回哪裡 |
+| 模組流程 | [02 §2.3](framework/02_workflow.md#23-模組流程) | 一個模組的 M1–M7 怎麼走、哪些問題交給 R 失敗分類 |
+| 一次派工到放行 | [04 §4.2](framework/04_rules.md#42-派工與放行) | 串接層怎麼派工、回收、檢查、放行 |
+| 節點狀態 | [04 §4.3](framework/04_rules.md#43-節點與執行的狀態) | 一個節點會處在哪些狀態、什麼事件讓它轉換 |
+| 追溯與過期 | [04 §4.4](framework/04_rules.md#44-過期與重新進入) | 上游改版時，哪些東西會過期 |
+| R 失敗分類的去處 | [04 §4.5](framework/04_rules.md#45-r-失敗分類) | 每一種失敗退回哪裡、要不要人 |
+| 變更處理 | [04 §4.6](framework/04_rules.md#46-c-變更處理) | 變更 CR 進來後，依改到的東西從哪裡重走 |
+| 版本同步 | [04 §4.7](framework/04_rules.md#47-s-版本同步) | 發現新 commit 時，各種變更怎麼處理 |
+| 串接層服務架構 | [impl/service I2](impl/service.md#i2-架構) | 服務、入口、紀錄、執行端之間怎麼連 |
+| 服務生命週期 | [impl/service I6.1](impl/service.md#i61-服務生命週期圖) | 服務怎麼啟動、停止、恢復 |
 
-**所有圖用同一套圖例**：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。人工關卡一律畫成六角形。
+**圖例**（所有圖共用）：藍＝節點或執行步驟；橘＝需要人（關卡、核准、交給人），關卡一律畫成六角形；紫＝串接層的判斷；綠＝紀錄；灰＝圖外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。
 
-## v0.6 → v0.7 章節對照
+## 寫作約定
 
-v0.6 的兩份文件（《平台 spec》《串接層服務實作設計》）已拆進上面的資料夾：
-
-| v0.6 | v0.7 |
-| :---- | :---- |
-| A1 目標與範圍 | 01 §1.1 |
-| A2 用語 | 01 §1.4 |
-| A3 設計原則 | 01 §1.5 |
-| A4 平台組成 | 01 §1.6 |
-| A5 專案層流程 | 02 §2.2；各階段的細節 → `nodes/P0`–`P7` |
-| A6 模組流程 | 02 §2.3；R 失敗分類 → 03 §3.6；各節點細節 → `nodes/M1`–`M7` |
-| A6.1 M2 驗收合約與判別能力 | `nodes/M2` |
-| A6.2 M3／M6 審查放行 | 03 §3.9 |
-| A7 C 變更處理 | 03 §3.7、`nodes/C` |
-| A7.1 S 版本同步 | 03 §3.8 |
-| A8.1 狀態 | 03 §3.4（補上狀態轉換表） |
-| A8.2 交接清單格式 | 04 §4.3 |
-| A8.3 節點卡範本 | `nodes/README`（改成介面／實作兩段） |
-| A8.4 驗證證據的有效性 | 03 §3.5 |
-| A8.5 `.glados/` 與版本對應 | 04 §4.1（版本與 hash）、04 §4.9（`.glados/` 配置）、03 §3.13（CI） |
-| A8.6 信任邊界 | 03 §3.11 |
-| A9.1 三層結構 | 03 §3.1 |
-| A9.2–A9.4 節點執行方式 | `impl/ai_node_execution` |
-| A9.5 任何 agent 都能執行任何節點 | 03 §3.13 |
-| A9.6 串接層服務的必要性質 | 03 §3.12 |
-| A10 專案設定 | 06 |
-| A11 平台工具對照 | `nodes/README`，以及各節點卡的實作段 |
-| A12 建置路線 | 01 §1.7 |
-| A13 待決事項 | 01 §1.8 |
-| Part B（E39） | `projects/E39`（B1–B7 → E1–E7） |
-| 附錄 A–C | 01 附錄 A–C |
-| 《串接層服務實作設計》I1–I8 | `impl/service` |
+- 用一般人讀得懂的中文寫，不自創縮寫。節點與關卡代號（P0、M4、G1、H2…）是流程圖上的名字，第一次出現時附上名稱，例如「M4 實作與 build」「G1 範圍核准」。
+- **每個概念只在一個地方定義**，其他地方用連結引用；連結寫成「文件編號 §節號」。
+- 檢查用中文名稱（例如「build 零警告」），定義集中在 [framework/05](framework/05_checks.md)。
+- 格式範例裡的欄位名稱用英文（它們是檔案格式的一部分），旁邊附中文說明。
+- 正文只寫現行規則。還沒定案的寫「待確認」並連到 [framework/08](framework/08_open_questions.md) 的編號；版本差異寫在 [CHANGELOG](CHANGELOG.md)。
