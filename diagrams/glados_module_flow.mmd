@@ -1,24 +1,43 @@
 %%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
 flowchart TD
-  IN1["P3 展開／需求變更"]:::route -.-> M1
-  IN2["bug 型 CR"]:::route -.-> M2
-  IN3["介面／預算變更"]:::route -.-> M3
-  M1["M1 需求釐清<br/>有編號 spec；TBD 清空"]:::exec --> H1{{"H1 核准需求"}}:::human
-  H1 --> M2["M2 驗收定義<br/>驗收合約＋測試實作＋判別能力證據"]:::exec
-  M2 -. "合約新增／變更" .-> H2{{"H2 核准驗收合約<br/>合約內補 case 不重開"}}:::human
-  H2 --> M3
-  M2 -->|"合約已核准；測試經獨立審查與工具檢查"| M3["M3 實作計畫＋獨立審查<br/>阻擋項目在 M3 內修計畫重審"]:::exec
-  M3 --> M4["M4 實作＋build<br/>限定路徑、0 warning、預算內"]:::exec
-  M4 --> M5["M5 驗證<br/>image／測試／環境版本一致"]:::exec
-  M5 -->|PASS| M6["M6 獨立審查<br/>逐項處置；證據綁 diff hash"]:::exec
-  M6 -->|"無未解決阻擋項目"| M7["M7 完成交接<br/>產出物已通過且有效、必要核准齊全"]:::exec
-  M7 --> P4["P4 整合（專案層）"]:::note
-  M5 -->|FAIL| R["R 失敗分類<br/>規則為主、必要獨立判讀"]:::route
-  M6 -. "需修正" .-> R
-  M3 -. "需求／架構爭議" .-> R
-  R -. "code 錯" .-> M4
-  R --> OTHER["其他退回<br/>測試實作錯 → M2<br/>驗收標準需改 → M2＋H2<br/>spec 缺口 → M1＋H1<br/>介面衝突 → P3＋G2<br/>環境／超過輪數 → 交給人"]:::route
+  IN1(["P3 展開，或需求變更"]):::ext
+  IN2(["bug 型 CR"]):::ext
+  IN3(["介面或記憶體預算變更"]):::ext
+  M1["M1 需求釐清<br/>寫成有編號的 spec 條目"]:::exec
+  WAIT["等待外部回覆<br/>問題寫進 Jira"]:::route
+  H1{{"H1 需求核准"}}:::human
+  M2["M2 驗收定義<br/>驗收合約、case、判別能力證據"]:::exec
+  Q2{"驗收合約有新增<br/>或變更嗎？"}:::route
+  H2{{"H2 驗收合約核准"}}:::human
+  M3["M3 實作計畫<br/>另一個 session 審查計畫<br/>↻ 審查有阻擋項目：在 M3 內修計畫重審"]:::exec
+  M4["M4 實作與 build<br/>只改計畫列出的檔案<br/>↻ build 不過、有 warning、超預算：重做，最多 3 輪"]:::exec
+  M5["M5 驗證<br/>跑驗收合約的必要 case"]:::exec
+  M6["M6 獨立審查<br/>審查 diff"]:::exec
+  M7["M7 完成交接<br/>串接層核對全部紀錄"]:::exec
+  P4(["P4 整合（專案層）"]):::ext
+  R["R 失敗分類<br/>決定退回哪裡（見失敗分類圖）"]:::route
+  IN1 --> M1
+  M1 -. "有問題要問客戶、SOC、HW" .-> WAIT
+  WAIT -. "答案回來" .-> M1
+  M1 --> H1 --> M2
+  IN2 --> M2
+  M2 --> Q2
+  Q2 -->|"有"| H2 --> M3
+  Q2 -->|"沒有，只在合約內補 case"| M3
+  IN3 --> M3
+  M3 --> M4
+  M4 --> M5
+  M5 -->|"必要 case 全部 PASS"| M6
+  M6 -->|"沒有未處置的阻擋項目"| M7
+  M7 --> P4
+  M2 -. "spec 條目轉不成 case、<br/>平台觀察不到" .-> R
+  M3 -. "需求或架構爭議" .-> R
+  M4 -. "需要改計畫以外的檔案" .-> R
+  M5 -. "case FAIL、環境錯誤、驗證缺口" .-> R
+  M6 -. "需要修正" .-> R
+  M7 -. "紀錄不齊或對不上目前版本" .-> R
   classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
   classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
   classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
-  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;

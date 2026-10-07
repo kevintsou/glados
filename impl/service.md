@@ -32,32 +32,38 @@
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
 flowchart TD
-  subgraph ENTRY["操作入口（不實作放行規則）"]
-    GUI["openBCT GUI<br/>GLADOS 分頁"]:::exec
-    CLI["CLI"]:::exec
-    API["API／MCP"]:::exec
+  subgraph ENTRY["操作入口：只送要求，不自己判斷放行"]
+    GUI["openBCT GLADOS 分頁"]:::ext
+    CLI["CLI"]:::ext
+    API["API／MCP"]:::ext
   end
-  GUI -->|"開啟時連線／按需啟動"| SVC
-  CLI -->|"獨立啟動／停止"| SVC
+  SVC["串接層服務（獨立背景程式）<br/>觀察、版本同步、守門、派工"]:::route
+  REC[("受保護的紀錄 branch<br/>通過紀錄、核准索引、正式進度、<br/>執行紀錄、版本同步報告")]:::store
+  APPR{{"人工核准<br/>MR approval、簽章 commit、Jira"}}:::human
+  WS["執行工作區<br/>按需 clone，固定輸入版本，遵守隔離"]:::exec
+  NODE["節點執行<br/>AI session、build、script"]:::exec
+  BR["模組工作 branch<br/>.glados/ 產出物與交接清單（申請）"]:::exec
+  OB["openBCT<br/>跑 case、借還設備"]:::exec
+  GUI -->|"開啟時連線，必要時啟動服務"| SVC
+  CLI -->|"單獨啟動或停止"| SVC
   API --> SVC
-  SVC["串接層服務（獨立背景程式）<br/>觀察、版本同步、守門、派工<br/>持久保存執行紀錄、核准索引、正式進度"]:::route
-  SVC -->|"唯一可寫"| REC["受保護的紀錄 branch<br/>通過紀錄、核准索引、正式進度、版本同步報告"]:::human
-  SVC -->|"按需 clone／worktree<br/>固定輸入版本、遵守隔離"| WS["執行工作區"]:::exec
-  WS --> NODE["節點執行<br/>AI 獨立 session／build／script"]:::exec
-  NODE -->|"產出＋交接清單（申請）"| BR["模組工作 branch<br/>.glados/ artifacts、handoff"]:::exec
-  BR -->|"回收、核對"| SVC
-  SVC -->|"跑 case、借還設備"| OB["openBCT 測試執行與 lab worker<br/>測試執行器、設備鎖（DeviceLease）"]:::exec
+  APPR -->|"服務核對身分與版本後建立索引"| SVC
+  SVC -->|"跑 case、借設備"| OB
   OB -->|"報告（服務核對後才採用）"| SVC
-  GUI -. "查詢正式紀錄（免 clone）" .-> REC
-  LIFE["生命週期獨立：關閉 GUI 不停止服務<br/>主動停止後不立即自動重啟<br/>一般停止先收尾；立即停止記錄中斷"]:::note
-  GUI -.-> LIFE
+  SVC -->|"派工"| WS --> NODE -->|"產出與交接清單"| BR
+  BR -->|"回收、核對"| SVC
+  SVC ==>|"只有服務能寫入"| REC
+  GUI -. "只看進度時直接讀，不用 clone" .-> REC
   classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
   classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
   classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
-  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
 ```
 
 [可編輯 Mermaid 圖源](../diagrams/glados_service_architecture.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。 粗線＝只有串接層服務能寫入正式紀錄。
 
 | 元件 | 角色 | 能寫正式紀錄嗎 |
 | :---- | :---- | :---- |
@@ -144,25 +150,32 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 ### I6.1 服務生命週期圖
 
 ```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
 flowchart TD
-  OPEN["開啟 openBCT GLADOS 分頁"] --> CHECK{"服務狀態可確認？"}
-  CHECK -->|無法確認| UNKNOWN["顯示無法連線；不重複啟動"]
-  CHECK -->|已停止| START["啟動單一服務實例"]
-  CHECK -->|運行中| CONNECT["連線既有服務"]
-  START --> CONNECT
-  CONNECT --> RUN["獨立背景執行；派工仍依專案規則與關卡"]
-  RUN -->|關閉分頁或 openBCT| BACKGROUND["服務繼續執行"]
-  RUN -->|使用者一般停止| DRAIN["停止新派工；顯示停止中"]
-  DRAIN --> SAVE["目前的執行回收並保存；等待核准／待同步狀態持久保存"]
-  RUN -->|使用者立即停止| CANCEL["要求取消；保存產出、log 與中斷狀態"]
-  SAVE --> STOP["服務退出；已開啟的分頁不自動重啟"]
+  OPEN(["開啟 openBCT GLADOS 分頁"]):::ext --> CHECK{"服務狀態？"}:::route
+  MANUAL(["使用者手動啟動服務"]):::ext --> START
+  CHECK -->|"運行中"| CONNECT["連線既有服務"]:::exec
+  CHECK -->|"已停止"| START["啟動服務<br/>同時只會有一個"]:::exec
+  CHECK -->|"無法確認"| UNKNOWN["顯示「無法連線」<br/>不重複啟動"]:::ext
+  START --> RECOVER["先核對上次留下的執行、<br/>設備與待同步紀錄"]:::route
+  RECOVER --> CONNECT
+  CONNECT --> RUN["服務在背景執行<br/>派工仍依專案規則與關卡"]:::exec
+  RUN -->|"關閉分頁或 openBCT"| BG["服務繼續執行"]:::exec
+  RUN -->|"一般停止"| DRAIN["停止新派工，顯示「停止中」<br/>等目前的執行回收並保存"]:::exec
+  RUN -->|"立即停止"| CANCEL["要求取消<br/>保存產出、log 與中斷狀態"]:::exec
+  CANCEL -.-> UNCONF["沒能確認停止的執行端或設備<br/>標示「待核對」"]:::human
+  DRAIN --> STOP["服務退出<br/>已開啟的分頁不會自動把它重啟"]:::exec
   CANCEL --> STOP
-  STOP -->|手動啟動或再次開啟分頁| RECOVER["核對殘留執行、設備與待同步紀錄"]
-  RECOVER --> RUN
-  CANCEL -.-> UNCONFIRMED["取消未確認：worker／設備待核對；不推定已停止或釋放"]
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
 ```
 
 [可編輯 Mermaid 圖源](../diagrams/glados_service_lifecycle.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。 每次啟動服務（不論是開分頁時自動啟動或手動啟動），都先核對上次留下的執行、設備與待同步紀錄。
 
 ---
 

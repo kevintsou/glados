@@ -45,6 +45,42 @@ LLM 可以提供影響分析或失敗判讀，但只是給規則的輸入，不�
 
 ## 3.3 派工與放行
 
+**圖：一次派工到放行**
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart TD
+  A["派工前檢查<br/>版本同步、輸入已通過且有效、<br/>核准齊全、沒有其他執行中、環境可用"]:::route
+  B["固定輸入版本，派工<br/>每次都開新的 session"]:::route
+  N["節點執行<br/>AI、人、工具或 script 都可以"]:::exec
+  H["交出產出物與交接清單<br/>（只是申請）"]:::exec
+  S2{"放行前檢查：<br/>輸入有被改嗎？"}:::route
+  CK["串接層執行出口檢查<br/>自行核對、工具執行、獨立審查"]:::route
+  EV[("證據紀錄<br/>綁定目前的版本與 hash")]:::store
+  Q{"出口檢查都通過？"}:::route
+  G{{"出口關卡：等人核准"}}:::human
+  REC[("寫入正式紀錄：已通過<br/>決定下一站")]:::store
+  R(["交給 R 失敗分類"]):::ext
+  OLD(["結果保留但不放行<br/>依版本同步判斷重跑或重走"]):::ext
+  A --> B --> N --> H --> S2
+  S2 -->|"有"| OLD
+  S2 -->|"沒有"| CK --> EV --> Q
+  Q -->|"沒有"| R
+  Q -->|"通過，這站有關卡"| G
+  Q -->|"通過，這站沒有關卡"| REC
+  G -->|"核准"| REC
+  G -. "不核准：回本節點修正" .-> A
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
+```
+
+[可編輯 Mermaid 圖源](../diagrams/glados_dispatch_release.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。
+
 ### 派工前要滿足的條件（依序）
 
 1. **S 版本同步的派工前檢查通過**，並固定這次要用的輸入 commit 與所有上游產出物版本。
@@ -59,11 +95,12 @@ LLM 可以提供影響分析或失敗判讀，但只是給規則的輸入，不�
 1. 收集產出、交接清單與 log。
 2. **S 版本同步的放行前檢查**：比對執行期間新增的 commit。輸入在執行期間被改了，結果保留但不放行（[§3.8](#38-s-版本同步與影響檢查)）。
 3. 核對交接清單格式與每個檔案的 hash。
-4. 執行節點卡列的出口檢查：自行核對的直接算；需要工具的派工去跑；需要獨立審查的確認有審查證據；需要人工核准的確認有核准紀錄。
-5. 全部通過 → 把產出物設為「已通過」，寫入正式紀錄並同步。
-6. 更新正式進度；再做一次派工前檢查，決定下一站。
+4. 執行節點卡列的出口檢查：自行核對的直接算；需要工具的派工去跑；需要獨立審查的確認有審查證據。每個檢查都留下證據紀錄。
+5. 這一站有出口關卡時，等人核准（節點狀態為「等待核准」）。不核准就回本節點修正。
+6. 檢查全過、必要核准齊全 → 把產出物設為「已通過」，寫入正式紀錄並同步。
+7. 更新正式進度；再做一次派工前檢查，決定下一站。
 
-任何一步不通過，交給 [§3.6 R 失敗分類](#36-r-失敗分類與退回)決定去處。**程式正常結束（exit 0）只代表程式跑完了，不代表節點完成。**
+出口檢查沒過，交給 [§3.6 R 失敗分類](#36-r-失敗分類與退回)決定去處。**程式正常結束（exit 0）只代表程式跑完了，不代表節點完成。**
 
 ---
 
@@ -98,6 +135,45 @@ v0.7 把狀態分成五組，各自獨立：產出物處理狀態、產出物有
 ### 3.4.3 節點狀態
 
 專案層節點每個專案一份；模組層節點每個模組一份。
+
+**圖：節點狀態**
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart LR
+  P["待開始"]:::exec
+  RD["可開始"]:::exec
+  RUN["執行中"]:::exec
+  WX["等待外部回覆"]:::ext
+  CK["交接檢查中"]:::exec
+  WA{{"等待核准"}}:::human
+  DN[("完成")]:::store
+  HM{{"交給人"}}:::human
+  BACK(["依人的決定回到流程：<br/>重跑、退回其他節點，<br/>或人自己做完交出交接清單"]):::ext
+  P -->|"進入條件滿足"| RD
+  RD -->|"派工"| RUN
+  RUN -->|"執行結束"| CK
+  CK -->|"通過，有關卡"| WA
+  WA -->|"核准"| DN
+  CK -->|"通過，沒有關卡"| DN
+  RUN -. "要問外部" .-> WX
+  WX -. "答案回來" .-> RD
+  CK -. "沒過，本節點重做" .-> RD
+  WA -. "不核准，修正" .-> RD
+  CK -. "沒過，退回其他節點；<br/>或執行期間輸入被改" .-> P
+  DN -. "輸出過期" .-> P
+  CK -. "超過輪數、環境問題、<br/>判不出原因" .-> HM
+  HM -.-> BACK
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
+```
+
+[可編輯 Mermaid 圖源](../diagrams/glados_node_state.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。 圖上把「交給人之後怎麼回到流程」收成一個方框，細節見下表與 [§3.10](#310-迴圈上限與交給人)。
 
 | 狀態 | 意思 |
 | :---- | :---- |
@@ -169,29 +245,34 @@ v0.7 把狀態分成五組，各自獨立：產出物處理狀態、產出物有
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
-flowchart TB
-  CR["CR／來源"]:::route --> SPEC["spec 條目　B2@v2"]:::exec
-  SPEC --> CON["驗收合約（H2 核准）"]:::exec
-  APP{{"人工核准：獨立紀錄<br/>身分＋範圍＋對象版本／hash"}}:::human --> CON
-  CON --> CASE["case　版本＋hash"]:::exec
-  CASE --> PLAN["計畫步驟（引用 case）"]:::exec
-  PLAN --> DIFF["commit／diff（引用計畫步驟）"]:::exec
-  DIFF --> IMG["build → image hash"]:::exec
-  CASE --> TS["測試集合版本／hash"]:::exec
-  ENV["驗證環境版本／設定 hash"]:::exec
-  IMG --> REP["驗證報告＋原始 log＋執行編號<br/>綁 image、測試集合、環境、驗收合約版本"]:::exec
-  TS --> REP
-  ENV --> REP
-  SPEC -. "改版：相依的定義過期" .-> CASE
-  IMG -. "改變：該 image 的 M5／P4／P5 全部重跑" .-> REP
-  N["註記：需求鏈依條目相依判斷要不要重寫，<br/>未受影響的 spec／case 定義保持有效；<br/>但有效的 case 定義，不等於可以沿用舊 image 的 PASS"]:::note
+flowchart LR
+  subgraph REQ["需求鏈：上游改版時，只有相連的那條鏈過期"]
+    direction LR
+    CR["CR 或其他來源"]:::ext --> SPEC["spec 條目 B2（第 2 版）<br/>經 H1 核准"]:::exec --> CON["驗收合約<br/>經 H2 核准"]:::exec --> CASE["case"]:::exec --> PLAN["計畫步驟"]:::exec --> COMMIT["commit"]:::exec
+  end
+  subgraph EVI["驗證證據：image、測試集合、驗證環境任何一個變了，報告就過期"]
+    direction LR
+    IMG["image<br/>（由 commit build 出來）"]:::exec
+    TS["測試集合<br/>（由 case 組成）"]:::exec
+    ENV["驗證環境"]:::exec
+    REP[("驗證報告＋原始 log")]:::store
+    IMG --> REP
+    TS --> REP
+    ENV --> REP
+  end
+  COMMIT --> IMG
+  CASE --> TS
+  CON --> REP
   classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
   classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
   classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
-  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
 ```
 
 [可編輯 Mermaid 圖源](../diagrams/glados_cr_trace.mmd)
+
+怎麼看這張圖：箭頭從上游指向下游，上游改版時，箭頭指到的東西就過期。左邊框是**需求鏈**，右邊框是**驗證證據**；驗證報告同時綁定 image、測試集合、驗證環境與驗收合約的版本。
 
 1. spec 寫成有編號的條目（B1、B2…），不能是一整段敘述。
 2. 每個產出物寫明引用的上游條目和版本：case 寫「依賴 spec 的 B2 第 1 版」；計畫的每一步寫對應哪些 case；commit message 寫對應的計畫步驟。格式見 [04 §4.2](04_records.md)。
@@ -217,16 +298,44 @@ flowchart TB
 
 ## 3.6 R 失敗分類與退回
 
-模組內部發現問題時（M5 驗證失敗、M6 審查要求修正、M3 遇到需求或架構爭議、檢查沒過），依下表決定退回哪裡：
+模組內部或專案層發現問題時（M2 的 spec 條目轉不成 case 或平台觀察不到、M3 遇到需求或架構爭議、M4 需要改計畫以外的檔案、M5 驗證失敗、M6 審查要求修正、M7 交接核對沒過、P4 整合或 P5 全量驗收失敗），依下表決定退回哪裡。
+
+**圖：R 失敗分類的去處**
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart LR
+  IN(["M2–M7、P4、P5<br/>發現問題"]):::ext --> R{"R 失敗分類<br/>依規則判斷類型<br/>（規則判不出來時，<br/>派一次獨立分析參考）"}:::route
+  R -->|"code 錯"| D1["回 M4 實作與 build<br/>計入輪數"]:::ext
+  R -->|"計畫不夠用"| D2["回 M3 實作計畫"]:::ext
+  R -->|"測試實作錯"| D3["回 M2 驗收定義<br/>在合約內修正"]:::ext
+  R -->|"驗收標準要改"| D4["回 M2，經 H2 核准<br/>（需求也變就先回 M1）"]:::human
+  R -->|"spec 缺口或矛盾"| D5["回 M1，經 H1 核准"]:::human
+  R -->|"介面衝突"| D6["回 P3，經 G2 核准"]:::human
+  R -->|"交接紀錄過期或不齊"| D7["從最早過期的那一站重走"]:::ext
+  R -->|"環境問題、驗證缺口、<br/>連續 3 輪同樣失敗"| D8["交給人"]:::human
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
+```
+
+[可編輯 Mermaid 圖源](../diagrams/glados_failure_routing.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。
 
 | 失敗類型 | 怎麼判斷 | 要改版的產出物 | 退回 | 需要人嗎？ |
 | :---- | :---- | :---- | :---- | :---- |
 | code 錯 | 測試符合 spec，實作不符 | diff | M4 | 不用，計入輪數 |
+| 計畫不夠用 | 需要改計畫以外的檔案，或計畫的步驟做不出來 | 實作計畫 | M3 | 不用 |
 | 測試實作錯 | case 沒有落實已核准的驗收合約 | case／測試腳本 | M2 | 不用；在合約內修正，經獨立審查放行。若要改標準則須 H2 |
 | 驗收標準要改 | 預期行為、判定方式或必要覆蓋要改 | 驗收合約 | M2（需求有變則先 M1） | 要（H2；需求變更另須 H1） |
 | spec 缺口或矛盾 | spec 沒定義這個行為，或來源互相衝突 | spec 條目 | M1 | 要 |
 | 介面衝突 | 必須改其他模組的介面 | 架構文件 | P3 | 要 |
+| 交接紀錄過期或不齊 | M7 或 P4 核對時，發現產出物過期、核准不對應目前版本、或證據對不上 | — | 依 [§3.5](#35-過期與重新進入)，從最早過期的那一站重走 | 依重走那一站的關卡 |
 | 環境問題 | 驗證平台或工具異常 | — | 交給人 | 要 |
+| 驗證缺口 | 平台觸發不了或觀察不到 | — | 交給人，決定補哪種驗證手段 | 要 |
 | 沒有進展 | 連續 3 輪同樣的失敗 | — | 交給人 | 要 |
 
 其他規則：
@@ -239,6 +348,32 @@ flowchart TB
 ---
 
 ## 3.7 C 變更分析：變更 CR 怎麼處理
+
+**圖：變更處理**
+
+```mermaid
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart TD
+  CR(["變更 CR（T0 之後進來）"]):::ext --> C
+  SF(["S 版本同步發現<br/>需要範圍或需求決策"]):::ext --> C
+  C["C 變更分析<br/>產出影響報告"]:::exec --> GC{{"GC 變更核准<br/>這一版接不接？"}}:::human
+  GC -->|"不接"| DEFER[("記錄：延後或拒絕")]:::store
+  GC -->|"接"| K{"改到哪一種產出物？"}:::route
+  K -->|"專案設定<br/>（基底、平台、toolchain）"| E0["從 P0／P1 重走<br/>所有證據過期，重開 G0"]:::ext
+  K -->|"差異分析<br/>（全新功能）"| E2["P2 追加模組<br/>新模組從 M1 開始，重開 G1"]:::ext
+  K -->|"架構<br/>（介面或記憶體預算）"| E3["從 P3 重走，重開 G2<br/>依賴該介面的模組從 M3 重走"]:::ext
+  K -->|"spec 條目<br/>（需求改了）"| E4["該模組從 M1 重走<br/>只重走改動條目往下的鏈，H1 審差異"]:::ext
+  K -->|"case<br/>（既有行為的 bug）"| E5["該模組在 M2 補重現 bug 的 case<br/>再走 M3 → M4"]:::ext
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
+```
+
+[可編輯 Mermaid 圖源](../diagrams/glados_change_flow.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。
 
 **R、C、S 的分工**：R 處理模組內部的失敗；C 處理外部進來的變更 CR，以及需要核准的範圍或需求變更；S 偵測 repo 的版本差異（包括人工穿插的 commit），先分類與分析影響，再沿用 C、R 與過期機制。S 不會自己放寬需求或驗收標準。
 
@@ -276,25 +411,29 @@ flowchart TB
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
 flowchart TD
-  T["觸發：開啟／更新專案、新 commit、派工前、結果放行前"]:::route --> SNAP["固定 branch 快照<br/>比對已檢查的 SHA、執行時的輸入 SHA、FW／測試／設定 hash"]:::exec
-  SNAP --> AN["規則分類差異＋必要獨立影響分析<br/>功能／需求／介面含義不靠路徑猜測；核准決策仍交給人"]:::exec
-  AN --> META["純進度／索引更新<br/>FW 與相依內容未變"]:::exec
-  AN --> CHG["FW／測試／需求／設定變更"]:::route
-  AN --> CON["重疊衝突／分岔／影響未知"]:::human
-  META --> OK["更新同步位置，保留有效證據<br/>核對出口條件與必要核准"]:::exec
-  CHG --> INV["標記受影響產出與證據<br/>沿用 C／R 與重新進入規則<br/>人工實作可接續，不必 AI 重寫"]:::route
-  CON --> BLK["阻擋放行，保留人工改動與執行結果<br/>不默默 reset、merge 或 rebase"]:::human
-  BLK -->|解決後| SNAP
-  OK --> GUARD["派工／放行前再次確認 branch 版本<br/>由串接層服務統一認領與派工"]:::exec
-  INV --> GUARD
-  N["註記：SHA 定位版本；內容 hash 判斷影響<br/>.glados/ 的純進度 commit 不使 FW 證據過期<br/>程式正常結束 ≠ 交接完成"]:::note
+  T(["開啟專案、偵測到新 commit、<br/>派工前、放行前"]):::ext --> SNAP["固定這次讀到的 commit<br/>和上次檢查過的版本比對"]:::route
+  SNAP --> K{"這次有什麼變更？"}:::route
+  K -->|"只有進度紀錄"| A1["更新已檢查的位置<br/>證據保持有效"]:::route
+  K -->|"有人手動改了 FW code"| A2["登記人工 diff，重新 build<br/>舊證據過期，從 M5 驗證重走<br/>（必要時先核對 M3 計畫）"]:::route
+  K -->|"需求、介面、預算、<br/>專案設定改了"| A3["交給 C 變更分析與關卡<br/>已經在 repo 裡，不等於已核准"]:::human
+  K -->|"測試或驗證環境改了"| A4["相關證據過期<br/>回 M2，或處理環境"]:::route
+  K -->|"執行期間輸入被改了"| A5["結果保留但不放行<br/>判斷重跑或從哪裡重走"]:::route
+  K -->|"分岔、衝突、未提交的修改、<br/>影響無法確認"| A6["擋住，交給人<br/>不自動 reset、merge、rebase"]:::human
+  A6 -. "人處理完" .-> SNAP
+  A1 --> OK["派工或放行前<br/>再確認一次 branch 沒變"]:::route
+  A2 --> OK
+  A4 --> OK
+  A5 --> OK
   classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
   classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
   classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
-  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
 ```
 
 [可編輯 Mermaid 圖源](../diagrams/glados_sync_flow.mmd)
+
+圖例：藍色＝節點或執行步驟；橘色＝需要人（關卡、核准、交給人）；紫色＝串接層的判斷；綠色＝紀錄；灰色＝這張圖以外的節點或起點。實線＝正常往下走；虛線＝失敗、退回或等待。 圖上六種變更和下方表格一一對應。
 
 **什麼時候執行**：開啟或更新專案、每次派工前、節點回收與結果放行前、偵測到追蹤中 branch 的新 commit。單純查詢時可以只讀分析、顯示「待同步」；修改正式紀錄與派工由串接層服務統一執行。
 

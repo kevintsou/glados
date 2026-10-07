@@ -1,16 +1,21 @@
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
 flowchart TD
-  OPEN["開啟 openBCT GLADOS 分頁"] --> CHECK{"服務狀態可確認？"}
-  CHECK -->|無法確認| UNKNOWN["顯示無法連線；不重複啟動"]
-  CHECK -->|已停止| START["啟動單一服務實例"]
-  CHECK -->|運行中| CONNECT["連線既有服務"]
-  START --> CONNECT
-  CONNECT --> RUN["獨立背景執行；派工仍依專案規則與關卡"]
-  RUN -->|關閉分頁或 openBCT| BACKGROUND["服務繼續執行"]
-  RUN -->|使用者一般停止| DRAIN["停止新派工；顯示停止中"]
-  DRAIN --> SAVE["目前的執行回收並保存；等待核准／待同步狀態持久保存"]
-  RUN -->|使用者立即停止| CANCEL["要求取消；保存產出、log 與中斷狀態"]
-  SAVE --> STOP["服務退出；已開啟的分頁不自動重啟"]
+  OPEN(["開啟 openBCT GLADOS 分頁"]):::ext --> CHECK{"服務狀態？"}:::route
+  MANUAL(["使用者手動啟動服務"]):::ext --> START
+  CHECK -->|"運行中"| CONNECT["連線既有服務"]:::exec
+  CHECK -->|"已停止"| START["啟動服務<br/>同時只會有一個"]:::exec
+  CHECK -->|"無法確認"| UNKNOWN["顯示「無法連線」<br/>不重複啟動"]:::ext
+  START --> RECOVER["先核對上次留下的執行、<br/>設備與待同步紀錄"]:::route
+  RECOVER --> CONNECT
+  CONNECT --> RUN["服務在背景執行<br/>派工仍依專案規則與關卡"]:::exec
+  RUN -->|"關閉分頁或 openBCT"| BG["服務繼續執行"]:::exec
+  RUN -->|"一般停止"| DRAIN["停止新派工，顯示「停止中」<br/>等目前的執行回收並保存"]:::exec
+  RUN -->|"立即停止"| CANCEL["要求取消<br/>保存產出、log 與中斷狀態"]:::exec
+  CANCEL -.-> UNCONF["沒能確認停止的執行端或設備<br/>標示「待核對」"]:::human
+  DRAIN --> STOP["服務退出<br/>已開啟的分頁不會自動把它重啟"]:::exec
   CANCEL --> STOP
-  STOP -->|手動啟動或再次開啟分頁| RECOVER["核對殘留執行、設備與待同步紀錄"]
-  RECOVER --> RUN
-  CANCEL -.-> UNCONFIRMED["取消未確認：worker／設備待核對；不推定已停止或釋放"]
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef store fill:#E6F4EA,stroke:#4E9A6A,color:#1E4D2B;
+  classDef ext fill:#F3F4F6,stroke:#9AA3AE,color:#444B55;
