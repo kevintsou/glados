@@ -11,7 +11,7 @@ flowchart TD
   M3 --> M4["M4 實作＋build<br/>限定路徑、0 warning、預算內"]:::exec
   M4 --> M5["M5 驗證<br/>image／測試／環境版本一致"]:::exec
   M5 -->|PASS| M6["M6 獨立審查<br/>逐項處置；證據綁 diff hash"]:::exec
-  M6 -->|"無未解決阻擋項目"| M7["M7 完成交接<br/>accepted、current、必要核准齊全"]:::exec
+  M6 -->|"無未解決阻擋項目"| M7["M7 完成交接<br/>產出物已通過且有效、必要核准齊全"]:::exec
   M7 --> P4["P4 整合（專案層）"]:::note
   M5 -->|FAIL| R["R 失敗分類<br/>規則為主、必要獨立判讀"]:::route
   M6 -. "需修正" .-> R

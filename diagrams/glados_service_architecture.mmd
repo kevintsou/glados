@@ -8,13 +8,13 @@ flowchart TD
   GUI -->|"開啟時連線／按需啟動"| SVC
   CLI -->|"獨立啟動／停止"| SVC
   API --> SVC
-  SVC["串接層服務（獨立背景程式）<br/>觀察、S、守門、派工<br/>持久化 run、核准索引、正式進度"]:::route
-  SVC -->|"唯一可寫"| REC["受保護紀錄 ref<br/>accepted、核准索引、正式進度、S 報告"]:::human
+  SVC["串接層服務（獨立背景程式）<br/>觀察、版本同步、守門、派工<br/>持久保存執行紀錄、核准索引、正式進度"]:::route
+  SVC -->|"唯一可寫"| REC["受保護的紀錄 branch<br/>通過紀錄、核准索引、正式進度、版本同步報告"]:::human
   SVC -->|"按需 clone／worktree<br/>固定輸入版本、遵守隔離"| WS["執行工作區"]:::exec
   WS --> NODE["節點執行<br/>AI 獨立 session／build／script"]:::exec
   NODE -->|"產出＋交接清單（申請）"| BR["模組工作 branch<br/>.glados/ artifacts、handoff"]:::exec
   BR -->|"回收、核對"| SVC
-  SVC -->|"跑 case、借還設備"| OB["openBCT 測試執行與 lab worker<br/>Orchestrator、DeviceLease"]:::exec
+  SVC -->|"跑 case、借還設備"| OB["openBCT 測試執行與 lab worker<br/>測試執行器、設備鎖（DeviceLease）"]:::exec
   OB -->|"報告（服務核對後才採用）"| SVC
   GUI -. "查詢正式紀錄（免 clone）" .-> REC
   LIFE["生命週期獨立：關閉 GUI 不停止服務<br/>主動停止後不立即自動重啟<br/>一般停止先收尾；立即停止記錄中斷"]:::note

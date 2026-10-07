@@ -4,15 +4,15 @@ flowchart TB
   SPEC --> CON["驗收合約（H2 核准）"]:::exec
   APP{{"人工核准：獨立紀錄<br/>身分＋範圍＋對象版本／hash"}}:::human --> CON
   CON --> CASE["case　版本＋hash"]:::exec
-  CASE --> PLAN["plan 步驟（引用 case）"]:::exec
-  PLAN --> DIFF["commit／diff（引用 plan 步驟）"]:::exec
+  CASE --> PLAN["計畫步驟（引用 case）"]:::exec
+  PLAN --> DIFF["commit／diff（引用計畫步驟）"]:::exec
   DIFF --> IMG["build → image hash"]:::exec
   CASE --> TS["測試集合版本／hash"]:::exec
   ENV["驗證環境版本／設定 hash"]:::exec
-  IMG --> REP["驗證報告＋原始 log＋執行 ID<br/>綁 image、測試集合、環境、驗收合約版本"]:::exec
+  IMG --> REP["驗證報告＋原始 log＋執行編號<br/>綁 image、測試集合、環境、驗收合約版本"]:::exec
   TS --> REP
   ENV --> REP
-  SPEC -. "改版：相依的定義 stale" .-> CASE
+  SPEC -. "改版：相依的定義過期" .-> CASE
   IMG -. "改變：該 image 的 M5／P4／P5 全部重跑" .-> REP
   N["註記：需求鏈依條目相依判斷要不要重寫，<br/>未受影響的 spec／case 定義保持有效；<br/>但有效的 case 定義，不等於可以沿用舊 image 的 PASS"]:::note
   classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
