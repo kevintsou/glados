@@ -1,0 +1,45 @@
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart LR
+  subgraph MAIN["主流程　◆ 橘色連線＝必須通過的人工核准關卡"]
+    direction TB
+    P0["P0 專案啟動<br/>專案設定、T0、起點、KB 快照"]:::exec
+    P1["P1 基線建立<br/>build 與既有功能基準"]:::exec
+    P2["P2 差異分析<br/>範圍 CR → 模組、regression 範圍"]:::exec
+    P3["P3 架構與介面<br/>介面合約、記憶體預算"]:::exec
+    M["模組 × N｜M1–M7<br/>交接齊全、證據有效、必要核准齊全"]:::exec
+    P4["P4 整合<br/>端到端 boot flow"]:::exec
+    P5["P5 全量驗收<br/>regression、靜態分析、安全審查"]:::exec
+    P6["P6 交付<br/>release／ROM tapeout"]:::exec
+    P7["P7 回寫＋人確認<br/>KB、規則、skill、hook、eval"]:::exec
+    P0 -->|"◆ G0 啟動核准"| P1
+    P1 --> P2
+    P2 -->|"◆ G1 範圍核准"| P3
+    P3 -->|"◆ G2 架構 DR"| M
+    M --> P4
+    P4 --> P5
+    P5 -->|"◆ G3 最終交付核准"| P6
+    P6 --> P7
+    P4 -. "失敗：對應模組" .-> M
+    P5 -. "失敗：對應模組" .-> M
+    M -. "介面衝突" .-> P3
+  end
+  subgraph CHG["變更處理與版本守門"]
+    direction TB
+    CR["變更 CR<br/>T0 之後進來"]:::route
+    C["C 影響分析<br/>改到哪個產出物、哪些下游過期"]:::route
+    GC{{"GC 這版接不接"}}:::human
+    DEFER["記錄延後或拒絕"]:::route
+    STALE["改版上游產出物，標記下游 stale<br/>從重新進入點重走：<br/>project → P0／P1　delta → P2<br/>arch → P3　spec → M1　case → M2"]:::route
+    S["S 版本守門（註記）<br/>開啟專案、偵測新 commit、<br/>每次派工前、結果放行前都執行；<br/>人工 commit 也經過 S，<br/>沿用 C／R 與過期規則"]:::note
+    CR --> C
+    C --> GC
+    GC -->|不接| DEFER
+    GC -->|接| STALE
+    STALE ~~~ S
+  end
+  MAIN ~~~ CHG
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;
+  linkStyle 0,2,3,6 stroke:#C08A3E,stroke-width:2.5px

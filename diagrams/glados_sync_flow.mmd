@@ -1,0 +1,18 @@
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart TD
+  T["觸發：開啟／更新專案、新 commit、派工前、結果放行前"]:::route --> SNAP["固定 ref 快照<br/>比對已檢查 SHA、run 輸入 SHA、FW／測試／設定 hash"]:::exec
+  SNAP --> AN["規則分類差異＋必要獨立影響分析<br/>功能／需求／介面含義不靠路徑猜測；核准決策仍交給人"]:::exec
+  AN --> META["純進度／索引更新<br/>FW 與相依內容未變"]:::exec
+  AN --> CHG["FW／測試／需求／設定變更"]:::route
+  AN --> CON["重疊衝突／分岔／影響未知"]:::human
+  META --> OK["更新同步位置，保留有效證據<br/>核對出口條件與必要核准"]:::exec
+  CHG --> INV["標記受影響產出與證據<br/>沿用 C／R 與重新進入規則<br/>人工實作可接續，不必 AI 重寫"]:::route
+  CON --> BLK["阻擋放行，保留人工改動與執行結果<br/>不默默 reset、merge 或 rebase"]:::human
+  BLK -->|解決後| SNAP
+  OK --> GUARD["派工／放行前再次確認 ref<br/>由串接層服務統一認領與派工"]:::exec
+  INV --> GUARD
+  N["註記：SHA 定位版本；內容 hash 判斷影響<br/>.glados/ 的純進度 commit 不使 FW 證據過期<br/>exit 0 ≠ 交接完成"]:::note
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;

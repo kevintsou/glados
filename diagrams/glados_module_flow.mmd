@@ -1,0 +1,24 @@
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart TD
+  IN1["P3 展開／需求變更"]:::route -.-> M1
+  IN2["bug 型 CR"]:::route -.-> M2
+  IN3["介面／預算變更"]:::route -.-> M3
+  M1["M1 需求釐清<br/>有編號 spec；TBD 清空"]:::exec --> H1{{"H1 核准需求"}}:::human
+  H1 --> M2["M2 驗收定義<br/>驗收合約＋測試實作＋判別能力證據"]:::exec
+  M2 -. "合約新增／變更" .-> H2{{"H2 核准驗收合約<br/>合約內補 case 不重開"}}:::human
+  H2 --> M3
+  M2 -->|"合約已核准；測試經獨立審查與工具檢查"| M3["M3 實作計畫＋獨立審查<br/>阻擋項目在 M3 內修計畫重審"]:::exec
+  M3 --> M4["M4 實作＋build<br/>限定路徑、0 warning、預算內"]:::exec
+  M4 --> M5["M5 驗證<br/>image／測試／環境版本一致"]:::exec
+  M5 -->|PASS| M6["M6 獨立審查<br/>逐項處置；證據綁 diff hash"]:::exec
+  M6 -->|"無未解決阻擋項目"| M7["M7 完成交接<br/>accepted、current、必要核准齊全"]:::exec
+  M7 --> P4["P4 整合（專案層）"]:::note
+  M5 -->|FAIL| R["R 失敗分類<br/>規則為主、必要獨立判讀"]:::route
+  M6 -. "需修正" .-> R
+  M3 -. "需求／架構爭議" .-> R
+  R -. "code 錯" .-> M4
+  R --> OTHER["其他退回<br/>測試實作錯 → M2<br/>驗收標準需改 → M2＋H2<br/>spec 缺口 → M1＋H1<br/>介面衝突 → P3＋G2<br/>環境／超過輪數 → 交給人"]:::route
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;

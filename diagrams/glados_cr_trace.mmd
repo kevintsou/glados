@@ -1,0 +1,21 @@
+%%{init: {"theme":"base","themeVariables":{"fontSize":"15px","lineColor":"#5F6B7A","primaryTextColor":"#1F2D3D"},"flowchart":{"curve":"basis","nodeSpacing":36,"rankSpacing":46,"htmlLabels":true}}}%%
+flowchart TB
+  CR["CR／來源"]:::route --> SPEC["spec 條目　B2@v2"]:::exec
+  SPEC --> CON["驗收合約（H2 核准）"]:::exec
+  APP{{"人工核准：獨立紀錄<br/>身分＋範圍＋對象版本／hash"}}:::human --> CON
+  CON --> CASE["case　版本＋hash"]:::exec
+  CASE --> PLAN["plan 步驟（引用 case）"]:::exec
+  PLAN --> DIFF["commit／diff（引用 plan 步驟）"]:::exec
+  DIFF --> IMG["build → image hash"]:::exec
+  CASE --> TS["測試集合版本／hash"]:::exec
+  ENV["驗證環境版本／設定 hash"]:::exec
+  IMG --> REP["驗證報告＋原始 log＋執行 ID<br/>綁 image、測試集合、環境、驗收合約版本"]:::exec
+  TS --> REP
+  ENV --> REP
+  SPEC -. "改版：相依的定義 stale" .-> CASE
+  IMG -. "改變：該 image 的 M5／P4／P5 全部重跑" .-> REP
+  N["註記：需求鏈依條目相依判斷要不要重寫，<br/>未受影響的 spec／case 定義保持有效；<br/>但有效的 case 定義，不等於可以沿用舊 image 的 PASS"]:::note
+  classDef exec fill:#E8F0FB,stroke:#5B7DB1,color:#1F2D3D;
+  classDef human fill:#FFF0DB,stroke:#C08A3E,color:#5A3B0A;
+  classDef route fill:#EFE7FA,stroke:#8A6BBE,color:#3A2463;
+  classDef note fill:#FFFFFF,stroke:#9AA3AE,stroke-dasharray:5 4,color:#444B55;

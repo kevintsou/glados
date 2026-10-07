@@ -1,0 +1,16 @@
+flowchart TD
+  OPEN["開啟 openBCT GLADOS 分頁"] --> CHECK{"服務狀態可確認？"}
+  CHECK -->|無法確認| UNKNOWN["顯示無法連線；不重複啟動"]
+  CHECK -->|已停止| START["啟動單一服務實例"]
+  CHECK -->|運行中| CONNECT["連線既有服務"]
+  START --> CONNECT
+  CONNECT --> RUN["獨立背景執行；派工仍依專案規則與關卡"]
+  RUN -->|關閉分頁或 openBCT| BACKGROUND["服務繼續執行"]
+  RUN -->|使用者一般停止| DRAIN["停止新派工；顯示停止中"]
+  DRAIN --> SAVE["目前 run 回收並保存；等待核准／待同步狀態持久保存"]
+  RUN -->|使用者立即停止| CANCEL["要求取消；保存產出、log 與中斷狀態"]
+  SAVE --> STOP["服務退出；已開啟的分頁不自動重啟"]
+  CANCEL --> STOP
+  STOP -->|手動啟動或再次開啟分頁| RECOVER["核對殘留執行、設備與待同步紀錄"]
+  RECOVER --> RUN
+  CANCEL -.-> UNCONFIRMED["取消未確認：worker／設備待核對；不推定已停止或釋放"]
