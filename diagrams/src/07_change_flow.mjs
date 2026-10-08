@@ -6,7 +6,8 @@ export default {
   direction: "DOWN",
   uniform: false,
   nodes: [
-    { id: "CR", kind: "ext", title: "變更 CR", sub: "T0 之後進來" },
+    { id: "CR", kind: "ext", title: "變更 CR", sub: "範圍凍結點之後進來" },
+    { id: "XS", kind: "ext", title: "外部來源同步發現", sub: "CR 被改或取消、spec 頁改版" },
     { id: "SF", kind: "ext", title: "S 版本同步發現", sub: "需要範圍或需求決策" },
     { id: "C", tag: "C", title: "變更分析", sub: "產出影響報告" },
     { id: "GC", kind: "gate", title: "GC 變更核准", sub: "這一版接不接？" },
@@ -19,7 +20,7 @@ export default {
     { id: "E5", kind: "ext", title: "該模組在 M2 補 case", sub: ["重現 bug", "再走 M3 → M4"] },
   ],
   edges: [
-    ["CR", "C"], ["SF", "C"], ["C", "GC"],
+    ["CR", "C"], ["XS", "C"], ["SF", "C"], ["C", "GC"],
     ["GC", "DEFER", "不接"], ["GC", "K", "接"],
     ["K", "E0", "專案設定\n（基底、平台、toolchain）"],
     ["K", "E2", "差異分析\n（全新功能）"],

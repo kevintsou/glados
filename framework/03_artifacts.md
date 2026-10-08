@@ -12,8 +12,11 @@
 
 | 產出物 | 檔案位置 | 產出節點 | 會用到的節點 | 改版時從哪裡重走 |
 | :---- | :---- | :---- | :---- | :---- |
+| 來源快照 | `sources/`（Jira CR、Confluence spec 頁，每一項各自有版本與 hash） | 工具（串接層派工） | P0、P2、M1、C | G0 之前直接重抓；G0 之後只能經 C 改版，只有依賴改動項目的那條鏈過期 |
 | 專案說明 | `project.md` | P0 | 全部 | P0／P1；所有證據過期；重開 G0 |
-| 專案設定 | `profile.json` | P0 | 全部 | 同上 |
+| 範圍清單 | `scope.md` | P0 | P2、M1、P5、C | P0；依賴改動項目的鏈過期；重開 G0（只審差異） |
+| 專案設定 | `profile.json` | P0 | 全部 | P0／P1；所有證據過期；重開 G0 |
+| 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | 待確認（[08 框架第 16 項](08_open_questions.md#81-框架待決)） |
 | 基線報告 | `artifacts/baseline/` | P1 | P2、M2、P5 | P1，之後依相依重走 |
 | 差異分析 | `artifacts/delta.md` | P2 | P3、C、M1 | P2；新模組從 M1 開始；重開 G1 |
 | 架構文件 | `artifacts/arch.md` | P3 | M1、M3、M4、P4 | P3；依賴該介面的模組從 M3 重走；重開 G2 |
@@ -67,6 +70,18 @@
 
 純進度紀錄可以排除在 FW 來源 hash 之外，但 `.glados/` 裡的需求、合約、架構、專案設定或流程規則變更，仍依各自的相依類別檢查，不能整個目錄一律忽略。反過來，FW 來源 hash 沒變，也不代表測試、環境或人工核准一定還有效。
 
+### 外部來源：先凍結成快照才能引用
+
+Jira、Confluence 上的內容隨時會被改，不能直接當依據。規則：
+
+- **由工具抓，不由 AI 搜**：串接層派工具，依專案設定抓下來源快照。CR 範圍是專案設定指定的 Jira Epic；spec 頁是專案設定列出的頁面 ID（[07](07_project_profile.md)）。用什麼條件查、查齊了沒，由工具和檢查保證，不靠 AI 自己判斷。
+- **每一項都有版本與 hash**：
+  - Jira CR 本身沒有版本號，快照存完整的原始內容（含全部留言）、Jira 上的更新時間與內容 hash。
+  - Confluence 頁面本身有版本號，快照記錄頁面 ID、版本號與內容 hash，另外存一份內容（隔離的工作區可能連不到 Confluence）。
+- **完整性可以驗證**：快照記錄查詢條件和查詢回傳的總數；快照的張數必須等於總數。
+- **AI 只讀快照**：節點可以用 MCP 查線上內容找線索，但寫進產出物的依據必須引用快照裡的項目。發現快照以外的重要來源，就請工具把它加進快照。
+- **G0 之後的改版只能經 C**：G0 核准的快照凍結，抓取時間就是範圍凍結點（[01 §1.7](01_overview.md#17-用語表)）。之後 Jira／Confluence 上的差異由外部來源同步發現（[04 §4.7](04_rules.md#47-s-版本同步)），交給 C 變更分析；GC 接受後，才由工具產生來源快照的新版本。
+
 ---
 
 ## 3.3 產出物與核准的狀態
@@ -117,8 +132,9 @@ depends_on:               # 依賴的上游產出物（細到條目）
   - id: arch.md#IF-LCP-1
     version: v1
     hash: <內容 hash>
-  - id: cr/SDKBOOT-2421   # 外部來源，記錄讀取時的快照
-    snapshot: <快照編號或讀取時間>
+  - id: sources/jira/SDKBOOT-2421   # 來源快照裡的一項（§3.2）
+    version: v1
+    hash: <內容 hash>
 produced_by:              # 由哪個節點的哪次執行產出
   node: M1
   run_id: <執行編號>
@@ -322,13 +338,13 @@ confirmed_by: <確認處置的獨立審查執行編號>
 ```yaml
 format: glados.sync/v1
 sync_id: <編號>
-trigger: 新 commit              # 開啟專案／新 commit／派工前／放行前
-branch: <branch>
+trigger: 新 commit              # 開啟專案／新 commit／派工前／放行前／外部來源同步
+branch: <branch>                # 外部來源同步時改填來源快照的版本
 from_commit: <上次已檢查到的 commit>
 to_commit: <這次檢查到的 commit>
 changes:
-  - path: duan/app/boot/lcp/lcp.c
-    kind: FW                    # 進度紀錄／FW／測試／需求／介面／專案設定／驗證環境
+  - path: duan/app/boot/lcp/lcp.c   # 外部來源同步時填來源項目，例如 sources/jira/SDKBOOT-2421
+    kind: FW                    # 進度紀錄／FW／測試／需求／介面／專案設定／驗證環境／外部來源
     origin: human               # human（人工）／node（節點）／unknown（不明）
     hash_before: <hash>
     hash_after: <hash>
@@ -378,8 +394,11 @@ blocking:
   <FW source 與 build 檔案>
   .glados/
     projects/<專案編號>/
-      project.md               # 專案說明：範圍、T0、起點
+      project.md               # 專案說明：範圍凍結點、起點、禁看 branch
+      scope.md                 # 範圍清單：每一項新增、修改、保留、移除或這版不做
       profile.json             # 專案設定，不放機器密碼或 token
+      environment.json         # 環境清單：skill、MCP、工具、toolchain、知識庫的版本
+      sources/                 # 來源快照：Jira CR、Confluence spec 頁（工具產生）
       versions.json            # 已檢查到的 commit、FW 來源快照與內容 hash（串接層寫）
       workflow.json            # 流程版本、節點與執行規則
       artifacts/               # 產出物（見 §3.1）

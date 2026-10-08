@@ -5,10 +5,10 @@
 //   cd diagrams && npm install && node build.mjs
 import ELK from "elkjs/lib/elk.bundled.js";
 import { readdir, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 
-const HERE = path.dirname(new URL(import.meta.url).pathname);
+const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FONT = "'PingFang TC','Noto Sans TC','Microsoft JhengHei','Noto Sans CJK TC',system-ui,-apple-system,'Segoe UI',sans-serif";
 
 // ---------- theme ----------------------------------------------------------

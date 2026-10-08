@@ -5,10 +5,10 @@ export default {
   subtitle: "每個專案跑一次；橘色六角形是人工關卡",
   direction: "DOWN",
   nodes: [
-    { id: "P0", tag: "P0", title: "專案啟動", sub: "定範圍、T0、起點、知識庫快照" },
+    { id: "P0", tag: "P0", title: "專案啟動", sub: ["P0a 草擬、P0b 討論", "範圍清單、起點、環境清單"] },
     { id: "G0", kind: "gate", title: "G0 啟動核准" },
     { id: "P1", tag: "P1", title: "基線建立", sub: "確認起點能 build、能跑，留下對照基準" },
-    { id: "P2", tag: "P2", title: "差異分析", sub: "範圍 CR → code → 切成模組" },
+    { id: "P2", tag: "P2", title: "差異分析", sub: "範圍清單 → code → 切成模組" },
     { id: "G1", kind: "gate", title: "G1 範圍核准" },
     { id: "P3", tag: "P3", title: "架構與介面", sub: "介面合約、記憶體預算" },
     { id: "G2", kind: "gate", title: "G2 架構審查" },
@@ -23,7 +23,7 @@ export default {
   edges: [
     ["P0", "G0"], ["G0", "P1"], ["P1", "P2"], ["P2", "G1"], ["G1", "P3"], ["P3", "G2"], ["G2", "M"],
     ["M", "P4"], ["P4", "P5"], ["P5", "G3"], ["G3", "P6"], ["P6", "P7"], ["P7", "G4"],
-    ["P2", "P0", "資訊不足", "back"],
+    ["P2", "P0", "範圍或設定要改", "back"],
     ["P3", "P2", "範圍有誤", "back"],
     ["M", "P3", "介面衝突", "back"],
     ["P4", "M", "失敗：回對應的模組", "back"],
