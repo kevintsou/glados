@@ -6,10 +6,10 @@ export default {
   direction: "DOWN",
   nodes: [
     { id: "P0", tag: "P0", title: "專案啟動", sub: ["P0a 草擬、P0b 討論", "範圍清單、起點、環境清單"] },
-    { id: "G0", kind: "gate", title: "G0 啟動核准" },
+    { id: "G0", kind: "gate", title: "G0 啟動核准", sub: "固定專案範圍、起點與環境" },
     { id: "P1", tag: "P1", title: "基線建立", sub: "確認起點能 build、能跑，留下對照基準" },
-    { id: "P2", tag: "P2", title: "差異分析", sub: ["P2a 分析、P2b 整理 CR", "範圍清單 → code → 切成模組"] },
-    { id: "G1", kind: "gate", title: "G1 範圍核准" },
+    { id: "P2", tag: "P2", title: "差異分析", sub: ["P2a 分析、P2b 整理 CR", "P2b 定案即更新 Jira（設定允許時）", "範圍清單 → code → 切成模組"] },
+    { id: "G1", kind: "gate", title: "G1 範圍核准", sub: ["審核整理後的結果、建立需求基準", "第一次通過後，需求變更走 C＋GC"] },
     { id: "P3", tag: "P3", title: "架構與介面", sub: "介面合約、記憶體預算" },
     { id: "G2", kind: "gate", title: "G2 架構審查" },
     { id: "M", tag: "M1–M7", title: "每個模組各跑一次", sub: "見模組流程圖" },
