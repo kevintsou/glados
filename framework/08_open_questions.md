@@ -39,7 +39,7 @@
 | :---- | :---- | :---- |
 | 1 | 大型證據（image、log、報告）的保存位置、存取與保留期限 | [03 §3.11](03_artifacts.md#311-存放位置與寫入權限) |
 | 2 | 串接層帳號：個人企業席位，還是組織 API key | [impl/ai_node_execution.md](../impl/ai_node_execution.md) |
-| 3 | 人工核准的具體機制：簽章 commit、MR approval，還是 Jira 核准 | [03 §3.6](03_artifacts.md#36-核准與決定紀錄) |
+| 3 | ~~人工核准的具體機制~~：v0.8 已決定，見 §8.3 | [impl/gate_signoff](../impl/gate_signoff.md) |
 | 4 | 各專案可用的錯誤注入、受控修改與補驗證手段 | [nodes/M2](../nodes/M2.md) |
 | 5 | 串接層服務部署在哪台機器、跨機器的身分與授權、和 openBCT 的介面 | [impl/service.md I8](../impl/service.md#i8-待決事項) |
 | 6 | 各專案 CI 排除規則的具體設定（要和 CI 管理者確認） | [06 §6.6](06_service.md#66-ci) |
@@ -61,7 +61,11 @@
 | v0.8 | P0 分成 P0a（AI 草擬）與 P0b（人和 AI 一起討論）；P0 決定範圍（新增、修改、保留、移除、這版不做），產出範圍清單，由 G0 核准 | [nodes/P0](../nodes/P0.md) |
 | v0.8 | P0 產出環境清單（skill、MCP、工具、toolchain、知識庫的版本），出口檢查加「環境就緒」；原本的知識庫快照併進環境清單 | [nodes/P0](../nodes/P0.md)、[05](05_checks.md) |
 | v0.8 | 需求來源（Jira CR、Confluence spec 頁）由工具抓成來源快照，AI 只讀快照；實作採直接呼叫 REST API 的 script；spec 頁在專案設定列頁面 ID | [03 §3.2](03_artifacts.md#32-編號版本與-hash)、[07](07_project_profile.md) |
-| v0.8 | G0 之後 CR 內容的任何變動一律走 C；S 版本同步擴大為也比對 Jira／Confluence（外部來源同步） | [04 §4.6](04_rules.md#46-c-變更處理)、[04 §4.7](04_rules.md#47-s-版本同步) |
+| v0.8 | G0 之後其他人在 Jira／Confluence 上的修改一律走 C；S 版本同步擴大為也比對 Jira／Confluence（外部來源同步） | [04 §4.6](04_rules.md#46-c-變更處理)、[04 §4.7](04_rules.md#47-s-版本同步) |
+| v0.8 | P2 分成 P2a（AI 分析）與 P2b（人和 AI 整理 CR：拆分、補 CR、澄清、修改），不另開節點；GLADOS 自己提出的 CR 修訂記在 CR 修訂紀錄，經 P2b 確認、G1 核准，不走 C；會改到範圍清單標記的退回 P0 | [nodes/P2](../nodes/P2.md) |
+| v0.8 | CR 修訂要不要寫回 Jira 由專案設定決定；E39 因為雙向隔離不寫回 | [07](07_project_profile.md)、[projects/E39](../projects/E39.md) |
+| v0.8 | 「資訊不足」定義為「某個必要輸出填不出來，原因是某個輸入缺漏或有問題」，退回產出該輸入的那一站；成為 R 失敗分類的通用類型「輸入不足」 | [04 §4.5](04_rules.md#45-r-失敗分類)、[nodes/P2](../nodes/P2.md) |
+| v0.8 | 人工關卡用簽核 skill 引導審閱，最後由人親自送出（簽核指令跳出的系統對話框，以及 openBCT GLADOS 分頁的按鈕，先做對話框）；不用 GitLab MR。AI 不給核准建議，改成讓核准人逐項表態；專案設定新增「關卡核准人」 | [02 §2.4](02_workflow.md#24-人工關卡)、[impl/gate_signoff](../impl/gate_signoff.md) |
 | v0.8 | T0 改名為「範圍凍結點」（T0 在 IC 領域常指 tapeout），定義為 G0 核准的來源快照的抓取時間 | [01 §1.7](01_overview.md#17-用語表) |
 | v0.7 | 先把框架做好，節點實作之後個別展開；文件確認後才開始實作 | [01 §1.6](01_overview.md#16-建置路線) |
 | v0.7 | 只認證據：放行以串接層執行檢查留下的證據紀錄為準，節點自己寫的結果只供參考 | [05 §5.1](05_checks.md#51-只認證據) |

@@ -11,7 +11,7 @@ export default {
       { id: "CLI", kind: "ext", title: "CLI" },
       { id: "API", kind: "ext", title: "API／MCP" },
     ] },
-    { id: "APPR", kind: "gate", title: "人工核准", sub: "MR approval、簽章 commit、Jira" },
+    { id: "APPR", kind: "gate", title: "人工核准", sub: ["簽核 skill 引導", "人親自確認後送出"] },
     { id: "SVC", kind: "rule", title: "串接層服務", sub: ["獨立背景程式", "觀察、版本同步、守門、派工"] },
     { id: "REC", kind: "record", title: "受保護的紀錄 branch", sub: ["通過紀錄、核准索引、正式進度、", "執行紀錄、版本同步報告"] },
     { id: "WS", title: "執行工作區", sub: ["按需 clone，固定輸入版本", "遵守隔離"] },

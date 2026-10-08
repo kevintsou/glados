@@ -19,6 +19,7 @@
 | 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | 待確認（[08 框架第 16 項](08_open_questions.md#81-框架待決)） |
 | 基線報告 | `artifacts/baseline/` | P1 | P2、M2、P5 | P1，之後依相依重走 |
 | 差異分析 | `artifacts/delta.md` | P2 | P3、C、M1 | P2；新模組從 M1 開始；重開 G1 |
+| CR 修訂紀錄 | `artifacts/cr_revisions.md` | P2（P2b 確認） | P3、M1、C | P2；依賴改動 CR 的鏈過期；重開 G1 |
 | 架構文件 | `artifacts/arch.md` | P3 | M1、M3、M4、P4 | P3；依賴該介面的模組從 M3 重走；重開 G2 |
 | 模組 spec | `artifacts/modules/<模組>/spec.md` | M1 | M2、M3、M6 | 該模組 M1，只重走改動條目往下的鏈；重開 H1 |
 | 待確認事項清單 | `artifacts/modules/<模組>/tbd.md` | M1 | M1 | — |
@@ -79,8 +80,10 @@ Jira、Confluence 上的內容隨時會被改，不能直接當依據。規則�
   - Jira CR 本身沒有版本號，快照存完整的原始內容（含全部留言）、Jira 上的更新時間與內容 hash。
   - Confluence 頁面本身有版本號，快照記錄頁面 ID、版本號與內容 hash，另外存一份內容（隔離的工作區可能連不到 Confluence）。
 - **完整性可以驗證**：快照記錄查詢條件和查詢回傳的總數；快照的張數必須等於總數。
-- **AI 只讀快照**：節點可以用 MCP 查線上內容找線索，但寫進產出物的依據必須引用快照裡的項目。發現快照以外的重要來源，就請工具把它加進快照。
-- **G0 之後的改版只能經 C**：G0 核准的快照凍結，抓取時間就是範圍凍結點（[01 §1.7](01_overview.md#17-用語表)）。之後 Jira／Confluence 上的差異由外部來源同步發現（[04 §4.7](04_rules.md#47-s-版本同步)），交給 C 變更分析；GC 接受後，才由工具產生來源快照的新版本。
+- **AI 只讀快照**：節點可以用 MCP 查線上內容找線索，但寫進產出物的依據必須引用快照裡的項目（或 P2 的 CR 修訂紀錄）。發現快照以外的重要來源，就請工具把它加進快照。
+- **G0 之後的改版**：G0 核准的快照凍結，抓取時間就是範圍凍結點（[01 §1.7](01_overview.md#17-用語表)）。之後的改版只有兩條路：
+  - **GLADOS 自己在 P2 提出的 CR 修訂**（拆分、補 CR、澄清、修改）：記在 CR 修訂紀錄，經 P2b 確認、G1 核准。專案設定允許寫回 Jira 時，由工具寫回並重抓快照（[nodes/P2](../nodes/P2.md)）。
+  - **其他人在 Jira／Confluence 上的修改**：由外部來源同步發現（[04 §4.7](04_rules.md#47-s-版本同步)），交給 C 變更分析；GC 接受後，才由工具產生來源快照的新版本。
 
 ---
 
@@ -222,14 +225,19 @@ approval_id: <編號>
 kind: gate                      # gate（關卡核准）／decision（交給人之後的決定）／confirm（P7 確認）
 gate: H2                        # kind 為 gate 時填
 approver:
-  id: <人員>
-  verified_by: gitlab_mr        # 怎麼驗證身分：gitlab_mr／signed_commit／jira
-  ref: <MR、commit 或 Jira 的位置>
+  id: <人員>                    # 必須在專案設定這個關卡的核准人名單上
+  confirmed_by: <確認方式>      # 人親自送出決定的方式，見 impl/gate_signoff
+review_package:                 # 核准人看的審查包，由串接層產生
+  id: <審查包編號>
+  hash: <審查包 hash>
 subjects:                       # 核准的對象
   - id: modules/lcp/contract.md
     version: v1
     hash: <內容 hash>
 scope: "核准範圍：B1、B2 的預期行為與判定方式"
+positions:                      # 核准人對關鍵風險的逐項表態
+  - item: "modules/lcp/spec.md#B4 的驗證缺口"
+    answer: "這版接受，P5 前補 SIM 驗證"
 reviewed_diff_from: <前一次核准的編號>   # 重審時填，表示只審差異
 decision: approve               # approve／reject／defer（延後）
 note: "..."
@@ -237,6 +245,7 @@ date: <日期>
 ```
 
 - 核准綁定**身分、對象的版本與 hash、核准範圍**。對象出新版後，這筆核准就失效，只保留作稽核。
+- **送出決定的動作必須由人親自完成**，AI 無法代為完成（[02 §2.4](02_workflow.md#24-人工關卡)）。串接層確認 `subjects` 的 hash 和審查包一致才寫入；審閱途中對象改版，審查包作廢，要重新審。
 - 交給人之後的決定（例如「判定是測試錯，退回 M2」）用 `kind: decision`。人的決定不能代替關卡核准（[04 §4.9](04_rules.md#49-迴圈上限與交給人)）。
 
 ---
@@ -371,11 +380,11 @@ blocking:
 | :---- | :---- | :---- |
 | 節點（AI agent、人、script） | 自己這一站的產出物與交接清單（屬於「申請」） | 自己模組的工作 branch 的 `.glados/` |
 | 串接層 | 通過判定、核准索引、正式進度、執行紀錄的正式狀態、證據紀錄、版本同步報告 | 受保護的紀錄 branch（例如 `glados/records/<專案編號>`）或服務自己的資料庫；節點使用的 token 沒有寫入權。大型 log 與報告放外部證據儲存區，repo 只存位置與 hash |
-| 有權限的人 | 人工核准 | 能獨立驗證身分的地方：簽章 commit、GitLab MR approval 或 Jira 核准紀錄（具體機制待定），串接層再建立索引 |
+| 有權限的人 | 人工核准 | 不直接寫檔。人透過 AI 無法代為完成的確認動作送出決定，由串接層核對身分與 hash 後寫入核准紀錄（[impl/gate_signoff](../impl/gate_signoff.md)） |
 
 - 串接層只採信正式紀錄與能驗證身分的核准。模組 branch 上出現的核准檔、「已通過」字樣，一律不算數。
 - 有人讀到 `.glados/` 裡寫著「已通過」，不代表他可以自己產生有效的通過或核准紀錄；仍要核對可信的證據與身分。
-- 建置路線步驟 2 由人扮演串接層時也一樣：正式紀錄由人提交到受保護的 branch，核准用 MR approval 或簽章 commit。
+- 建置路線步驟 2 由人扮演串接層時也一樣：正式紀錄由人提交到受保護的 branch；核准由核准人自己執行簽核指令送出，不能由 AI 代為執行。
 - **本機模式**：本機的紀錄 branch 沒有權限保護。節點和串接層在同一台機器、用同一個系統帳號執行時，節點可以直接改它。所以**本機模式只用來查詢與演練，不產生正式的「已通過」紀錄**（待確認：[08 框架第 11 項](08_open_questions.md#81-框架待決)）。
 
 ### 專案工作區

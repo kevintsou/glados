@@ -45,6 +45,8 @@ claude -p "執行節點 M4：依 handoff/in/M3.yaml 實作，完成後寫出 han
 | 沒人在旁時的權限詢問 | `--permission-mode dontAsk`：沒有事先允許的動作直接拒絕 |
 | 追蹤編號 | `--session-id`，由串接層產生 |
 
+節點的設定一律不載入簽核 skill，也不允許執行簽核指令，避免節點核准自己的產出（[gate_signoff.md](gate_signoff.md)）。
+
 **回收結果只看檔案**：
 
 1. 看 exit code 與 JSON 的 `is_error`。實測沒登入時 `subtype` 仍然是 `success`，但 `is_error: true`、exit 1，所以不能只看 `subtype`。`permission_denials` 會列出被擋下的動作。

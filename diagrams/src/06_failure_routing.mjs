@@ -7,7 +7,7 @@ export default {
   uniform: false,
   layerSpacing: 70,
   nodes: [
-    { id: "IN", kind: "ext", title: "M2–M7、P4、P5", sub: "發現問題" },
+    { id: "IN", kind: "ext", title: "任何節點、M2–M7、P4、P5", sub: ["回報輸入不足", "或發現問題"] },
     { id: "R", kind: "rule", title: "R 失敗分類", sub: ["依規則判斷類型", "判不出來時派一次獨立分析參考"] },
     { id: "D1", kind: "ext", title: "回 M4 實作與 build", sub: "計入輪數" },
     { id: "D2", kind: "ext", title: "回 M3 實作計畫" },
@@ -16,6 +16,7 @@ export default {
     { id: "D5", kind: "human", title: "回 M1，經 H1 核准" },
     { id: "D6", kind: "human", title: "回 P3，經 G2 核准" },
     { id: "D7", kind: "ext", title: "從最早過期的那一站重走" },
+    { id: "D9", kind: "ext", title: "回產出該輸入的那一站", sub: ["外部資訊：等待外部回覆", "依那一站的關卡"] },
     { id: "D8", kind: "human", title: "交給人" },
   ],
   edges: [
@@ -27,6 +28,7 @@ export default {
     ["R", "D5", "spec 缺口或矛盾"],
     ["R", "D6", "介面衝突"],
     ["R", "D7", "交接紀錄過期或不齊"],
+    ["R", "D9", "輸入不足"],
     ["R", "D8", "環境問題、驗證缺口、\n連續 3 輪同樣失敗"],
   ],
 };
