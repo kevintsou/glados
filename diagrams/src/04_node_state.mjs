@@ -13,7 +13,7 @@ export default {
     { id: "WA", kind: "gate", title: "等待核准" },
     { id: "DN", kind: "record", title: "完成" },
     { id: "HM", kind: "human", title: "交給人", sub: ["任何狀態都可能轉到這裡", "例如有衝突，或核准人決定交給人"] },
-    { id: "BACK", kind: "ext", title: "依人的決定回到流程", sub: ["重跑、退回其他節點，", "或人自己做完交出交接清單"] },
+    { id: "BACK", kind: "ext", title: "依人的決定回到流程", sub: ["自己做、指定退回、修好環境重跑、", "讓同一站再試，或這版不做"] },
   ],
   edges: [
     ["P", "RD", "進入條件滿足"], ["RD", "RUN", "派工"], ["RUN", "CK", "執行結束"],
