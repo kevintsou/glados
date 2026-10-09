@@ -20,7 +20,7 @@ export default {
     { id: "M6", tag: "M6", title: "獨立審查", sub: "另一個執行者審查 diff" },
     { id: "M7", tag: "M7", title: "完成交接", sub: "串接層核對全部紀錄" },
     { id: "P4", kind: "ext", title: "P4 整合（專案層）" },
-    { id: "R", kind: "rule", title: "R 失敗分類", sub: "決定退回哪裡（見失敗分類圖）" },
+    { id: "R", kind: "rule", title: "R 失敗分類", sub: ["決定退回哪裡（見失敗分類圖）", "任何一站回報輸入不足也交給它"] },
   ],
   edges: [
     ["IN1", "M1"],

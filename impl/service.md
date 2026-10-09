@@ -37,10 +37,11 @@
 | :---- | :---- | :---- |
 | 串接層服務 | 觀察、版本同步、守門、派工；持久保存進度、執行紀錄、核准索引、版本同步分析 | 能，唯一可寫者（[framework/03 §3.11](../framework/03_artifacts.md#311-存放位置與寫入權限)） |
 | 操作入口：openBCT GLADOS 分頁、CLI、API／MCP | 查詢、送出要求（執行、核准、重跑）；不實作放行規則 | 不能，只能送要求給服務 |
-| 專案工作區 repo | 模組 branch 放節點產出；受保護的紀錄 branch 放正式紀錄 | — |
+| 專案工作區 repo | 模組與專案層的工作 branch 放節點產出；受保護的紀錄 branch 放正式紀錄與來源快照 | — |
 | 執行工作區 | 按需 clone 或建 worktree，固定輸入版本，遵守隔離限制 | 不能 |
 | 節點執行 | AI 獨立 session、build、script | 不能，只交產出與交接清單 |
 | openBCT 測試執行與 lab worker | 跑 case、產生報告、管理設備借用 | 不能；報告由服務核對後才採用 |
+| Jira／Confluence | 需求來源。服務派工具抓來源快照、做外部來源同步；專案設定允許時，寫回 P2b 定案的 CR 修訂（[framework/03 §3.2](../framework/03_artifacts.md#32-編號版本與-hash)） | 不能；快照由工具產生，放在受保護的紀錄 branch |
 
 服務和 openBCT 之間的介面（呼叫哪些 API、報告格式、設備借用流程）待定（I8）。
 

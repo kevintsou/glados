@@ -2,7 +2,7 @@
 export default {
   id: "glados_failure_routing",
   title: "R 失敗分類的去處",
-  subtitle: "橘色的去處需要人；灰色的不需要",
+  subtitle: "橘色的去處一定需要人；灰色的不需要，或依重走那一站的關卡",
   direction: "RIGHT",
   uniform: false,
   layerSpacing: 70,

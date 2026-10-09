@@ -7,7 +7,7 @@ export default {
   uniform: false,
   nodes: [
     { id: "REQ", label: "需求鏈：只有相連的那條鏈過期", direction: "DOWN", children: [
-      { id: "CR", kind: "ext", title: "CR 或其他來源" },
+      { id: "CR", kind: "ext", title: "CR、spec 頁", sub: "需求基準：來源快照＋CR 修訂紀錄" },
       { id: "SPEC", title: "spec 條目 B2", sub: ["第 2 版", "經 H1 核准"] },
       { id: "CON", title: "驗收合約", sub: "經 H2 核准" },
       { id: "CASE", title: "case" },

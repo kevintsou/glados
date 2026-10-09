@@ -5,7 +5,7 @@ export default {
   subtitle: "節點交出的只是申請；放行看串接層留下的證據",
   direction: "DOWN",
   nodes: [
-    { id: "A", kind: "rule", title: "派工前檢查", sub: ["版本同步、輸入已通過且有效、", "核准齊全、沒有其他執行中、環境可用"] },
+    { id: "A", kind: "rule", title: "派工前檢查", sub: ["版本同步、輸入已通過且有效、", "核准齊全、沒有其他執行中、", "環境可用且符合環境清單"] },
     { id: "B", kind: "rule", title: "固定輸入版本，派工", sub: "每次都開新的 session" },
     { id: "N", title: "節點執行", sub: "AI、人、工具或 script 都可以" },
     { id: "H", title: "交出產出物與交接清單", sub: "只是申請" },
