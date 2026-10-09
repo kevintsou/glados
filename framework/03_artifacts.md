@@ -8,7 +8,7 @@
 
 ## 3.1 產出物目錄
 
-所有產出物都在這張表。節點卡的「輸入」「輸出」用這裡的名稱。檔案位置是 `.glados/projects/<專案編號>/` 底下的相對路徑（建議配置，待確認：[08 框架第 8 項](08_open_questions.md#81-框架待決)）。
+所有產出物都在這張表。節點卡的「輸入」「輸出」用這裡的名稱。檔案位置是 `.glados/projects/<專案編號>/` 底下的相對路徑（建議配置，待確認：[08 框架第 6 項](08_open_questions.md#81-框架待決)）。
 
 | 產出物 | 檔案位置 | 產出節點 | 會用到的節點 | 改版時從哪裡重走 |
 | :---- | :---- | :---- | :---- | :---- |
@@ -16,7 +16,7 @@
 | 專案說明 | `project.md` | P0 | 全部 | P0／P1；所有證據過期；重開 G0 |
 | 範圍清單 | `scope.md` | P0 | P1、P2、P5、C | 依賴改動項目的鏈過期。第一次通過 G1 前：回 P0，重開 G0（只審差異）；之後：經 C，由 GC 核准，不重開 G0 |
 | 專案設定 | `profile.json` | P0 | 全部 | 依改動的欄位：只有用到該欄位的節點，從最早的那一站重走；改起點、CPU 與 toolchain、build 設定或驗證平台，從 P0／P1 重走、所有證據過期（[07 §7.2](07_project_profile.md#72-填寫規則)）。都要重開 G0（只審差異） |
-| 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | 待確認（[08 框架第 9 項](08_open_questions.md#81-框架待決)） |
+| 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | 待確認（[08 框架第 7 項](08_open_questions.md#81-框架待決)） |
 | 基線報告 | `artifacts/baseline/` | P1 | P2、P3、M2、P5 | P1，之後依相依重走 |
 | 差異分析 | `artifacts/delta.md` | P2 | P3、M1、P5、C | P2；新模組從 M1 開始；重開 G1 |
 | CR 修訂紀錄 | `artifacts/cr_revisions.md` | P2（P2b 確認） | P3、M1、C | P2；依賴改動 CR 的鏈過期；重開 G1 |
@@ -411,7 +411,7 @@ created_at: <時間>
 
 | 寫入者 | 能寫什麼 | 寫在哪裡 |
 | :---- | :---- | :---- |
-| 節點（AI agent、人、script） | 自己這一站的產出物與交接清單（屬於「申請」） | 模組層節點寫在自己模組的工作 branch 的 `.glados/`；專案層節點寫在專案層的工作 branch 的 `.glados/`（branch 名稱待定：[08 框架第 8 項](08_open_questions.md#81-框架待決)） |
+| 節點（AI agent、人、script） | 自己這一站的產出物與交接清單（屬於「申請」） | 模組層節點寫在自己模組的工作 branch 的 `.glados/`；專案層節點寫在專案層的工作 branch 的 `.glados/`（branch 名稱待定：[08 框架第 6 項](08_open_questions.md#81-框架待決)） |
 | 工具（串接層派工） | 來源快照 | 和串接層寫的紀錄一樣，放在受保護的紀錄 branch；節點只能讀，不能改 |
 | 串接層 | 通過判定、核准索引、正式進度、執行紀錄的正式狀態、證據紀錄、版本同步報告、R 判定紀錄 | 受保護的紀錄 branch（例如 `glados/records/<專案編號>`）或服務自己的資料庫；節點使用的 token 沒有寫入權。大型 log 與報告放外部證據儲存區，repo 只存位置與 hash |
 | 有權限的人 | 人工核准 | 不直接寫檔。人透過 AI 無法代為完成的確認動作送出決定，由串接層核對身分與 hash 後寫入核准紀錄（[impl/gate_signoff](../impl/gate_signoff.md)） |
@@ -425,7 +425,7 @@ created_at: <時間>
 
 - **預設就是 FW repo**。專案設定列有禁止 agent 看到的 branch 時（例如 E39 的對照實驗），工作區必須是另一個只含允許 branch 的 repo（GitLab mirror 或 fork），agent 能用的 GitLab 權限也只限於這個 repo；GLADOS 的產出不推回原 repo，做到雙向隔離。
 - **同一個 repo 可以有多個 GLADOS 專案**，用專案編號、需求範圍與 branch 對應區分。
-- **每個模組一個工作 branch**，節點把產出與交接清單 commit 在這個 branch 的 `.glados/` 底下；專案層節點用專案層的工作 branch（名稱待定：[08 框架第 8 項](08_open_questions.md#81-框架待決)）。人工 commit 可以穿插，但要經過 S 版本同步核對。
+- **每個模組一個工作 branch**，節點把產出與交接清單 commit 在這個 branch 的 `.glados/` 底下；專案層節點用專案層的工作 branch（名稱待定：[08 框架第 6 項](08_open_questions.md#81-框架待決)）。人工 commit 可以穿插，但要經過 S 版本同步核對。
 - 每台機器的本機路徑、憑證與暫存檔另外存在本機，不當成共用的專案資料。
 
 ### `.glados/` 建議配置
