@@ -73,7 +73,7 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 
 | 情境 | 行為 | 工作區 |
 | :---- | :---- | :---- |
-| 查詢 GitLab 專案 | 用 GitLab API 讀受保護紀錄 branch 與模組 branch 的 `.glados/`；每次固定讀同一個 commit | 查詢端不需要 clone |
+| 查詢 GitLab 專案 | 用 GitLab API 讀受保護紀錄 branch，以及模組與專案層工作 branch 的 `.glados/`；每次固定讀同一個 commit | 查詢端不需要 clone |
 | 在本機執行 GitLab 專案 | 有合適的工作區就重用，否則 clone 指定來源並準備節點的 worktree；執行版本同步與環境檢查 | 本機需要可重現的輸入快照 |
 | 開啟本機 repo | 讀取本機的 `.glados/`、branch 與 commit，顯示和遠端的同步情況 | 用既有 repo；有未提交的修改或分岔時，先由版本同步處理 |
 | 查看或驅動遠端執行 | 查詢串接層服務，或由有權限的人要求服務派工 | 查詢端不需要 clone；執行機器負責 clone 或 worktree |

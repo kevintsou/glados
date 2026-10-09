@@ -14,19 +14,19 @@
 | :---- | :---- | :---- | :---- | :---- |
 | 來源快照 | `sources/`（Jira CR、Confluence spec 頁，每一項各自有版本與 hash） | 工具（串接層派工） | P0、P2、M1、C | 第一次通過 G1 前由 P0／P2 整理並請工具產生新版；之後經 C＋GC 改版，只有依賴改動項目的那條鏈過期 |
 | 專案說明 | `project.md` | P0 | 全部 | P0／P1；所有證據過期；重開 G0 |
-| 範圍清單 | `scope.md` | P0 | P1、P2、M1、P5、C | 依賴改動項目的鏈過期。第一次通過 G1 前：回 P0，重開 G0（只審差異）；之後：經 C，由 GC 核准，不重開 G0 |
+| 範圍清單 | `scope.md` | P0 | P1、P2、P5、C | 依賴改動項目的鏈過期。第一次通過 G1 前：回 P0，重開 G0（只審差異）；之後：經 C，由 GC 核准，不重開 G0 |
 | 專案設定 | `profile.json` | P0 | 全部 | 依改動的欄位：只有用到該欄位的節點，從最早的那一站重走；改起點、CPU 與 toolchain、build 設定或驗證平台，從 P0／P1 重走、所有證據過期（[07 §7.2](07_project_profile.md#72-填寫規則)）。都要重開 G0（只審差異） |
 | 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | 待確認（[08 框架第 16 項](08_open_questions.md#81-框架待決)） |
-| 基線報告 | `artifacts/baseline/` | P1 | P2、M2、P5 | P1，之後依相依重走 |
-| 差異分析 | `artifacts/delta.md` | P2 | P3、C、M1 | P2；新模組從 M1 開始；重開 G1 |
+| 基線報告 | `artifacts/baseline/` | P1 | P2、P3、M2、P5 | P1，之後依相依重走 |
+| 差異分析 | `artifacts/delta.md` | P2 | P3、M1、P5、C | P2；新模組從 M1 開始；重開 G1 |
 | CR 修訂紀錄 | `artifacts/cr_revisions.md` | P2（P2b 確認） | P3、M1、C | P2；依賴改動 CR 的鏈過期；重開 G1 |
-| 架構文件 | `artifacts/arch.md` | P3 | M1、M3、M4、P4 | P3；依賴該介面的模組從 M3 重走；重開 G2 |
+| 架構文件 | `artifacts/arch.md` | P3 | M1、M3、M4、M6、P4 | P3；依賴該介面的模組從 M3 重走；重開 G2 |
 | 模組 spec | `artifacts/modules/<模組>/spec.md` | M1 | M2、M3、M6 | 該模組 M1，只重走改動條目往下的鏈；重開 H1 |
 | 待確認事項清單 | `artifacts/modules/<模組>/tbd.md` | M1 | M1 | — |
 | 驗收合約 | `artifacts/modules/<模組>/contract.md` | M2 | M3、M5、M7、P5 | M2；重開 H2 |
 | 驗收清單 | `artifacts/modules/<模組>/checklist.md` | M2（執行結果由工具填） | M5、M7 | M2 |
 | 測試實作 | 專案設定的測試框架位置 | M2 | M3、M4（唯讀）、M5、P5 | M2；合約內的修正不重開 H2 |
-| 測試基準 | 測試集合的版本標記 | 串接層（核對 M2 的證據後建立） | M4（唯讀）、M5、P5 | M2 |
+| 測試基準 | 測試集合的版本標記 | 串接層（核對 M2 的證據後建立） | M3、M4（唯讀）、M5、P5 | M2 |
 | 實作計畫 | `artifacts/modules/<模組>/plan.md` | M3 | M4、M6 | M3 |
 | 模組 commit | 模組工作 branch | M4 | M5、M6、P4 | M4 |
 | image | 證據儲存區 | 串接層派工的 build | M5、P4、P5 | 用這個 image 產生的驗證證據全部過期並重跑 |
@@ -35,7 +35,7 @@
 | 模組交接包 | `handoff/` | M7（串接層組成） | P4 | 模組被重新打開時，P4、P5 結果一併過期 |
 | 整合 branch、boot flow 報告 | 整合 branch、`artifacts/integration/` | P4 | P5 | P4 |
 | 全量驗收報告 | `artifacts/acceptance/` | P5 | G3、P6 | P5 |
-| release 包 | 專案設定的交付位置 | P6 | P7 | — |
+| release 包、交付紀錄 | 專案設定的交付位置 | P6 | P7 | — |
 | 回寫提案 | `artifacts/writeback/` | P7 | — | — |
 | 影響報告 | `artifacts/changes/<CR 編號>/` | C | GC、重新進入點的節點 | C |
 
@@ -198,7 +198,7 @@ tbd:                            # 要等外部回答的問題
   - id: TBD-3
     question: "<問題>"
     asked_to: SOC
-    jira: <Jira 編號>
+    jira: <Jira 編號>           # 專案設定「寫進 Jira」允許時才有
 notes_for_next: "..."           # 給下一站的補充；要寫出來，不能只留在對話裡
 ```
 
@@ -393,7 +393,7 @@ blocking:
 
 - **預設就是 FW repo**。專案設定列有禁止 agent 看到的 branch 時（例如 E39 的對照實驗），工作區必須是另一個只含允許 branch 的 repo（GitLab mirror 或 fork），agent 能用的 GitLab 權限也只限於這個 repo；GLADOS 的產出不推回原 repo，做到雙向隔離。
 - **同一個 repo 可以有多個 GLADOS 專案**，用專案編號、需求範圍與 branch 對應區分。
-- **每個模組一個工作 branch**，節點把產出與交接清單 commit 在這個 branch 的 `.glados/` 底下。人工 commit 可以穿插，但要經過 S 版本同步核對。
+- **每個模組一個工作 branch**，節點把產出與交接清單 commit 在這個 branch 的 `.glados/` 底下；專案層節點用專案層的工作 branch（名稱待定：[08 框架第 15 項](08_open_questions.md#81-框架待決)）。人工 commit 可以穿插，但要經過 S 版本同步核對。
 - 每台機器的本機路徑、憑證與暫存檔另外存在本機，不當成共用的專案資料。
 
 ### `.glados/` 建議配置
