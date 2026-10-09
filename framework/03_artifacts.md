@@ -16,7 +16,7 @@
 | 專案說明 | `project.md` | P0 | 全部 | P0／P1；所有證據過期；重開 G0 |
 | 範圍清單 | `scope.md` | P0 | P1、P2、P5、C | 依賴改動項目的鏈過期。第一次通過 G1 前：回 P0，重開 G0（只審差異）；之後：經 C，由 GC 核准，不重開 G0 |
 | 專案設定 | `profile.json` | P0 | 全部 | 依改動的欄位：只有用到該欄位的節點，從最早的那一站重走；改起點、CPU 與 toolchain、build 設定或驗證平台，從 P0／P1 重走、所有證據過期（[07 §7.2](07_project_profile.md#72-填寫規則)）。都要重開 G0（只審差異） |
-| 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | 待確認（[08 框架第 3 項](08_open_questions.md#81-框架待決)） |
+| 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | P0；重開 G0（只審差異）；會過期什麼依項目類別（[04 §4.4](04_rules.md#44-過期與重新進入)） |
 | 基線報告 | `artifacts/baseline/` | P1 | P2、P3、M2、P5 | P1，之後依相依重走 |
 | 差異分析 | `artifacts/delta.md` | P2 | P3、M1、P5、C | P2；新模組從 M1 開始；重開 G1 |
 | CR 修訂紀錄 | `artifacts/cr_revisions.md` | P2（P2b 確認） | P3、M1、C | P2；依賴改動 CR 的鏈過期；重開 G1 |
@@ -163,6 +163,7 @@ executor:                       # 誰執行的
   kind: ai                      # ai／human／tool
   id: <session 或人員識別>
 input_commit: <這次用的完整 commit SHA>
+environment_list: <這次用的環境清單版本>
 output:                         # 產出放在哪裡
   branch: glados/<專案編號>/<模組名稱>
   commit: <產出所在的 commit SHA>
@@ -274,6 +275,7 @@ executor:
   id: <session 或執行端識別>
 dispatched_by: <串接層服務身分>  # 只有串接層派的執行產生的證據才算數
 input_commit: <commit SHA>
+environment_list: <環境清單版本>
 inputs: [ ... ]                 # 上游產出物版本與 hash
 started_at: <時間>
 ended_at: <時間>
