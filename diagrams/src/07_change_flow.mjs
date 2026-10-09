@@ -6,7 +6,7 @@ export default {
   direction: "DOWN",
   uniform: false,
   nodes: [
-    { id: "CR", kind: "ext", title: "變更 CR", sub: "第一次通過 G1 後進來" },
+    { id: "CR", kind: "ext", title: "變更 CR", sub: "不在 G1 的需求基準裡" },
     { id: "XS", kind: "ext", title: "外部來源同步發現", sub: "CR 被改或取消、spec 頁改版" },
     { id: "SF", kind: "ext", title: "S 版本同步發現", sub: "需要範圍或需求決策" },
     { id: "C", tag: "C", title: "變更分析", sub: "產出影響報告" },
