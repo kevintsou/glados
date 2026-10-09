@@ -29,4 +29,4 @@
 - **執行方式**：影響分析無人在旁執行；GC 討論用互動式 session。
 - **工具**：Atlassian MCP、bootcode-qa。
 - **待展開議題**：
-  - 影響分析信心不足時的升級規則（[framework/08 框架第 12 項](../framework/08_open_questions.md#81-框架待決)）。
+  - 怎麼判斷影響分析「信心不足」。判斷不出影響時一律交給人（[framework/04 §4.7](../framework/04_rules.md#47-s-版本同步)）。
