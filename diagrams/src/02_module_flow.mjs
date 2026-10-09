@@ -15,7 +15,7 @@ export default {
     { id: "H2", kind: "gate", title: "H2 驗收合約核准" },
     { id: "TB", kind: "rule", title: "建立測試基準，M2 完成", sub: "串接層核對目前版本的證據與合約核准" },
     { id: "IN3", kind: "ext", title: "介面或記憶體預算變更" },
-    { id: "M3", tag: "M3", title: "實作計畫", sub: ["另一個 session 審查計畫", "↻ 審查有阻擋項目：修計畫重審"] },
+    { id: "M3", tag: "M3", title: "實作計畫", sub: ["另一個 session 審查計畫", "↻ 審查有阻擋項目：修計畫重審，最多 3 輪"] },
     { id: "M4", tag: "M4", title: "實作與 build", sub: ["只改計畫列出的檔案", "↻ build 失敗或超預算：重做，最多 3 輪"] },
     { id: "M5", tag: "M5", title: "驗證", sub: "跑驗收合約的必要 case" },
     { id: "M6", tag: "M6", title: "獨立審查", sub: "另一個執行者審查 diff" },
