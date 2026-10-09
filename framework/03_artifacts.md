@@ -2,7 +2,12 @@
 
 > **這份文件回答**：每一站交出什麼、怎麼編號與追蹤版本、產出物有哪些狀態、交接清單與各種紀錄長什麼樣子、存在哪裡、誰能寫。
 >
-> 格式用 YAML 範例加上欄位說明呈現，欄位名稱是初稿（待審：[08 框架第 1 項](08_open_questions.md#81-框架待決)）。文件確認後才轉成機器可讀的格式定義，那屬於實作階段。
+> 格式用 YAML 範例加上欄位說明呈現。所有紀錄的共同規則：
+>
+> - 每種紀錄都有 `format`、自己的編號、`project_id`（專案編號）與 `created_at`（建立時間）。
+> - 引用產出物一律寫編號、版本與內容 hash。
+> - 「誰執行的」一律用 `executor`，種類是 `ai`（AI）、`tool`（工具）、`human`（人）、`orchestrator`（串接層）。
+> - 欄位名稱用英文；欄位值目前中英文都有，轉成機器可讀格式時統一配英文代號（和 [05 §5.6](05_checks.md#56-新增或修改檢查) 的檢查名稱一樣）。轉成機器可讀格式屬於實作階段。
 
 ---
 
@@ -159,13 +164,14 @@ module: <模組名稱>              # 專案層節點填 "-"
 node: M2
 run_id: <這次執行的編號>
 attempt: 1                      # 第幾輪
+created_at: <時間>
 executor:                       # 誰執行的
-  kind: ai                      # ai／human／tool
+  kind: ai                      # ai／tool／human／orchestrator
   id: <session 或人員識別>
 input_commit: <這次用的完整 commit SHA>
 environment_list: <這次用的環境清單版本>
 output:                         # 產出放在哪裡
-  branch: glados/<專案編號>/<模組名稱>
+  branch: glados/<專案編號>/<模組名稱>   # 專案層是 glados/<專案編號>/project
   commit: <產出所在的 commit SHA>
 inputs:                         # 用了哪些上游產出物
   - id: modules/lcp/spec.md#B1
@@ -190,6 +196,7 @@ approvals_requested:            # 這一站需要哪個關卡核准
     subjects:
       - id: modules/lcp/contract.md
         version: v1
+        hash: <內容 hash>
     reason: 新增驗收合約
 open_blockers: []               # 還沒解決、會擋住下一站的問題
 verification_gaps:              # 驗證缺口
@@ -228,8 +235,12 @@ reentry:                        # 從 R、C 或交給人回到這一站時才有
 ```yaml
 format: glados.approval/v1
 approval_id: <編號>
+project_id: <專案編號>
 kind: gate                      # gate（關卡核准）／decision（交給人之後的決定）／confirm（P7 確認）
 gate: H2                        # kind 為 gate 時填
+node: <節點>                    # kind 為 decision 時填：對哪一站做的決定
+module: <模組名稱>              # kind 為 decision 時填；專案層填 "-"
+refers_to: [ <R 判定紀錄或其他紀錄的編號> ]   # kind 為 decision 時填：因為哪筆紀錄交給人
 approver:
   id: <人員>                    # 必須在專案設定這個關卡的核准人名單上
   confirmed_by: <確認方式>      # 人親自送出決定的方式，見 impl/gate_signoff
@@ -249,7 +260,7 @@ decision: approve               # 關卡：approve／reject／defer（延後）
                                 # 交給人之後（kind: decision）：self（自己做）／return（指定退回）／retry_env（修好環境後重跑）／retry（讓同一站再試）／drop（這版不做）
 return_to: <節點>              # decision 為 return 時填
 note: "..."
-date: <日期>
+created_at: <時間>
 ```
 
 - 核准綁定**身分、對象的版本與 hash、核准範圍**。對象出新版後，這筆核准就失效，只保留作稽核。
@@ -270,13 +281,17 @@ module: <模組名稱>
 node: M4
 purpose: node                   # node（節點執行）／check（檢查執行）／analysis（獨立分析）
 attempt: 2
+created_at: <時間>
 executor:
-  kind: ai
+  kind: ai                      # ai／tool／human／orchestrator
   id: <session 或執行端識別>
 dispatched_by: <串接層服務身分>  # 只有串接層派的執行產生的證據才算數
 input_commit: <commit SHA>
 environment_list: <環境清單版本>
 inputs: [ ... ]                 # 上游產出物版本與 hash
+reentry:                        # 派工時附上的退回原因（從 R、C 或交給人回來時才有）；交接清單的 reentry 要和它一致
+  from: R
+  records: [ <紀錄編號> ]
 started_at: <時間>
 ended_at: <時間>
 exit_code: 0
@@ -300,10 +315,12 @@ interruption:                   # 中斷時才填
 ```yaml
 format: glados.evidence/v1
 evidence_id: <編號>
+project_id: <專案編號>
 check: build 零警告             # 檢查名稱，見 05
 run_id: <產生這筆證據的執行編號>
-executed_by:                    # 串接層自行核對／工具執行／獨立審查／人工核准
-  kind: tool
+method: 工具執行                # 串接層自行核對／工具執行／獨立審查／人工核准（05 §5.2）
+executor:
+  kind: tool                    # ai／tool／human／orchestrator
   id: <執行端識別>
 subject:                        # 受檢的對象
   id: <產出物或 commit>
@@ -314,7 +331,7 @@ bound_to:                       # 這筆證據綁定的版本；有用到的才�
   fw_source_hash: <hash>
   image_hash: <hash>
   test_set: { version: <版本>, hash: <hash> }
-  environment: { version: <版本>, hash: <hash> }
+  verification_env: { version: <版本>, hash: <hash> }   # 驗證環境
   contract: { version: <版本>, hash: <hash> }
 result: PASS                    # PASS／FAIL／未執行／環境錯誤／驗證缺口，見 05 §5.3
 details: <報告或原始 log 的位置>
@@ -333,6 +350,7 @@ M3 實作計畫、M6 獨立審查、P5 安全審查發現的每一項問題各�
 ```yaml
 format: glados.finding/v1
 finding_id: <編號>
+project_id: <專案編號>
 review_run: <審查的執行編號>
 subject:                        # 被審的對象
   id: <計畫或 diff>
@@ -344,7 +362,8 @@ blocking: true                  # 依 04 §4.8 由類型決定，實作者不能
 impact: "HMAC 驗證失敗時仍接受 ID page"
 disposition: fixed              # fixed（已修正）／not_valid（不成立）／deferred（延後）／escalated（交給關卡）
 disposition_evidence: [ <證據編號> ]
-confirmed_by: <確認處置的獨立審查執行編號>
+confirmation_run: <確認處置的獨立審查執行編號>
+created_at: <時間>
 ```
 
 ---
@@ -356,10 +375,14 @@ confirmed_by: <確認處置的獨立審查執行編號>
 ```yaml
 format: glados.sync/v1
 sync_id: <編號>
+project_id: <專案編號>
+created_at: <時間>
 trigger: 新 commit              # 開啟專案／新 commit／派工前／放行前／外部來源同步
-branch: <branch>                # 外部來源同步時改填來源快照的版本
+branch: <branch>                # 以下三欄：比對 git 時才填
 from_commit: <上次已檢查到的 commit>
 to_commit: <這次檢查到的 commit>
+snapshot_from: <來源快照版本>     # 以下兩欄：外部來源同步時才填，比對前後的快照版本
+snapshot_to: <來源快照版本>
 changes:
   - path: duan/app/boot/lcp/lcp.c   # 外部來源同步時填來源項目，例如 sources/jira/SDKBOOT-2421
     kind: FW                    # 進度紀錄／FW／測試／需求／介面／專案設定／驗證環境／外部來源
@@ -369,7 +392,8 @@ changes:
 impact:
   - target: <產出物或證據編號>
     effect: 過期                # 過期／保持有效／無法判斷
-    basis: 規則                 # 規則／獨立分析（附執行編號）
+    basis: 規則                 # 規則／獨立分析
+    analysis_run: <執行編號>     # basis 為獨立分析時才填
 routing:
   - to: R 失敗分類              # C 變更分析／R 失敗分類／某個節點／交給人
     reason: "人工修改 lcp.c，需重新 build 與驗證"

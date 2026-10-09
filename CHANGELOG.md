@@ -150,6 +150,12 @@
 - `.glados/` 目錄配置照 03 §3.12 定案；新增「branch 名稱」：專案層 `glados/<專案編號>/project`、模組 `glados/<專案編號>/<模組名稱>`、整合 `glados/<專案編號>/integration`、紀錄 `glados/records/<專案編號>`。`project`、`integration` 保留，不能當模組名稱。
 - 框架待決只剩 1 項：交接清單與各種紀錄的格式。
 
+**框架待決：紀錄格式定案**（2026-10-09）
+
+- 03 開頭寫明所有紀錄的共同規則：每種紀錄都有 `format`、編號、`project_id`、`created_at`；引用產出物一律寫編號、版本與 hash；「誰執行的」統一用 `executor`（`ai`／`tool`／`human`／`orchestrator`）；欄位值轉成機器可讀格式時統一配英文代號。
+- 各格式補齊與改名：核准紀錄 `date` → `created_at`，決定類補 `node`、`module`、`refers_to`；執行紀錄補 `reentry`；證據 `executed_by` → `executor` 加 `method`，`environment` → `verification_env`；審查發現 `confirmed_by` → `confirmation_run`；版本同步報告加 `snapshot_from`、`snapshot_to`，判定依據拆成 `basis` 與 `analysis_run`；交接清單申請關卡的對象補 hash。
+- 框架待決全部有結論（08 §8.1 清空）。
+
 ## v0.7 改了什麼
 
 **結構**
