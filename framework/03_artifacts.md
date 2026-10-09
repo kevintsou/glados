@@ -26,7 +26,7 @@
 | 驗收合約 | `artifacts/modules/<模組>/contract.md` | M2 | M3、M5、M7、P5 | M2；重開 H2 |
 | 驗收清單 | `artifacts/modules/<模組>/checklist.md` | M2（執行結果由工具填） | M5、M7 | M2 |
 | 測試實作 | 專案設定的測試框架位置 | M2 | M3、M4（唯讀）、M5、P5 | M2；合約內的修正不重開 H2 |
-| 測試基準 | 測試集合的版本標記 | 串接層（核對 M2 的證據後建立） | M3、M4（唯讀）、M5、P5 | M2 |
+| 測試基準 | 測試集合的版本標記 | 串接層（M2 出口檢查通過、核對必要的 H2 核准後建立） | M3、M4（唯讀）、M5、P5 | M2 |
 | 實作計畫 | `artifacts/modules/<模組>/plan.md` | M3 | M4、M6 | M3 |
 | 模組 commit | 模組工作 branch | M4 | M5、M6、P4 | M4 |
 | image | 證據儲存區 | 串接層派工的 build | M5、P4、P5 | 用這個 image 產生的驗證證據全部過期並重跑 |

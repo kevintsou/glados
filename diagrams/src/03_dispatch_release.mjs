@@ -16,6 +16,7 @@ export default {
     { id: "Q", kind: "decision", title: "出口檢查都通過？" },
     { id: "R", kind: "ext", title: "交給 R 失敗分類" },
     { id: "G", kind: "gate", title: "出口關卡：等人核准" },
+    { id: "FIN", kind: "rule", title: "核對必要核准，完成服務產出", sub: "例如 M2 的測試基準" },
     { id: "REC", kind: "record", title: "寫入正式紀錄：已通過", sub: "決定下一站" },
   ],
   edges: [
@@ -24,8 +25,8 @@ export default {
     ["S2", "CK", "沒有"], ["CK", "EV"], ["EV", "Q"],
     ["Q", "R", "沒有", "back"],
     ["Q", "G", "通過，這站有關卡"],
-    ["Q", "REC", "通過，這站沒有關卡"],
-    ["G", "REC", "核准"],
+    ["Q", "FIN", "通過，這站沒有關卡"],
+    ["G", "FIN", "核准"], ["FIN", "REC"],
     ["G", "A", "不核准：回本節點修正", "back"],
   ],
 };
