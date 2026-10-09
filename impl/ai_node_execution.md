@@ -67,7 +67,7 @@ claude -p "執行節點 M4：依 handoff/in/M3.yaml 實作，完成後寫出 han
 
 - 不加 `-p` 執行 `claude` 就是互動式。節點設定改寫成工作目錄裡的檔案（CLAUDE.md 或 skill、`.claude/settings.json`、`.mcp.json`），人用終端機、desktop app、VS Code 都會套用。
 - **不能用 Stop hook 強制交出交接清單**：互動模式下每回一次話就會觸發一次，會讓 AI 不把發言權交回給人。改用人執行的收尾指令（例如 `/m1-done`）核對交接清單，加上 SessionEnd hook 記錄未完成的狀態。
-- 要等客戶、SOC、HW 回答的問題：登記成待確認事項並寫進 Jira，節點狀態改成「等待外部回覆」。答案回來後開**新 session** 從檔案接續，不用 `--resume`。
+- 要等客戶、SOC、HW 回答的問題：登記成待確認事項，節點狀態改成「等待外部回覆」。專案設定「寫進 Jira」允許時由工具寫進 Jira；不允許時（例如 E39）由人轉問，答案記回待確認事項清單。答案回來後開**新 session** 從檔案接續，不用 `--resume`。
 
 ---
 

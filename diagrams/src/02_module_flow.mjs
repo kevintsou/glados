@@ -7,7 +7,7 @@ export default {
   nodes: [
     { id: "IN1", kind: "ext", title: "P3 展開，或需求變更" },
     { id: "M1", tag: "M1", title: "需求釐清", sub: "寫成有編號的 spec 條目" },
-    { id: "WAIT", kind: "wait", title: "等待外部回覆", sub: ["問題寫進 Jira", "答案回來再接續"] },
+    { id: "WAIT", kind: "wait", title: "等待外部回覆", sub: ["登記待確認事項", "設定允許時寫進 Jira，否則由人轉問", "答案回來再接續"] },
     { id: "H1", kind: "gate", title: "H1 需求核准" },
     { id: "IN2", kind: "ext", title: "bug 型 CR" },
     { id: "M2", tag: "M2", title: "驗收定義", sub: "驗收合約、case、判別能力證據" },

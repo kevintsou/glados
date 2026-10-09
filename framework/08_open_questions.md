@@ -63,7 +63,7 @@
 | v0.8 | 需求來源（Jira CR、Confluence spec 頁）由工具抓成來源快照，AI 只讀快照；實作採直接呼叫 REST API 的 script；spec 頁在專案設定列頁面 ID | [03 §3.2](03_artifacts.md#32-編號版本與-hash)、[07](07_project_profile.md) |
 | v0.8 | G0 固定專案範圍、起點與環境；第一次通過 G1 前，CR／spec 的新增或修改都由 P0／P2 整理；第一次通過 G1 後才走 C＋GC，即使重開 G1 或回到 P0／P2 也不解除。S 版本同步比對 Jira／Confluence，依同一分界處理 | [04 §4.6](04_rules.md#46-c-變更處理)、[04 §4.7](04_rules.md#47-s-版本同步) |
 | v0.8 | P2 分成 P2a（AI 分析）與 P2b（人和 AI 整理 CR：拆分、補 CR、澄清、修改），不另開節點；第一次通過 G1 前的 CR 修訂記在 CR 修訂紀錄，P2b 定案即更新 Jira（設定允許時）與相關快照，G1 審核整理後的結果並建立需求基準；會改到範圍清單標記的退回 P0 | [nodes/P2](../nodes/P2.md) |
-| v0.8 | CR 修訂要不要寫回 Jira 由專案設定決定；E39 因為雙向隔離不寫回 | [07](07_project_profile.md)、[projects/E39](../projects/E39.md) |
+| v0.8 | GLADOS 的內容（P2b 的 CR 修訂、要問外部的待確認事項）要不要寫進 Jira，由專案設定「寫進 Jira」決定；不寫時 CR 修訂只留在內部、待確認事項由人轉問。E39 因為雙向隔離都不寫 | [07](07_project_profile.md)、[projects/E39](../projects/E39.md) |
 | v0.8 | 「輸入不足」定義為「某個必要輸出填不出來，原因是某個輸入缺漏或有問題」，退回產出該輸入的那一站；是 R 失敗分類的通用類型（P0、P2 原本叫「資訊不足」，統一改名） | [04 §4.5](04_rules.md#45-r-失敗分類)、[nodes/P2](../nodes/P2.md) |
 | v0.8 | 人工關卡用簽核 skill 引導審閱，最後由人親自送出（簽核指令跳出的系統對話框，以及 openBCT GLADOS 分頁的按鈕，先做對話框）；不用 GitLab MR。AI 不給核准建議，改成讓核准人逐項表態；專案設定新增「關卡核准人」 | [02 §2.4](02_workflow.md#24-人工關卡)、[impl/gate_signoff](../impl/gate_signoff.md) |
 | v0.8 | 不再用 T0（T0 在 IC 領域常指 tapeout；討論中一度改名為「範圍凍結點」，最後拿掉）：G0 固定範圍、起點與環境，核准時間記在 G0 的核准紀錄；CR 變更走 C 的分界是 G1 以來源快照、CR 修訂紀錄與差異分析的版本與 hash 建立的需求基準 | [01 §1.7](01_overview.md#17-用語表) |
