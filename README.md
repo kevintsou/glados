@@ -24,7 +24,7 @@ bootcode FW 開發流程平台。目前是 **v0.8 框架定稿**：框架（流�
 | 還沒決定的事、已經決定的事 | [framework/08 待決事項](framework/08_open_questions.md) |
 | 每個節點的介面與實作構想 | [nodes/](nodes/README.md) |
 | E39 怎麼套用 GLADOS | [projects/E39](projects/E39.md) |
-| 實作設計（框架確認後才開始） | [impl/service](impl/service.md)、[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/gate_signoff](impl/gate_signoff.md)、[impl/tools](impl/tools.md) |
+| 實作設計（框架確認後才開始） | [impl/service](impl/service.md)、[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/gate_signoff](impl/gate_signoff.md)、[impl/bcgen](impl/bcgen.md)、[impl/tools](impl/tools.md) |
 | 討論筆記 | [notes/](notes/playbook_kit_review.md) |
 | 版本紀錄、和 v0.6 的章節對照 | [CHANGELOG](CHANGELOG.md) |
 

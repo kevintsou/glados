@@ -34,6 +34,7 @@
 
 - 每張節點卡的「待展開議題」。
 - [impl/service.md I8](../impl/service.md#i8-待決事項)：串接層服務的待決事項。
+- [impl/bcgen.md B9](../impl/bcgen.md#b9-待決事項)：bcgen 接進 GLADOS 的待決事項。
 - [projects/E39.md E7](../projects/E39.md#e7-e39-待決事項)：E39 專案自己的待決事項。
 
 ---

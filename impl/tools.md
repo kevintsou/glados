@@ -5,8 +5,8 @@
 | 節點 | 工具 |
 | :---- | :---- |
 | 串接層、S 版本同步 | 串接層服務（入口：openBCT GLADOS 分頁、CLI、API）、GitLab／本機 git、版本比對與獨立影響分析 |
-| P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、grill-me |
-| P1 | ds5-build／andes-build、remote-ice、bootcode-qa |
+| P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、grill-me；P0 另用 bcgen 的 MCP 盤點起點（[bcgen.md](bcgen.md)） |
+| P1 | ds5-build／andes-build、remote-ice、bootcode-qa、bcgen 的 MCP（核對 build target） |
 | P2 | GitLab MCP、bootcode-qa、subagent 平行分析；P2b：CR 撰寫 skill（新做，參考 write-jira-desc）、grill-me、寫回 Jira 的工具 |
 | 人工關卡 | 簽核 skill、簽核指令（系統對話框）、openBCT GLADOS 分頁的核准按鈕（[gate_signoff.md](gate_signoff.md)） |
 | P3 | bootcode-qa、pyconvert（eFuse／BCFG 欄位與 layout） |
@@ -24,4 +24,5 @@
 
 - `write-openbct-test`、`write-jira-desc` 在 openBCT 的 `.agents/skills/`。
 - `grill-me` 被 openBCT 的 write-jira-desc 引用，但 openBCT 與 bct_knowledge_base 兩個 repo 裡都沒有它的本體，來源與版本待確認。
+- bcgen 在 bct_knowledge_base 的 `tools/bcgen/`（公版 bootcode 產生工具＋公版 code 包）；MCP 是規劃中的新入口（[bcgen.md](bcgen.md)）。
 - 其他 skill（bootcode-qa、remote-ice、ds5-build、andes-build、pyconvert、logic-analyzer、pps-log-verify、corvia-code-review、ci-owner、sim-release、vault-smith、the-validator）都在 bct_knowledge_base 的 `Skills/`。
