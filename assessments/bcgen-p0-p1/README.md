@@ -1,6 +1,6 @@
 # bcgen 在 GLADOS P0／P1 的角色評估
 
-評估日期：2026-10-08（Asia/Taipei）
+評估日期：2026-10-08（Asia/Taipei）；2026-10-12 補上第 13 節「E39 起點實測」。
 
 文件性質：獨立評估提案，供討論與決定修改範圍。本文沒有變更 GLADOS 規則，也沒有修改 bcgen。
 
@@ -346,7 +346,7 @@ E39 文件指定 PS5037 前代起點、ARM Cortex-R5／DS-5，並禁止 agent �
 推薦流程：
 
 1. 由 GLADOS／人提供只含允許來源的隔離 repo，固定指定的 PS5037 起點 commit。
-2. bcgen inspect 只讀這份 snapshot，列 CPU／系列、4 個既有 build 設定、記憶體、eFuse／register，以及功能候選與未知。
+2. bcgen inspect 只讀這份 snapshot，列 CPU／系列、4 個既有 build 設定、記憶體、eFuse／register，以及功能候選與未知。（2026-10-12 實測：起點 `.cproject` 有 6 個 build 設定，而現行匯入對 ARM 起點的系列、image、build 設定會漏或給預設值，見第 13 節。）
 3. 與起點 code、來源快照／既有測試清單交叉核對，供 P0a 草擬與 P0b 定案；bcgen 不能取代 Jira／Confluence 來源快照的完整性檢查。
 4. P1 保留原 source 結構與 DS-5 build，對核準起點產出 image 與基線 log。
 
@@ -437,6 +437,17 @@ python -B assessments/bcgen-p0-p1/inspect_bcgen.py --bcgen-root ../bct_knowledge
 
 這份 JSON 的 hash 用來讓讀者知道評估針對哪份工作目錄內容，不是由 GLADOS 串接層產生的正式證據。重新執行會取得當時的來源版本，結果可能隨工具修改而不同。
 
+第 13 節的附件：
+
+- [observations_e39_start.json：E39 起點實測結果與輸入 SHA-256](observations_e39_start.json)
+- [inspect_e39_start.py：重跑 E39 起點實測](inspect_e39_start.py)
+
+`--src-root` 指向起點 repo 的 `ws_fw/src_root`；腳本用 `BCGEN_SRC_ROOT` 指定起點，不讀 bcgen 的 `settings.json`。`--expect-commit` 不符時拒絕執行。腳本只讀兩個 repo，JSON 輸出必須放在兩個 repo 之外；沒有產生、build 或上板。發布版 JSON 把兩處本機根目錄改成邏輯標記，其餘內容保持原樣。
+
+```powershell
+python -B assessments/bcgen-p0-p1/inspect_e39_start.py --bcgen-root ../bct_knowledge_base/tools/bcgen --src-root ../duanyue/ws_fw/src_root --expect-commit 83dc1a65b --output ../bcgen_e39_start_latest.json
+```
+
 ### 12.2 來源索引
 
 | 索引 | 來源 | 本文使用的依據 |
@@ -454,5 +465,57 @@ python -B assessments/bcgen-p0-p1/inspect_bcgen.py --bcgen-root ../bct_knowledge
 | S11 | [E39](https://github.com/kevintsou/glados/blob/1d4fe12fc4cd25de46177f64d2d218bd7c31b407/projects/E39.md#L21) | Delta／ARM 起點、禁止來源、build 設定與隔離 |
 | S12 | [GLADOS 待決事項](https://github.com/kevintsou/glados/blob/1d4fe12fc4cd25de46177f64d2d218bd7c31b407/framework/08_open_questions.md#L11) | 環境清單改版、格式及實作仍待定 |
 | S13 | [bcgen README](https://github.com/kevintsou/bct_knowledge_base/blob/458201183677a95d813948f3e474027d99136da6/tools/bcgen/README.md)、[公版 code 包](https://github.com/kevintsou/bct_knowledge_base/blob/458201183677a95d813948f3e474027d99136da6/tools/bcgen/bootcode_ai/README.md) | 工具用途、wizard、輸出、stub／PC 模擬設計 |
+| S14 | [匯入的 CPU／image／系列判斷](https://github.com/kevintsou/bct_knowledge_base/blob/2b6a8cba1d5a9f5b7acd10524ac9607967892685/tools/bcgen/core/importer.py#L136-L152)、[KAT 判斷](https://github.com/kevintsou/bct_knowledge_base/blob/2b6a8cba1d5a9f5b7acd10524ac9607967892685/tools/bcgen/core/importer.py#L175)、[target 推導](https://github.com/kevintsou/bct_knowledge_base/blob/2b6a8cba1d5a9f5b7acd10524ac9607967892685/tools/bcgen/core/buildgen.py#L30) | 第 13 節：ARM 起點的系列、image、build 設定、KAT 為什麼盤點不到 |
+| S15 | [E39 專案設定](https://github.com/kevintsou/glados/blob/ba634930497794177f500bc5a6d419f3dc640ae0/projects/E39.md#L23) | 第 13 節：起點 commit、ROM 配置、系列、build 設定的對照值 |
 
-本提案新增的 CLI、報告格式、input bundle、嚴格前置檢查與流程位置，均為建議能力；第 2 節與附件中的測試結果才是這次確認的現況。
+本提案新增的 CLI、報告格式、input bundle、嚴格前置檢查與流程位置，均為建議能力；第 2 節、第 13 節與附件中的測試結果才是確認過的現況。
+
+## 13. 補充：E39 起點實測（2026-10-12）
+
+第 2 節只用 PS5910 範例，沒有掃描 E39 的起點 code（第 2.1 節）。這一節補上：用 bcgen 現有的匯入、設定檢查、target 推導與過往問題篩選，直接讀 E39 起點，看 P0a 實際能拿到什麼。
+
+### 13.1 範圍
+
+- **起點**：duanyue `release/PS5037` @ `83dc1a65b`，即 E39 專案設定的起點。[S15] `ws_fw` 底下沒有已追蹤檔案的修改；未追蹤的檔案裡沒有 `.c`，不會混進 code 參考搜尋。
+- **bcgen**：bct_knowledge_base `2b6a8cb`。和第 2 節的 `4582011` 相比，多了 sys_reset、bfm_enter、security_self_test 三個模組與 README 補齊，匯入與檢查的程式沒有改。
+- **做法**：用 `BCGEN_SRC_ROOT` 明確指定起點，不讀 `settings.json`；直接呼叫匯入、設定檢查、target 推導、過往問題篩選四個函式。沒有產生、沒有 build、沒有上板。
+- **對照依據**：起點的 DS-5 設定檔 `ws_fw/.cproject`、`proj/ps5037/scat/` 目錄，以及 E39 專案設定。
+- **隔離**：這次讀的是本機 duanyue 的工作目錄（checkout 在允許的 `release/PS5037`），不是 E39 規劃的隔離工作區 repo。bcgen 只讀工作目錄的檔案，不讀其他 branch；但正式的 P0a 仍要照第 10.1 節，只讀隔離的 snapshot。
+
+### 13.2 結果
+
+| 項目 | bcgen 匯入的結果 | 起點實際 | 原因 |
+| :--- | :--- | :--- | :--- |
+| CPU | arm | arm | 依 `startup.s` 判斷，正確 |
+| ROM | base `0x80000`、size `0x4D000` | 同 E39 專案設定 | 正確 |
+| ITCM／DTCM | ITCM `0x0`／`0x30000`；DTCM `0x800000`／`0x12000`，拆出 5 個子區域 | — | 讀到；沒有和實際用量核對 |
+| eFuse | `conf_efuse.h`、`conf_efuse_desc.h` | — | 讀到 |
+| 帶入的 code | 4 個函式（`phal_sys_rtt_*` 三個、`phal_isp_jump_init`），附來源行號 | — | 讀到 |
+| 系列 | 空白，附警告 IMPORT-SERIES | duan | 只看 `scat/build_exclude_boot.cfg`，這是 Andes 起點的檔案，ARM 起點沒有 [S14] |
+| image | 只有 boot | boot＋sandaru | 只認 `burner.ld`、`build_exclude_sandaru.cfg`；ARM 起點的是 `burner.scat` [S14] |
+| build 設定 | `ps5037_boot_mask_fpga` 1 個 | `.cproject` 有 6 個：boot_mask／boot_spice／sandaru × ASIC／FPGA | 匯入不設定 platform 與 boot type，這 1 個是空專案的預設值；bcgen 不讀 `.cproject` [S14] |
+| 功能 | 57 個中勾到 1 個（isp_jump_init） | — | KAT 只讀 `config/conf.h` 的 `KAT_xxx_EN`，ps5037 沒有這個檔，整個 `proj/ps5037` 也沒有這種寫法；其他功能本來就不判斷（IMPORT-FEAT）[S14] |
+| 設定檢查 | 3 個 error：BASIC-SERIES、PARAM-REQUIRED（UART 參考時脈）、EFUSE-BANK-COUNT | — | 系列是上面的匯入缺漏；另外兩個是產生 code 才需要的欄位 |
+| 適用的過往問題 | 8 條 | — | 全部沒有自動檢查，只能人工核對 |
+
+完整結果與輸入 SHA-256 見 [observations_e39_start.json](observations_e39_start.json)。
+
+### 13.3 對 P0／P1 的意義
+
+1. **讀到的部分可以直接用**：CPU、ROM／ITCM／DTCM、eFuse、帶入 code 的來源位置，可以當 P0a 盤點的「讀到」項目。
+2. **系列、image、build 設定會給錯的答案，不只是「不知道」**：系列留空還有警告；但 image 只列 boot、build 設定只列 1 個，看起來像讀到，其實是缺漏或預設值。照第 4.1 節的原則，補上 ARM 支援之前，盤點報告要把這三項標成「不知道」。
+3. **核對 build target 的前提是能讀 `.cproject`**：目前 bcgen 的 target 是照它自己的 Andes `build.sh` 命名推出來的，不是從起點讀的。對 E39 這種 DS-5 起點，要先能讀 `.cproject` 的 build 設定，才能抓到「專案設定漏列 target」。
+4. **設定檢查要分模式**：盤點既有起點時，UART 參考時脈、`EFUSE_BANK_COUNT` 這類產生 code 才需要的欄位不該報 error。這是第 7 節第 5 項的實例。
+5. **功能盤點不能靠 bcgen 的功能清單**：E39 的既有功能要從起點 code、知識庫與 Jira 既有測試項目盤點（GLADOS P0 節點卡的待展開議題）；bcgen 只能補 code 位置。
+6. **版本號鎖不住內容**：公版 code 包從 54 個模組變成 57 個（56 stub、1 partial），`VERSION` 仍是 `0.1.0`。這是第 4.3 節「只有 `VERSION=0.1.0` 不足以證明兩次用的是同一份內容」的實例。
+7. **E39 的 build 設定可能是 6 個**：`.cproject` 除了 boot_mask／boot_spice × ASIC／FPGA，還有 `ps5037_sandaru_asic`、`ps5037_sandaru_fpga`。這兩個能不能 build、要不要列進 P1 基線，這次沒有驗證。
+
+### 13.4 第 7 節缺口的現況（bct_knowledge_base `2b6a8cb`）
+
+| # | 現況 |
+| :--- | :--- |
+| 1 | 沒有變：命令列仍只有 serve、check、generate |
+| 8 | 沒有變：`build.sh` 最後仍固定 `exit 0`；bcgen README 的「目前限制」已寫明 |
+| 新增 | ARM 起點的系列、image、build 設定匯入（13.2） |
+
+其他缺口這次沒有重新檢查。

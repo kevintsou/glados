@@ -168,6 +168,12 @@
 - 新增 [impl/bcgen](impl/bcgen.md)：bcgen 保留網頁精靈與命令列，長出 MCP 讓 AI 在 P0a 盤點、P0b 討論、P1 開始時核對使用。第一版只開唯讀工具；結果只供參考，要當證據由串接層用命令列執行；每次綁定固定輸入、分清楚讀到／推測／不知道；AI 只提議、寫入要人確認；版本列進環境清單。新 IC 的起點在 P0 之前、流程外準備。框架不變。
 - P0、P1 節點卡的實作段、impl/tools、README 文件索引、08 的實作待決索引同步更新。
 
+**實作：bcgen 用 E39 起點實測**（2026-10-12）
+
+- bcgen 評估新增 §13：用 bcgen 現有的匯入、設定檢查、target 推導、過往問題篩選，唯讀跑 E39 起點（duanyue `release/PS5037` @ `83dc1a65b`，bct_knowledge_base `2b6a8cb`）。CPU、記憶體、eFuse、帶入 code 的來源讀得到；系列、image（漏 sandaru）、build 設定（只給預設的 1 個）會漏或給預設值；功能只勾到 1 個；設定檢查有 2 個 error 是產生 code 才需要的欄位。附重跑 script 與觀察結果 JSON。
+- [impl/bcgen](impl/bcgen.md)：B4 補上實測後的限制；B8 第 1 階段加入 ARM 起點的匯入（讀 `.cproject`、`burner.scat`、系列）與 `check` 分盤點／產生兩種模式，驗收加上 E39 起點的對照值；B9 新增第 5 項「MCP 什麼時候做」。
+- [projects/E39](projects/E39.md)：build 設定改為起點 `.cproject` 的 6 個（多了 sandaru × ASIC／FPGA），E7 第 5 項改成確認這兩個能不能 build、要不要列進來。
+
 ## v0.7 改了什麼
 
 **結構**

@@ -4,7 +4,7 @@
 >
 > **和框架的關係**：bcgen 是節點用的工具，放在實作層；框架不因為它改變。本文件的每一條限制，都是為了守住框架既有的規則（只認證據、可寫範圍、隔離、環境清單）。
 >
-> **背景評估**：bcgen 現況、在 P0／P1 能做與不能做的事、缺口與驗收條件，見 [assessments/bcgen-p0-p1](../assessments/bcgen-p0-p1/README.md)（2026-10-08，針對 bct_knowledge_base `4582011`）。
+> **背景評估**：bcgen 現況、在 P0／P1 能做與不能做的事、缺口與驗收條件，見 [assessments/bcgen-p0-p1](../assessments/bcgen-p0-p1/README.md)（2026-10-08，針對 bct_knowledge_base `4582011`）。用 E39 起點實際跑過的結果見同一份評估的 [§13](../assessments/bcgen-p0-p1/README.md#13-補充e39-起點實測2026-10-12)（2026-10-12，針對 `2b6a8cb`）。
 
 ---
 
@@ -63,6 +63,12 @@
 每個回應都帶：context 編號、輸入的版本與 hash、每一項的來源（檔案、行號、檔案 hash）與觀察程度（讀到／推測／不知道）。
 
 **不開放的功能**：產生專案（`generate`）、帶入 HAL（掃描後套用、自動帶入）、新增功能（寫 `features_custom.json`）、存設定（`settings.json`）。之後要給「準備新 IC 起點」用時，另外做一組，不放進 P0／P1 節點的 MCP 白名單。
+
+**用 E39 起點實測後的限制**（評估 [§13](../assessments/bcgen-p0-p1/README.md#13-補充e39-起點實測2026-10-12)）：
+
+- `inspect_start`：CPU、記憶體區域、eFuse、帶入 code 的來源位置讀得到。ARM 起點的系列、image、build 設定目前會漏掉或給預設值，補上 ARM 起點的匯入（B8 第 1 階段）之前，這三項一律標成「不知道」。功能清單只勾得到 1 個，E39 的既有功能要從其他來源盤點（[nodes/P0](../nodes/P0.md) 的待展開議題）。
+- `check_config`：要分「盤點」與「產生」兩種模式。盤點既有起點時，產生 code 才需要的欄位（例如 UART 參考時脈、`EFUSE_BANK_COUNT`）不報 error。
+- `check_build_targets`：DS-5 起點的 build 設定寫在 `.cproject`，要先能讀它才做得出來。
 
 ---
 
@@ -123,7 +129,7 @@
 
 | 階段 | 做什麼 | 驗收 |
 | :---- | :---- | :---- |
-| 1. 固定輸入與命令列 JSON | 每次執行明確指定起點 repo、commit 與資料版本；掃描只限指定範圍；`check` 與盤點輸出 JSON（附來源、hash、讀到／推測／不知道）；`version` 回報各項版本與 hash | 同樣的輸入得到同樣的結果；不寫入任何檔案；指定範圍以外的路徑會被拒絕；不支援的組合明確回報 |
+| 1. 固定輸入與命令列 JSON | 每次執行明確指定起點 repo、commit 與資料版本；掃描只限指定範圍；`check` 與盤點輸出 JSON（附來源、hash、讀到／推測／不知道）；`version` 回報各項版本與 hash。ARM 起點的匯入：讀 DS-5 `.cproject` 的 build 設定、認得 `burner.scat`、判斷系列；`check` 分盤點與產生兩種模式（B4 末段） | 同樣的輸入得到同樣的結果；不寫入任何檔案；指定範圍以外的路徑會被拒絕；不支援的組合明確回報；E39 起點（`83dc1a65b`）盤點出系列 duan、image boot＋sandaru、`.cproject` 的 6 個 build 設定；盤點模式不因產生用的欄位報 error |
 | 2. MCP（唯讀） | 在同一套核心上提供 B4 的工具；MCP 套件延遲載入 | 工具清單裡沒有任何寫入功能；每個回應都帶 context 與來源；沒裝 MCP 套件時網頁精靈與命令列照常運作 |
 | 3. P0／P1 對接 | `profile_draft` 對應 GLADOS 專案設定欄位；`check_build_targets`；節點設定的 MCP 白名單 | 專案設定草稿沒有機器路徑，缺的欄位有列出；漏列 target 能被抓到 |
 
@@ -137,3 +143,4 @@
 2. MCP 用官方 `mcp` 套件（要另外安裝），還是用標準函式庫自己實作 stdio 協定（維持零相依）。
 3. 盤點報告要不要成為 P0 的正式附件。目前只當工具輸出；要變成正式產出物，就是改框架。
 4. 「起點準備」要不要變成正式的一站（等第一個用 bcgen 起點的新 IC 專案）。
+5. MCP（B8 第 2 階段）什麼時候做。建置路線步驟 2 由人扮演串接層（[framework/01 §1.6](../framework/01_overview.md#16-建置路線)），P0 用命令列 JSON 就夠了；MCP 可以等步驟 3 接上串接層服務時再做。E39 實測後傾向這樣排，讓第 1 階段先把 ARM 起點的匯入做對（評估 [§13](../assessments/bcgen-p0-p1/README.md#13-補充e39-起點實測2026-10-12)）。
