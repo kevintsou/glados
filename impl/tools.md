@@ -5,8 +5,8 @@
 | 節點 | 工具 |
 | :---- | :---- |
 | 串接層、S 版本同步 | 串接層服務（入口：openBCT GLADOS 分頁、CLI、API）、GitLab／本機 git、版本比對與獨立影響分析 |
-| P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、grill-me；P0 另用 bcgen 的 MCP 盤點起點（[bcgen.md](bcgen.md)） |
-| P1 | ds5-build／andes-build、remote-ice、bootcode-qa、bcgen 的 MCP（核對 build target） |
+| P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、grill-me；P0 另用 bcgen 的唯讀 JSON CLI 盤點起點，步驟 3 再接 MCP（[bcgen.md](bcgen.md)） |
+| P1 | ds5-build／andes-build、remote-ice、bootcode-qa、bcgen 的唯讀 JSON CLI（核對 build target 的必要／排除處置；步驟 3 再接 MCP）；實際 build 證據由串接層核對 |
 | P2 | GitLab MCP、bootcode-qa、subagent 平行分析；P2b：CR 撰寫 skill（新做，參考 write-jira-desc）、grill-me、寫回 Jira 的工具 |
 | 人工關卡 | 簽核 skill、簽核指令（系統對話框）、openBCT GLADOS 分頁的核准按鈕（[gate_signoff.md](gate_signoff.md)） |
 | P3 | bootcode-qa、pyconvert（eFuse／BCFG 欄位與 layout） |

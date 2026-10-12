@@ -194,42 +194,158 @@
     {
       "id": "SRAM-001",
       "title": "SRAM 未 init 就使用",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "SRAM-INIT-ORDER",
+          "text": "sram_init() 之前執行的函式，不能存取尚未 init 的區段（elf + call graph 分析）",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "新增的 SRAM 區域有加進 init 清單",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "FPGA / SIM 開機前先把 SRAM 填 pattern，確認不受影響",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "MEM-001",
       "title": "記憶體大小在多處定義不一致",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "MEM-OVERLAP",
+          "text": "各區域不可重疊",
+          "implemented": true
+        },
+        {
+          "kind": "auto",
+          "code": "MEM-SYNC",
+          "text": ".ld / build.sh 的大小與專案 JSON 一致",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "手動改過 .ld 或 build.sh 的大小，要同步改專案 JSON",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "MEM-003",
       "title": "stack 用量超過配置",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "STACK-USAGE",
+          "text": "開 -fstack-usage，從 call graph 算最深 stack，與 stack size 比對",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "函式內不要宣告大的 local 陣列，改用 DBUF",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "REG-001",
       "title": "register 存取用錯 accessor",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "REG-RAW-ACCESS",
+          "text": "共用驅動層禁止直接使用 r_xxx_ 原始存取",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "register header 要和 regmap（http://192.168.41.158:8299/regmap/）的版本一致",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "REG-002",
       "title": "register / CSR 直接整個覆寫",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "REG-RMW",
+          "text": "寫入常數到有多個欄位的 register 時發出警告",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "確認寫入時沒有把其他欄位清掉",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "DBG-001",
       "title": "debug / 暫時性的 code 留著",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "DBG-LEFTOVER",
+          "text": "release build 不准出現 if (1)、if (0)、#if 0，DEBUG_KAT、HW_SIM_DEBUG 等開關要為 0",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "出版前 review 所有 debug 開關",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "ISR-001",
       "title": "成對的動作漏做",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "PAIR-CHECK",
+          "text": "同一個函式中成對 API 在每條 return 路徑都要配對",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "有提早 return 的函式，確認有恢復狀態",
+          "implemented": false
+        }
+      ]
     },
     {
       "id": "BLD-001",
       "title": "只編了自己的 target",
-      "check": null
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "BUILD-MATRIX",
+          "text": "CI 每次把每顆 IC 的所有 target 都編一遍",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "改共用層時，至少本機把兩條 CPU 線（andes / arm）都編過",
+          "implemented": false
+        }
+      ]
     }
   ],
   "start_point_facts": {
@@ -293,5 +409,18 @@
       "ws_fw/src_root/proj/ps5037/scat/scatter.h": "f8e37cf2ed349ee61247b4fb4f5054950a0580a43160044fc92ffa4332f713f4",
       "ws_fw/src_root/proj/ps5037/startup.s": "55857cb3d31498e7fdb81e536ee00d9f7fe04fb290807476f403e7e5d7c9f07b"
     }
-  }
+  },
+  "report_corrections": [
+    {
+      "corrected_on": "2026-10-12",
+      "field": "applicable_pitfalls[].checks",
+      "reason": "The probe exported the nonexistent singular check field as null; restore the actual checks list, including kind, code, text and implemented.",
+      "method": "Reconstructed with the frozen bcgen parser and checklist from the recorded bct_knowledge_base commit; all 27 recorded bcgen input SHA-256 hashes were verified before reconstruction.",
+      "bcgen_commit": "2b6a8cba1d5a9f5b7acd10524ac9607967892685",
+      "parser_sha256": "e8abef62d9ab7f47351f9f69f99ec081081b02c5db2527d22d3c4a7654f5c5d8",
+      "checklist_sha256": "b7627d7fc9b46536899e53deaeeb35e117a1bd3175430724b6565d06327a9f5e",
+      "firmware_probe_rerun": false,
+      "check_execution_results_added": false
+    }
+  ]
 }

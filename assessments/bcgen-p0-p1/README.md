@@ -477,7 +477,7 @@ python -B assessments/bcgen-p0-p1/inspect_e39_start.py --bcgen-root ../bct_knowl
 ### 13.1 範圍
 
 - **起點**：duanyue `release/PS5037` @ `83dc1a65b`，即 E39 專案設定的起點。[S15] `ws_fw` 底下沒有已追蹤檔案的修改；未追蹤的檔案裡沒有 `.c`，不會混進 code 參考搜尋。
-- **bcgen**：bct_knowledge_base `2b6a8cb`。和第 2 節的 `4582011` 相比，多了 sys_reset、bfm_enter、security_self_test 三個模組與 README 補齊，匯入與檢查的程式沒有改。
+- **bcgen**：bct_knowledge_base `2b6a8cb`。和第 2 節的 `4582011` 相比，多了 sys_reset、bfm_enter、security_self_test 三個模組與 README 補齊；`core/importer.py` 沒有改，但檢查程式有改：`check_project` 傳入系列並加入 HAL 匯入檢查，功能規則新增 `FEAT-SERIES`。第 2 節的檢查結果不能直接當成這個版本的結果。
 - **做法**：用 `BCGEN_SRC_ROOT` 明確指定起點，不讀 `settings.json`；直接呼叫匯入、設定檢查、target 推導、過往問題篩選四個函式。沒有產生、沒有 build、沒有上板。
 - **對照依據**：起點的 DS-5 設定檔 `ws_fw/.cproject`、`proj/ps5037/scat/` 目錄，以及 E39 專案設定。
 - **隔離**：這次讀的是本機 duanyue 的工作目錄（checkout 在允許的 `release/PS5037`），不是 E39 規劃的隔離工作區 repo。bcgen 只讀工作目錄的檔案，不讀其他 branch；但正式的 P0a 仍要照第 10.1 節，只讀隔離的 snapshot。
@@ -496,19 +496,21 @@ python -B assessments/bcgen-p0-p1/inspect_e39_start.py --bcgen-root ../bct_knowl
 | build 設定 | `ps5037_boot_mask_fpga` 1 個 | `.cproject` 有 6 個：boot_mask／boot_spice／sandaru × ASIC／FPGA | 匯入不設定 platform 與 boot type，這 1 個是空專案的預設值；bcgen 不讀 `.cproject` [S14] |
 | 功能 | 57 個中勾到 1 個（isp_jump_init） | — | KAT 只讀 `config/conf.h` 的 `KAT_xxx_EN`，ps5037 沒有這個檔，整個 `proj/ps5037` 也沒有這種寫法；其他功能本來就不判斷（IMPORT-FEAT）[S14] |
 | 設定檢查 | 3 個 error：BASIC-SERIES、PARAM-REQUIRED（UART 參考時脈）、EFUSE-BANK-COUNT | — | 系列是上面的匯入缺漏；另外兩個是產生 code 才需要的欄位 |
-| 適用的過往問題 | 8 條 | — | 全部沒有自動檢查，只能人工核對 |
+| 適用的過往問題 | 8 條，含 18 個檢查項目 | — | 1 個已實作自動檢查（MEM-001 的 `MEM-OVERLAP`）、8 個規劃中的自動檢查、9 個人工項目；這是能力 metadata，不是逐項執行或 PASS 證據 |
 
 完整結果與輸入 SHA-256 見 [observations_e39_start.json](observations_e39_start.json)。
+
+**觀察報告修正（2026-10-12）**：原 script 誤讀單數 `check`，把每條過往問題都匯出成 `null`，因此曾誤判為全數只能人工核對。現改讀 bcgen 實際回傳的 `checks` 清單，保留 `kind`、`code`、`text`、`implemented`。附件的檢查 metadata 依原記錄 SHA-256 核對過的 `2b6a8cb` 凍結程式與清單重建，保留原 `observed_at`、起點與其他觀察，並附 `report_corrections`；沒有重新掃描 FW、build 或上板。`implemented` 只表示規則已實作，不能當成執行結果。
 
 ### 13.3 對 P0／P1 的意義
 
 1. **讀到的部分可以直接用**：CPU、ROM／ITCM／DTCM、eFuse、帶入 code 的來源位置，可以當 P0a 盤點的「讀到」項目。
 2. **系列、image、build 設定會給錯的答案，不只是「不知道」**：系列留空還有警告；但 image 只列 boot、build 設定只列 1 個，看起來像讀到，其實是缺漏或預設值。照第 4.1 節的原則，補上 ARM 支援之前，盤點報告要把這三項標成「不知道」。
-3. **核對 build target 的前提是能讀 `.cproject`**：目前 bcgen 的 target 是照它自己的 Andes `build.sh` 命名推出來的，不是從起點讀的。對 E39 這種 DS-5 起點，要先能讀 `.cproject` 的 build 設定，才能抓到「專案設定漏列 target」。
+3. **核對 build target 的前提是能讀 `.cproject`**：目前 bcgen 的 target 是照它自己的 Andes `build.sh` 命名推出來的，不是從起點讀的。對 E39 這種 DS-5 起點，要先能讀 `.cproject` 的 build 設定，再核對每個 target 是否已列為必要或附理由明確排除；不能把有理由且經 G0 核准的排除當作漏列。待確認或盤點缺口仍要回 P0 解決（[impl/bcgen B5](../../impl/bcgen.md#b5-在-p0p1-怎麼用)）。
 4. **設定檢查要分模式**：盤點既有起點時，UART 參考時脈、`EFUSE_BANK_COUNT` 這類產生 code 才需要的欄位不該報 error。這是第 7 節第 5 項的實例。
 5. **功能盤點不能靠 bcgen 的功能清單**：E39 的既有功能要從起點 code、知識庫與 Jira 既有測試項目盤點（GLADOS P0 節點卡的待展開議題）；bcgen 只能補 code 位置。
 6. **版本號鎖不住內容**：公版 code 包從 54 個模組變成 57 個（56 stub、1 partial），`VERSION` 仍是 `0.1.0`。這是第 4.3 節「只有 `VERSION=0.1.0` 不足以證明兩次用的是同一份內容」的實例。
-7. **E39 的 build 設定可能是 6 個**：`.cproject` 除了 boot_mask／boot_spice × ASIC／FPGA，還有 `ps5037_sandaru_asic`、`ps5037_sandaru_fpga`。這兩個能不能 build、要不要列進 P1 基線，這次沒有驗證。
+7. **E39 起點盤點出 6 個設定，必要清單仍待 G0 核准**：`.cproject` 除了 boot_mask／boot_spice × ASIC／FPGA，還有 `ps5037_sandaru_asic`、`ps5037_sandaru_fpga`。這兩個能不能 build、是否為這版範圍所需，這次沒有驗證。P0b 必須逐項決定必要或明確排除，不能因 build 失敗而排除，也不能縮小 E39 的完整量產範圍；G0 核准後，所有必要設定都要有實際 0 warning build 證據。
 
 ### 13.4 第 7 節缺口的現況（bct_knowledge_base `2b6a8cb`）
 

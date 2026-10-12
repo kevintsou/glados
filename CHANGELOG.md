@@ -174,6 +174,13 @@
 - [impl/bcgen](impl/bcgen.md)：B4 補上實測後的限制；B8 第 1 階段加入 ARM 起點的匯入（讀 `.cproject`、`burner.scat`、系列）與 `check` 分盤點／產生兩種模式，驗收加上 E39 起點的對照值；B9 新增第 5 項「MCP 什麼時候做」。
 - [projects/E39](projects/E39.md)：build 設定改為起點 `.cproject` 的 6 個（多了 sandaru × ASIC／FPGA），E7 第 5 項改成確認這兩個能不能 build、要不要列進來。
 
+**實作：bcgen 規格邊界與觀察報告修正**（2026-10-12）
+
+- [impl/bcgen](impl/bcgen.md)：P0a 可保存四份候選草稿，P0b 確認決定、G0 核准確切版本；唯讀工具不代寫產出。版本依 AI 查詢、正式驗證、產生起點的用途分類，沿用 04 §4.4 的過期規則。
+- 起點盤點與必要 build 清單分開：每個 target 都要在既有 build 設定欄位處置為必要或附理由明確排除，待確認擋住 G0；排除不能用來隱藏 build 失敗或縮小 E39 的量產範圍。必要設定全部要實際 build 成功、0 warning；盤點、checker 或排除均不能計為 build PASS。同步 framework/05、07、P0／P1 節點卡與 E39。
+- 順序定為固定輸入與 ARM JSON CLI、P0／P1 CLI 對接、MCP 與服務對接；建置路線步驟 2 不依賴 MCP 或服務，步驟 3 再接 MCP。同步工具對照。
+- 評估 §13 修正「檢查程式沒有改」的敘述；觀察 script 改讀 `checks`，附件依原 SHA-256 核對的凍結輸入補回 1 個已實作自動檢查、8 個規劃中自動檢查、9 個人工項目的 metadata。保留原觀察時間與 FW 結果，記錄修補方法，沒有重新實測或新增 PASS 證據。
+
 ## v0.7 改了什麼
 
 **結構**

@@ -114,7 +114,7 @@ def main():
         "check_project": {"ok": check.get("ok"),
                           "messages": [{k: m[k] for k in ("level", "code", "msg")} for m in check.get("messages", [])]},
         "bcgen_targets_from_import": [t["name"] for t in buildgen.targets(project["basic"])],
-        "applicable_pitfalls": [{"id": p.get("id"), "title": p.get("title"), "check": p.get("check")}
+        "applicable_pitfalls": [{"id": p["id"], "title": p["title"], "checks": p["checks"]}
                                 for p in applicable],
         "start_point_facts": {
             "ds5_configurations": configurations,
