@@ -1,0 +1,461 @@
+{
+  "format": "bcgen-e39-start-observations/v1",
+  "observed_at": "2026-10-12T15:15:48+08:00",
+  "formal_glados_evidence": false,
+  "scope": "Read-only import/check/target/pitfall calls on the E39 start point; no generation, build or board run.",
+  "repositories": {
+    "bct_knowledge_base": {
+      "root": "<bct-knowledge-base-root>/tools/bcgen",
+      "head": "fedcbdb9f11c2973ac0a158bc8465bf7dd6b987b",
+      "working_tree_status": []
+    },
+    "start_point": {
+      "root": "<start-point-root>",
+      "head": "83dc1a65b2e201dbe765a2a0c5f3b6bd231c8ebd",
+      "branch": "release/PS5037",
+      "tracked_changes_under_ws_fw": [],
+      "untracked_files_under_src_root": 595,
+      "untracked_c_files_under_src_root": []
+    }
+  },
+  "package_version": "0.1.0",
+  "package_module_status_counts": {
+    "stub": 56,
+    "partial": 1
+  },
+  "importer": {
+    "basic": {
+      "ic": "PS5037",
+      "series": "duan",
+      "cpu": "arm",
+      "images": [
+        "boot",
+        "sandaru"
+      ],
+      "platforms": [
+        "FPGA",
+        "ASIC"
+      ],
+      "boot_types": [
+        "MASKROM",
+        "SPI"
+      ],
+      "owner": "",
+      "note": ""
+    },
+    "memory": {
+      "rom": {
+        "base": "0x00080000",
+        "size": "0x0004D000",
+        "macro": "ROM"
+      },
+      "itcm": {
+        "base": "0x00000000",
+        "size": "0x00030000",
+        "macro": "ATCM"
+      },
+      "dtcm": {
+        "base": "0x00800000",
+        "size": "0x00012000",
+        "macro": "BOOT_BTCM0",
+        "subregions": [
+          {
+            "name": "SCAT_DB",
+            "size": "0x00005000"
+          },
+          {
+            "name": "LOG_INFO",
+            "size": "0x00000400"
+          },
+          {
+            "name": "LOG_ERROR",
+            "size": "0x00000400"
+          },
+          {
+            "name": "LOG_TIME_STAMP",
+            "size": "0x00000800"
+          },
+          {
+            "name": "LOG_TRACKER",
+            "size": "0x0000C000"
+          }
+        ]
+      }
+    },
+    "features": [
+      "isp_jump_init"
+    ],
+    "catalog_feature_count": 57,
+    "code_functions": [
+      "phal_isp_jump_init",
+      "phal_sys_rtt_enable",
+      "phal_sys_rtt_get_ms",
+      "phal_sys_rtt_get_us"
+    ],
+    "params": {},
+    "efuse_files": [
+      "conf_efuse.h",
+      "conf_efuse_desc.h"
+    ],
+    "notes": [
+      {
+        "level": "info",
+        "code": "IMPORT",
+        "msg": "從 ws_fw/src_root/proj/ps5037 匯入；匯入是盡力而為，請逐項確認"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-IMAGE",
+        "msg": "有 sandaru 的 build 設定，產出 image 勾選 Boot + Sandaru"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-CPU",
+        "msg": "CPU 判斷為 arm（依 core_v5.h / start.S / startup.s）"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-SERIES",
+        "msg": "系列判斷為 duan（.cproject 的 build 設定編的是 src_root/duan/…）"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-BUILD",
+        "msg": ".cproject 有 6 個 ps5037 的 build 設定：ps5037_boot_mask_fpga、ps5037_boot_mask_asic、ps5037_boot_spice_fpga、ps5037_boot_spice_asic、ps5037_sandaru_asic、ps5037_sandaru_fpga；image / Platform / Boot type 依這些設定帶入"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-MEM",
+        "msg": "rom: base=SCAT_ROM_BASE size=SCAT_ROM_SIZE"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-MEM",
+        "msg": "itcm: base=SCAT_SPI_ATCM_BASE size=SCAT_ATCM_SIZE"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-MEM",
+        "msg": "dtcm: base=SCAT_BOOT_BTCM0_BASE size=SCAT_BOOT_BTCM0_SIZE"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-SUB",
+        "msg": "dtcm 子項目：SCAT_DB, LOG_INFO, LOG_ERROR, LOG_TIME_STAMP, LOG_TRACKER"
+      },
+      {
+        "level": "warning",
+        "code": "IMPORT-KAT",
+        "msg": "找不到 config/conf.h，KAT 無法判斷，請在 Step 4 手動勾選"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-DETECT",
+        "msg": "ps5037 有實作 phal_isp_jump_init()，自動勾選 isp_jump_init"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-CODE",
+        "msg": "phal_sys_rtt_enable() 帶入 ps5037 原本的寫法（proj/ps5037/phal/phal_sys.c:611）"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-CODE",
+        "msg": "phal_sys_rtt_get_us() 帶入 ps5037 原本的寫法（proj/ps5037/phal/phal_sys.c:624）"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-CODE",
+        "msg": "phal_sys_rtt_get_ms() 帶入 ps5037 原本的寫法（proj/ps5037/phal/phal_sys.c:618）"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-CODE",
+        "msg": "phal_isp_jump_init() 帶入 ps5037 原本的寫法（proj/ps5037/phal/phal_sys.c:390）"
+      },
+      {
+        "level": "info",
+        "code": "IMPORT-EFUSE",
+        "msg": "eFuse map 帶入 ps5037 的 conf_efuse_desc.h、conf_efuse.h"
+      },
+      {
+        "level": "warning",
+        "code": "IMPORT-FEAT",
+        "msg": "Host / 儲存 / 周邊功能無法自動判斷，請在 Step 4 手動勾選"
+      }
+    ]
+  },
+  "check_project": {
+    "ok": false,
+    "messages": [
+      {
+        "level": "info",
+        "code": "INIT-SKIP-DEFAULT",
+        "msg": "boot：原本會清 SCAT_BOOT_BTCM_STRUCT，但 Step 2 沒有這個子項目，這次不清"
+      },
+      {
+        "level": "error",
+        "code": "INIT-NEED-REGION",
+        "msg": "boot：一定要有記憶體子項目 SCAT_MABIAO（boot_sys_init_flow() 的 mabiao_init(SCAT_MABIAO_BASE, SCAT_MABIAO_SIZE)），請在 Step 2 的 DTCM 底下新增"
+      },
+      {
+        "level": "error",
+        "code": "INIT-NEED-REGION",
+        "msg": "boot：一定要有記憶體子項目 BCT_DBG_REGION（log_init() 的 sal_daka_init(BCT_DBG_REGION_BASE, BCT_DBG_REGION_SIZE, TRUE)），請在 Step 2 的 DTCM 底下新增"
+      },
+      {
+        "level": "error",
+        "code": "INIT-MUST-CLEAR",
+        "msg": "boot（duan）一定要清 SCAT_BOOT_BTCM_ZI（全域變數區），請在 Step 2 新增這個子項目並勾選清 0"
+      },
+      {
+        "level": "error",
+        "code": "INIT-NEED-REGION",
+        "msg": "sandaru：一定要有記憶體子項目 BCT_DBG_REGION（log_init() 的 sal_daka_init(BCT_DBG_REGION_BASE, BCT_DBG_REGION_SIZE, FALSE)），請在 Step 2 的 DTCM 底下新增"
+      },
+      {
+        "level": "error",
+        "code": "INIT-MUST-CLEAR",
+        "msg": "sandaru（duan）一定要清 SCAT_BOOT_BTCM_ZI（全域變數區），請在 Step 2 新增這個子項目並勾選清 0"
+      },
+      {
+        "level": "error",
+        "code": "PARAM-REQUIRED",
+        "msg": "UART：UART_REFERENCE_CLOCK（UART 參考時脈（Hz））必須填寫，每個案子不同（Step 4「UART」）"
+      },
+      {
+        "level": "error",
+        "code": "EFUSE-BANK-COUNT",
+        "msg": "eFuse header 一定要定義 EFUSE_BANK_COUNT（bank 數），請在 Step 3 的「Bank 數」填寫（這份有 EF_BANK_TOTAL_CNT = 32，可以在 Step 3 一鍵帶入）"
+      }
+    ]
+  },
+  "bcgen_targets_from_import": [
+    "ps5037_boot_mask_fpga",
+    "ps5037_boot_spice_fpga",
+    "ps5037_sandaru_fpga",
+    "ps5037_boot_mask_asic",
+    "ps5037_boot_spice_asic",
+    "ps5037_sandaru_asic"
+  ],
+  "applicable_pitfalls": [
+    {
+      "id": "SRAM-001",
+      "title": "SRAM 未 init 就使用",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "SRAM-INIT-ORDER",
+          "text": "sram_init() 之前執行的函式，不能存取尚未 init 的區段（elf + call graph 分析）",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "新增的 SRAM 區域有加進 init 清單",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "FPGA / SIM 開機前先把 SRAM 填 pattern，確認不受影響",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "MEM-001",
+      "title": "記憶體大小在多處定義不一致",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "MEM-OVERLAP",
+          "text": "各區域不可重疊",
+          "implemented": true
+        },
+        {
+          "kind": "auto",
+          "code": "MEM-SYNC",
+          "text": ".ld / build.sh 的大小與專案 JSON 一致",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "手動改過 .ld 或 build.sh 的大小，要同步改專案 JSON",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "MEM-003",
+      "title": "stack 用量超過配置",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "STACK-USAGE",
+          "text": "開 -fstack-usage，從 call graph 算最深 stack，與 stack size 比對",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "函式內不要宣告大的 local 陣列，改用 DBUF",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "REG-001",
+      "title": "register 存取用錯 accessor",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "REG-RAW-ACCESS",
+          "text": "共用驅動層禁止直接使用 r_xxx_ 原始存取",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "register header 要和 regmap（http://192.168.41.158:8299/regmap/）的版本一致",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "REG-002",
+      "title": "register / CSR 直接整個覆寫",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "REG-RMW",
+          "text": "寫入常數到有多個欄位的 register 時發出警告",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "確認寫入時沒有把其他欄位清掉",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "DBG-001",
+      "title": "debug / 暫時性的 code 留著",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "DBG-LEFTOVER",
+          "text": "release build 不准出現 if (1)、if (0)、#if 0，DEBUG_KAT、HW_SIM_DEBUG 等開關要為 0",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "出版前 review 所有 debug 開關",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "ISR-001",
+      "title": "成對的動作漏做",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "PAIR-CHECK",
+          "text": "同一個函式中成對 API 在每條 return 路徑都要配對",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "有提早 return 的函式，確認有恢復狀態",
+          "implemented": false
+        }
+      ]
+    },
+    {
+      "id": "BLD-001",
+      "title": "只編了自己的 target",
+      "checks": [
+        {
+          "kind": "auto",
+          "code": "BUILD-MATRIX",
+          "text": "CI 每次把每顆 IC 的所有 target 都編一遍",
+          "implemented": false
+        },
+        {
+          "kind": "manual",
+          "code": "",
+          "text": "改共用層時，至少本機把兩條 CPU 線（andes / arm）都編過",
+          "implemented": false
+        }
+      ]
+    }
+  ],
+  "start_point_facts": {
+    "ds5_configurations": [
+      "ps5037_boot_mask_asic",
+      "ps5037_boot_mask_fpga",
+      "ps5037_boot_spice_asic",
+      "ps5037_boot_spice_fpga",
+      "ps5037_sandaru_asic",
+      "ps5037_sandaru_fpga"
+    ],
+    "scat_files": [
+      "boot_mask.scat",
+      "boot_spice.scat",
+      "burner.scat",
+      "scatter.h"
+    ],
+    "importer_markers_present": {
+      "build_exclude_boot.cfg": false,
+      "build_exclude_sandaru.cfg": false,
+      "burner.ld": false,
+      "burner.scat": true
+    },
+    "kat_en_defines_in_proj": 0
+  },
+  "input_sha256": {
+    "bcgen": {
+      "bcgen.py": "1d22b22a7eba0c9677cda127b9210e56db2ccd8af828601f863835f8ab49ab3e",
+      "core/__init__.py": "152e837f86f7d6ea411cc6e4c25b9b5eb277047e9bbf0e8bca7148ab44882388",
+      "core/buildgen.py": "40ea6642f5d3da1383ed27102d426b5451130dc8ee96f3c4e1970c6a5f023eb3",
+      "core/catalog.py": "e237a7026a7a8bed805051b1b025e70fee8e5669411d9ff014872ca78de70e33",
+      "core/codepkg.py": "a65787c24846d967d7c773748586278d33523152c13936bc4ef05b06d04bc30e",
+      "core/coderef.py": "1dca8b38e3c59762940d11aef4e76f73e1d952341577cf6423e98c1763784c0e",
+      "core/custom.py": "6b51fef25dee9ce1a60638326c66ab72f91e58499b6ae1b38d01048e8d760e90",
+      "core/efuse.py": "ba482e53deb2af3db4c9b90b6343c11c3243a7e52cbdb2129ff1609ffa8b5527",
+      "core/generate.py": "d367697c8b893c240ef4bc00dce7ff2aceae50a84942272cfd4d8fa0d73a4e01",
+      "core/halimport.py": "48520cfeb9d4ec357a37b35b5d973c4d4948b9f171f26a94eaf763ae1d6754d7",
+      "core/importer.py": "dba51de2de927776d972c7f099264e080996a05e96a5794a7c527964f8082c56",
+      "core/initcfg.py": "d90bf302823b47bd8f6a8e41620a611aaad135f17faf4176e5898a35f7a9dadd",
+      "core/linker.py": "541c4930731488a93099f831be7cab5acc1f650b5ade9e95378b63ab8b93ea9f",
+      "core/memory.py": "ac02d52fc7984e3271c8ce4d1f6061e39f797a121193ffa58e004dbf0f0d1591",
+      "core/params.py": "f97063e9a0cfa41a84d97b65670de5bbec4cd5458f5e20cb1759e63f1ee20a75",
+      "core/pitfalls.py": "e8abef62d9ab7f47351f9f69f99ec081081b02c5db2527d22d3c4a7654f5c5d8",
+      "core/project.py": "be9295e50c927cd2a59c625e03a78a8d7316b54d9b8f00c723336841de12f8fd",
+      "core/reghdr.py": "36745e402b3845970649b0f8c43ac9d4baa049b46685181b06142f91048281e1",
+      "core/rules.py": "f70cfede674baa069817861c8f13a04a722b80f3f98c7e97c5ae39ad8c48e36a",
+      "core/server.py": "f33202a6a4b6288754efc4544eb427845fd29919b0a7141debf366a220056de4",
+      "core/settings.py": "e0a469a12a36a9457a14e1c23780b951fc0d3933bb490554256adbc60685fa4c",
+      "core/usercode.py": "66e323466a5452bd2f27718600b1a7efc213835126f3b7b6619e081192a0d46f",
+      "core/util.py": "cce721a0105e436a9ac742e56dc08cb98c8d7249b0d229ba54405c8d0f5724b1",
+      "catalog/features.json": "f31b7709e5aa1b531888db870198fec88dbc265c0db9ca86f11751997ed6417b",
+      "catalog/platform.json": "6e3684e3292441c434a2d462f7c61aabece9104167460c4548953dd26a060d2f",
+      "catalog/subregions.json": "e37d68a93a073fee0253f91aea73214a547c707cdd11543c1b85893da840a4cd",
+      "checklist/pitfalls.md": "b7627d7fc9b46536899e53deaeeb35e117a1bd3175430724b6565d06327a9f5e"
+    },
+    "start_point": {
+      "ws_fw/.cproject": "8708d1d35566616092813f38f2a823b7208862bd0cbb539e8daade8c23894877",
+      "ws_fw/src_root/proj/ps5037/scat/boot_mask.scat": "de87bc869994348d21662823b4a4a6c6c3ab212509f841ba0de1c903c4c24476",
+      "ws_fw/src_root/proj/ps5037/scat/boot_spice.scat": "eeb88a086b5307ec7576b119a2446103d0d58885340c03937267b6dffb32b434",
+      "ws_fw/src_root/proj/ps5037/scat/burner.scat": "402954a81bdf584d5f546b9b05a3f8ceccea381b35b16a7d9efc521742862598",
+      "ws_fw/src_root/proj/ps5037/scat/scatter.h": "f8e37cf2ed349ee61247b4fb4f5054950a0580a43160044fc92ffa4332f713f4",
+      "ws_fw/src_root/proj/ps5037/startup.s": "55857cb3d31498e7fdb81e536ee00d9f7fe04fb290807476f403e7e5d7c9f07b"
+    }
+  }
+}

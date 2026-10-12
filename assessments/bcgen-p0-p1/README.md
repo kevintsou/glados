@@ -440,6 +440,7 @@ python -B assessments/bcgen-p0-p1/inspect_bcgen.py --bcgen-root ../bct_knowledge
 第 13 節的附件：
 
 - [observations_e39_start.json：E39 起點實測結果與輸入 SHA-256](observations_e39_start.json)
+- [observations_e39_start_fedcbdb.json：bcgen `fedcbdb` 對同一起點重跑的結果（13.5）](observations_e39_start_fedcbdb.json)
 - [inspect_e39_start.py：重跑 E39 起點實測](inspect_e39_start.py)
 
 `--src-root` 指向起點 repo 的 `ws_fw/src_root`；腳本用 `BCGEN_SRC_ROOT` 指定起點，不讀 bcgen 的 `settings.json`。`--expect-commit` 不符時拒絕執行。腳本只讀兩個 repo，JSON 輸出必須放在兩個 repo 之外；沒有產生、build 或上板。發布版 JSON 把兩處本機根目錄改成邏輯標記，其餘內容保持原樣。
@@ -467,6 +468,7 @@ python -B assessments/bcgen-p0-p1/inspect_e39_start.py --bcgen-root ../bct_knowl
 | S13 | [bcgen README](https://github.com/kevintsou/bct_knowledge_base/blob/458201183677a95d813948f3e474027d99136da6/tools/bcgen/README.md)、[公版 code 包](https://github.com/kevintsou/bct_knowledge_base/blob/458201183677a95d813948f3e474027d99136da6/tools/bcgen/bootcode_ai/README.md) | 工具用途、wizard、輸出、stub／PC 模擬設計 |
 | S14 | [匯入的 CPU／image／系列判斷](https://github.com/kevintsou/bct_knowledge_base/blob/2b6a8cba1d5a9f5b7acd10524ac9607967892685/tools/bcgen/core/importer.py#L136-L152)、[KAT 判斷](https://github.com/kevintsou/bct_knowledge_base/blob/2b6a8cba1d5a9f5b7acd10524ac9607967892685/tools/bcgen/core/importer.py#L175)、[target 推導](https://github.com/kevintsou/bct_knowledge_base/blob/2b6a8cba1d5a9f5b7acd10524ac9607967892685/tools/bcgen/core/buildgen.py#L30) | 第 13 節：ARM 起點的系列、image、build 設定、KAT 為什麼盤點不到 |
 | S15 | [E39 專案設定](https://github.com/kevintsou/glados/blob/ba634930497794177f500bc5a6d419f3dc640ae0/projects/E39.md#L23) | 第 13 節：起點 commit、ROM 配置、系列、build 設定的對照值 |
+| S16 | [讀 `.cproject` 的 build 設定](https://github.com/kevintsou/bct_knowledge_base/blob/fedcbdb9f11c2973ac0a158bc8465bf7dd6b987b/tools/bcgen/core/importer.py#L136-L187)、[sandaru 與 KAT 提示](https://github.com/kevintsou/bct_knowledge_base/blob/fedcbdb9f11c2973ac0a158bc8465bf7dd6b987b/tools/bcgen/core/importer.py#L203-L246) | 13.5：ARM 起點匯入怎麼判斷系列、image、Platform、Boot type |
 
 本提案新增的 CLI、報告格式、input bundle、嚴格前置檢查與流程位置，均為建議能力；第 2 節、第 13 節與附件中的測試結果才是確認過的現況。
 
@@ -505,7 +507,7 @@ python -B assessments/bcgen-p0-p1/inspect_e39_start.py --bcgen-root ../bct_knowl
 ### 13.3 對 P0／P1 的意義
 
 1. **讀到的部分可以直接用**：CPU、ROM／ITCM／DTCM、eFuse、帶入 code 的來源位置，可以當 P0a 盤點的「讀到」項目。
-2. **系列、image、build 設定會給錯的答案，不只是「不知道」**：系列留空還有警告；但 image 只列 boot、build 設定只列 1 個，看起來像讀到，其實是缺漏或預設值。照第 4.1 節的原則，補上 ARM 支援之前，盤點報告要把這三項標成「不知道」。
+2. **系列、image、build 設定會給錯的答案，不只是「不知道」**：系列留空還有警告；但 image 只列 boot、build 設定只列 1 個，看起來像讀到，其實是缺漏或預設值。照第 4.1 節的原則，補上 ARM 支援之前，盤點報告要把這三項標成「不知道」。（bcgen `fedcbdb` 已補上，見 13.5。）
 3. **核對 build target 的前提是能讀 `.cproject`**：目前 bcgen 的 target 是照它自己的 Andes `build.sh` 命名推出來的，不是從起點讀的。對 E39 這種 DS-5 起點，要先能讀 `.cproject` 的 build 設定，再核對每個 target 是否已列為必要或附理由明確排除；不能把有理由且經 G0 核准的排除當作漏列。待確認或盤點缺口仍要回 P0 解決（[impl/bcgen B5](../../impl/bcgen.md#b5-在-p0p1-怎麼用)）。
 4. **設定檢查要分模式**：盤點既有起點時，UART 參考時脈、`EFUSE_BANK_COUNT` 這類產生 code 才需要的欄位不該報 error。這是第 7 節第 5 項的實例。
 5. **功能盤點不能靠 bcgen 的功能清單**：E39 的既有功能要從起點 code、知識庫與 Jira 既有測試項目盤點（GLADOS P0 節點卡的待展開議題）；bcgen 只能補 code 位置。
@@ -518,6 +520,30 @@ python -B assessments/bcgen-p0-p1/inspect_e39_start.py --bcgen-root ../bct_knowl
 | :--- | :--- |
 | 1 | 沒有變：命令列仍只有 serve、check、generate |
 | 8 | 沒有變：`build.sh` 最後仍固定 `exit 0`；bcgen README 的「目前限制」已寫明 |
-| 新增 | ARM 起點的系列、image、build 設定匯入（13.2） |
+| 新增 | ARM 起點的系列、image、build 設定匯入（13.2）；`fedcbdb` 已補上，見 13.5 |
 
 其他缺口這次沒有重新檢查。
+
+### 13.5 後續：bcgen `fedcbdb` 補上 ARM 起點的匯入（2026-10-12）
+
+bct_knowledge_base `fedcbdb` 讓匯入讀 DS-5 的 `ws_fw/.cproject`：找出會編 `proj/<ic>` 的 build 設定，看它們編的是 `src_root/duan/…` 還是 `yue/…` 來判斷系列；再用設定名稱 `<ic>_<boot_mask|boot_spice|sandaru>_<fpga|asic>` 帶入 image、Platform、Boot type。`burner.scat` 也算有 sandaru；沒有 `config/conf.h` 時提示 KAT 無法判斷。[S16]
+
+用同一支 script、同一個起點（`83dc1a65b`）重跑：
+
+| 項目 | `2b6a8cb`（13.2） | `fedcbdb` |
+| :--- | :--- | :--- |
+| 系列 | 空白 | duan |
+| image | boot | boot＋sandaru |
+| build target | 1 個，空專案的預設值 | 6 個，和 `.cproject` 完全一致 |
+| KAT | 沒有提示 | 警告 IMPORT-KAT：找不到 `config/conf.h`，KAT 無法判斷 |
+| 設定檢查 | 3 個 error | 7 個 error：5 個 `INIT-*`、PARAM-REQUIRED、EFUSE-BANK-COUNT |
+| 適用的過往問題 | 8 條、18 個檢查項目 | 不變 |
+
+完整結果見 [observations_e39_start_fedcbdb.json](observations_e39_start_fedcbdb.json)。這份直接用改讀 `checks` 的 script 產生，不需要修補。
+
+這代表：
+
+1. **13.3 第 2 點對 E39 起點已解決**：系列、image、build 設定現在是從起點讀到的，不再是預設值。13.3 第 3 點的前提（能讀 `.cproject`）也具備了；核對每個 target 的必要／排除處置還沒做（[impl/bcgen B8](../../impl/bcgen.md#b8-改-bcgen-的順序與驗收) 第 2 階段）。
+2. **判斷不出來時照實回報**：另一份 duanyue checkout（`main` @ `aad20b679`）裡，ps2327 的 build 設定只編 `proj/ps2327` 和 `sal`，沒有 duan／yue 資料夾，系列仍是「不知道」。同一份 checkout 的 ps5037、ps5303、ps2327 推出的 target 都和各自的 `.cproject` 一致；Andes 的 ps5032、ps5910、ps5963 匯入結果不變。
+3. **13.3 第 4 點（設定檢查要分模式）更迫切了**：系列判斷出來後，公版 code 包 duan 的開機初始化規則開始生效，要求 `SCAT_MABIAO`、`BCT_DBG_REGION` 等子區域，以及清除 `SCAT_BOOT_BTCM_ZI`。ps5037 沒有前兩個，`SCAT_BOOT_BTCM_ZI` 也不在 BTCM0 裡。新增的 5 個 `INIT-*` 和 PARAM-REQUIRED、EFUSE-BANK-COUNT 一樣，都是產生 code 才需要的條件；不分模式時，盤點 E39 起點會看到 7 個 error，沒有一個是在描述起點本身。
+4. **第 7 節第 1 項沒有變**：命令列仍只有 serve、check、generate；固定輸入、JSON 輸出、`check` 分模式都還沒做。

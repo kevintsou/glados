@@ -181,6 +181,12 @@
 - 順序定為固定輸入與 ARM JSON CLI、P0／P1 CLI 對接、MCP 與服務對接；建置路線步驟 2 不依賴 MCP 或服務，步驟 3 再接 MCP。同步工具對照。
 - 評估 §13 修正「檢查程式沒有改」的敘述；觀察 script 改讀 `checks`，附件依原 SHA-256 核對的凍結輸入補回 1 個已實作自動檢查、8 個規劃中自動檢查、9 個人工項目的 metadata。保留原觀察時間與 FW 結果，記錄修補方法，沒有重新實測或新增 PASS 證據。
 
+**實作：bcgen 補上 ARM 起點的匯入**（2026-10-12）
+
+- bct_knowledge_base `fedcbdb`：匯入改讀 DS-5 `.cproject`，從會編 `proj/<ic>` 的 build 設定判斷系列、image、Platform、Boot type；`burner.scat` 也算有 sandaru；沒有 `config/conf.h` 時提示 KAT 無法判斷。
+- 評估新增 §13.5：用同一支 script 對 E39 起點重跑，系列 duan、image boot＋sandaru、6 個 target 和 `.cproject` 完全一致；附 `observations_e39_start_fedcbdb.json`。系列判斷出來後，設定檢查多出 5 個公版開機初始化的 `INIT-*` error，和 UART 參考時脈、`EFUSE_BANK_COUNT` 一樣只對產生 code 有意義，`check` 分模式因此更迫切。
+- [impl/bcgen](impl/bcgen.md)：B4 的實測限制改成 `fedcbdb` 之後的狀態；B8 補上進度，第 1 階段只完成 ARM 起點匯入，固定輸入、命令列 JSON、`version`、`check` 分模式還沒做。
+
 ## v0.7 改了什麼
 
 **結構**

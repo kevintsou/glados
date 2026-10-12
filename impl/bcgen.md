@@ -67,9 +67,9 @@
 
 **用 E39 起點實測後的限制**（評估 [§13](../assessments/bcgen-p0-p1/README.md#13-補充e39-起點實測2026-10-12)）：
 
-- `inspect_start`：CPU、記憶體區域、eFuse、帶入 code 的來源位置讀得到。ARM 起點的系列、image、build 設定目前會漏掉或給預設值，補上 ARM 起點的匯入（B8 第 1 階段）之前，這三項一律標成「不知道」。功能清單只勾得到 1 個，E39 的既有功能要從其他來源盤點（[nodes/P0](../nodes/P0.md) 的待展開議題）。
-- `check_config`：要分「盤點」與「產生」兩種模式。盤點既有起點時，產生 code 才需要的欄位（例如 UART 參考時脈、`EFUSE_BANK_COUNT`）不報 error。
-- `check_build_targets`：DS-5 起點的 build 設定寫在 `.cproject`，要先能讀它才做得出來。
+- `inspect_start`：CPU、記憶體區域、eFuse、帶入 code 的來源位置讀得到。ARM 起點的系列、image、build 設定從 bct_knowledge_base `fedcbdb` 起改讀 DS-5 `.cproject`，E39 起點盤點出 duan、boot＋sandaru、6 個 build 設定（評估 [§13.5](../assessments/bcgen-p0-p1/README.md#135-後續bcgen-fedcbdb-補上-arm-起點的匯入2026-10-12)）；build 設定沒有編 duan／yue 資料夾的起點（例如 ps2327），系列仍標成「不知道」。功能清單只勾得到 1 個，沒有 `config/conf.h` 時 KAT 也無法判斷，E39 的既有功能要從其他來源盤點（[nodes/P0](../nodes/P0.md) 的待展開議題）。
+- `check_config`：要分「盤點」與「產生」兩種模式。盤點既有起點時，產生 code 才需要的條件不報 error：例如 UART 參考時脈、`EFUSE_BANK_COUNT`，以及系列判斷出來後才出現的公版開機初始化子區域（`INIT-*`）。目前盤點 E39 起點會看到 7 個這類 error。
+- `check_build_targets`：DS-5 起點的 build 設定寫在 `.cproject`，`fedcbdb` 起已能讀；核對必要／排除處置的部分還沒做（B8 第 2 階段）。
 
 ---
 
@@ -139,6 +139,8 @@
 | 1. 固定輸入與命令列 JSON | 每次執行明確指定起點 repo、commit 與資料版本；掃描只限指定範圍；`check` 與盤點輸出 JSON（附來源、hash、讀到／推測／不知道）；`version` 回報各項版本與 hash。ARM 起點的匯入：讀 DS-5 `.cproject` 的 build 設定、認得 `burner.scat`、判斷系列；`check` 分盤點與產生兩種模式（B4 末段） | 同樣的輸入得到同樣的結果；不寫入任何檔案；指定範圍以外的路徑會被拒絕；不支援的組合明確回報；E39 起點（`83dc1a65b`）盤點出系列 duan、image boot＋sandaru、`.cproject` 的 6 個 build 設定；盤點模式不因產生用的欄位報 error |
 | 2. P0／P1 的 CLI 對接（建置路線步驟 2） | `profile_draft` 對應 GLADOS 專案設定欄位；`check_build_targets` 區分盤點與必要／排除處置；由人扮演串接層獨立執行 CLI 留證據 | 不需 MCP 或服務即可使用；草稿沒有機器路徑，缺的欄位有列出；漏列或待確認會擋住交接，核准且有理由的排除不算遺漏也不算 PASS；必要設定全部要求實際 0 warning build 證據 |
 | 3. MCP 與服務對接（建置路線步驟 3） | 在同一套核心上提供 B4 的唯讀工具；MCP 套件延遲載入；節點設定 MCP 白名單，服務獨立派工 CLI checker | 工具清單沒有任何寫入功能；每個回應帶 context 與來源；沒裝 MCP 套件時網頁精靈與 CLI 照常運作；AI 查詢與正式檢查的執行紀錄可區分 |
+
+**進度（2026-10-12）**：第 1 階段的 ARM 起點匯入已在 bct_knowledge_base `fedcbdb` 完成，E39 起點的系列、image、6 個 build 設定都和驗收值相符（評估 [§13.5](../assessments/bcgen-p0-p1/README.md#135-後續bcgen-fedcbdb-補上-arm-起點的匯入2026-10-12)）。同一階段的固定輸入、命令列 JSON、`version`、`check` 分盤點／產生兩種模式還沒做。
 
 評估文件第 7 節列的缺口（build 腳本不回傳 make 失敗、輸出目錄會被清空等）屬於產生功能，在 B7 的起點準備用到時再修。
 
