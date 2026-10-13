@@ -12,7 +12,7 @@
 
 - **（2026-10-13 修訂）bcgen 只提供命令列，不做 MCP**：AI、人、串接層都用同一個唯讀 JSON 命令列。AI 節點以 `claude -p` 執行時，把 bcgen 的唯讀子指令列進允許清單就能呼叫，也只能呼叫這些子指令（[ai_node_execution](ai_node_execution.md)）。原本規劃的 MCP 不做：MCP server 通常全機註冊、只指向一個版本，和每個專案固定工具版本的要求衝突，功能也和命令列重複。之後若 AI 節點改走 openBCT 的 `openbct-agent`（只能呼叫 MCP tools），由 openBCT adapter 把固定版本的命令列包成 MCP tool（OBC-011），bcgen 不另做 MCP server。網頁精靈保留給人用，兩個入口共用同一套核心程式。
 - **AI 只能用唯讀子指令**。會寫東西的功能（產生專案、帶入 HAL、新增功能、存設定）不放進 P0／P1 AI 節點的允許清單。
-- **（v0.8.5 修訂）新專案的 code base 在 P1 建立**：P0 討論定案的生成配方就是 bcgen 的輸入；P1 由串接層執行 bcgen 或 script 做機械替換（例如換上新 IC 的 register、建立 IC 目錄與 build 設定），做不到的部分由 AI 在限定的移植範圍內補足，經獨立審查與 GB 核准（[nodes/P1](../nodes/P1.md)）。E39 也是這樣：以 PS5037 的 code base 為起點，換上 PS5039 的 register。bcgen 的生成功能要支援「以前代 code base 衍生」與 ARM，才能用在 E39；這部分的設計在下一批實作文件補上。B7 的「流程外準備」只剩全新骨架、還沒有任何可 build 起點的情況。
+- **（v0.8.5 修訂）新專案的 code base 在 P1 建立**：P0 討論定案的生成配方就是 bcgen 的輸入；P1 由串接層執行 bcgen 或 script 做機械替換（例如換上新 IC 的 register、建立 IC 目錄與 build 設定），做不到的部分由 AI 在限定的移植範圍內補足，經獨立審查與 GB 核准（[nodes/P1](../nodes/P1.md)）。E39 也是這樣：以 PS5037 的 code base 為起點，換上 PS5039 的 register。bcgen 的生成功能要支援「以前代 code base 衍生」與 ARM，才能用在 E39；順序與驗收見 B8 的 B 線，詳細設計在下一批實作文件補上。B7 的「流程外準備」只剩全新骨架、還沒有任何可 build 起點的情況。
 - **bcgen 對框架的影響**：bcgen 是 P0、P1 實作段的工具；盤點結果是工具輸出，P0 的正式產出仍是專案說明、範圍清單、專案設定、環境清單四份。bcgen 接入帶來的框架修訂是 v0.8.1 的「build 設定逐項處置」（2026-10-12，見上方「和框架的關係」），沒有新增產出物或節點。
 - **實作順序（2026-10-12，10-13 修訂）**：建置路線步驟 2 先做固定輸入的唯讀 JSON 命令列，補好 ARM 起點盤點與 P0／P1 欄位對應；步驟 3 由串接層服務派工同一個命令列（B8）。命令列不依賴服務才能執行。
 
@@ -68,7 +68,7 @@
 
 - `inspect_start`：CPU、記憶體區域、eFuse、帶入 code 的來源位置讀得到。ARM 起點的系列、image、build 設定從 bct_knowledge_base `fedcbdb` 起改讀 DS-5 `.cproject`，E39 起點盤點出 duan、boot＋sandaru、6 個 build 設定（評估 [§13.5](../assessments/bcgen-p0-p1/README.md#135-後續bcgen-fedcbdb-補上-arm-起點的匯入2026-10-12)）；build 設定沒有編 duan／yue 資料夾的起點（例如 ps2327），系列仍標成「不知道」。功能清單只勾得到 1 個，沒有 `config/conf.h` 時 KAT 也無法判斷，E39 的既有功能要從其他來源盤點（[nodes/P0](../nodes/P0.md) 的待展開議題）。
 - `check_config`：要分「盤點」與「產生」兩種模式。盤點既有起點時，產生 code 才需要的條件不報 error：例如 UART 參考時脈、`EFUSE_BANK_COUNT`，以及系列判斷出來後才出現的公版開機初始化子區域（`INIT-*`）。目前盤點 E39 起點會看到 7 個這類 error。
-- `check_build_targets`：DS-5 起點的 build 設定寫在 `.cproject`，`fedcbdb` 起已能讀；核對必要／排除處置的部分還沒做（B8 第 2 階段）。
+- `check_build_targets`：DS-5 起點的 build 設定寫在 `.cproject`，`fedcbdb` 起已能讀；核對必要／排除處置的部分還沒做（B8 A4）。
 
 ---
 
@@ -135,15 +135,31 @@
 
 ## B8. 改 bcgen 的順序與驗收
 
-| 階段 | 做什麼 | 驗收 |
-| :---- | :---- | :---- |
-| 1. 固定輸入與命令列 JSON | 每次執行明確指定起點 repo、commit 與資料版本；掃描只限指定範圍；`check` 與盤點輸出 JSON（附來源、hash、讀到／推測／不知道）；`version` 回報各項版本與 hash。ARM 起點的匯入：讀 DS-5 `.cproject` 的 build 設定、認得 `burner.scat`、判斷系列；`check` 分盤點與產生兩種模式（B4 末段） | 同樣的輸入得到同樣的結果；不寫入任何檔案；指定範圍以外的路徑會被拒絕；不支援的組合明確回報；E39 起點（`83dc1a65b`）盤點出系列 duan、image boot＋sandaru、`.cproject` 的 6 個 build 設定；盤點模式不因產生用的欄位報 error |
-| 2. P0／P1 的 CLI 對接（建置路線步驟 2） | `profile_draft` 對應 GLADOS 專案設定欄位；`check_build_targets` 區分盤點與必要／排除處置；由人扮演串接層獨立執行 CLI 留證據 | 不需 MCP 或服務即可使用；草稿沒有機器路徑，缺的欄位有列出；漏列或待確認會擋住交接，核准且有理由的排除不算遺漏也不算 PASS；必要設定全部要求實際 0 warning build 證據 |
-| 3. 服務對接（建置路線步驟 3） | AI 節點設定的命令允許清單只列 B4 的唯讀子指令；服務獨立派工命令列 checker | 允許清單裡沒有任何寫入功能；AI 查詢與正式檢查的執行紀錄可區分 |
+（2026-10-13 依 v0.8.5 改寫）分兩條線：**A 唯讀盤點**給 P0 與 P1 開始時的核對，**B 機械替換**給 P1 建立基底。固定版本、準備起點 worktree 與快照、計算正式 hash 都是串接層的工作（OBC-011，[framework/04 §4.2](../framework/04_rules.md#42-派工與放行)）；bcgen 只負責「能被固定」：只讀傳入的輸入。每個階段對應[共用待辦](../docs/coordination/glados-openbct-todo.md)的任務，完成條件以任務檔為準，這裡只列順序與要點。
 
-**進度（2026-10-12）**：第 1 階段的 ARM 起點匯入已在 bct_knowledge_base `fedcbdb` 完成，E39 起點的系列、image、6 個 build 設定都和驗收值相符（評估 [§13.5](../assessments/bcgen-p0-p1/README.md#135-後續bcgen-fedcbdb-補上-arm-起點的匯入2026-10-12)）。同一階段的固定輸入、命令列 JSON、`version`、`check` 分盤點／產生兩種模式還沒做。
+**A. 唯讀盤點（P0、P1 開始時）**
 
-評估文件第 7 節列的缺口（build 腳本不回傳 make 失敗、輸出目錄會被清空等）屬於產生功能，在 B7 的起點準備用到時再修。
+| 階段 | 做什麼 | 驗收 | 任務 |
+| :---- | :---- | :---- | :---- |
+| A1. 只讀傳入的輸入 | 起點目錄、catalog、過往問題清單、公版 code 包、生成配方都由參數傳入；不讀 `settings.json`、全域 catalog、自訂功能、環境變數或快取；越界與 symlink 逃逸一律拒絕；唯讀模式不寫任何檔案 | 同樣的輸入得到逐位元組相同的輸出；回報讀到的檔案與 hash，只供串接層核對 | BC-001 |
+| A2. 唯讀 JSON 命令列 | B4 的子指令與 `version`；每項附來源、hash 與讀到／推測／不知道；唯讀子指令和會寫入的指令分開，JSON 與 exit code 有版本 | 不支援的組合明確回報；AI 節點的命令允許清單可以只列唯讀子指令 | BC-002 |
+| A3. `check` 分盤點／產生兩種模式 | 盤點模式不因只跟產生有關的條件報 error（UART 參考時脈、`EFUSE_BANK_COUNT`、`INIT-*`），真正的盤點缺口照樣列出；產生模式保留全部檢查 | E39 起點目前 7 個只跟產生有關的 error，在盤點模式不再出現；未知與不支援不算完整成功 | BC-003 |
+| A4. P0／P1 對接 | `profile_draft` 對應專案設定欄位；`check_build_targets` 核對每個 target 的必要／排除處置 | 草稿沒有機器路徑，缺的欄位有列出；漏列或待確認會擋住交接；核准且有理由的排除不算遺漏，也不算 PASS；必要設定仍要實際 0 warning build 證據 | BC-004 |
+| A5. E39 資料覆蓋 | 補 E39 的功能線索與過往問題資料；缺 `conf.h`、parser 不支援時明列 | 功能勾選不當成已驗證的能力；資料有來源與版本 | BC-006 |
+| A6. 服務對接（建置路線步驟 3） | AI 節點設定的命令允許清單只列 B4 的唯讀子指令；服務獨立派工命令列 checker | 允許清單裡沒有任何寫入功能；AI 查詢與正式檢查的執行紀錄可區分 | OBC-011 |
+
+**B. 機械替換（P1 建立基底，v0.8.5 起）**
+
+| 階段 | 做什麼 | 驗收 | 任務 |
+| :---- | :---- | :---- | :---- |
+| B1. 產生功能的安全性 | make 失敗要回傳失敗；先寫到暫存區，完成後才發布，只寫生成區、不清空生成區以外的檔案、拒絕覆蓋已凍結的輸出；輸出逐檔清單；stub 與缺檔要分得出「只能當設定檔看」和「可以建立基線」 | 故意讓 make 失敗而 tee 成功，仍回傳失敗；同一份生成配方、工具版本與輸入重跑，產出逐檔相同（[framework/05](../framework/05_checks.md)「機械替換可重現」） | BC-007 |
+| B2. 以前代 code base 衍生（含 ARM） | 依生成配方換 register header；以前代 IC 目錄為底建立新 IC 目錄；產生新 IC 的 DS-5 `.cproject` 設定、依記憶體配置更新 scatter；在共用層的 IC 旗標（例如 duan 的 `IC_NAME`）加入新 IC。只做查表就能確定的替換，需要判斷的留給 P1 的移植 | 配方缺項或對照不到時明確失敗並列出缺什麼；用 E39 起點 `83dc1a65b` 加 PS5039 register 快照實際跑一次，產出能交給 P1 的移植步驟 | BC-008 |
+
+**順序**：A1 與 B1 沒有前置任務，先做；A1 是兩條線的共同基礎。A2、A3 接在 A1 之後，A4 要等 A2、A3。B2 要等 A1、B1；E39 的生成配方還在 P0 待決（[E39 E7](../projects/E39.md#e7-e39-待決事項) 第 13–15 項），可以先做衍生模式的骨架與 ARM `.cproject`／scatter 支援。
+
+**進度（2026-10-13）**：A 線只完成 ARM 起點的匯入（bct_knowledge_base `fedcbdb`；E39 起點盤點出 duan、boot＋sandaru、6 個 build 設定，見評估 [§13.5](../assessments/bcgen-p0-p1/README.md#135-後續bcgen-fedcbdb-補上-arm-起點的匯入2026-10-12)），其他階段都還沒開始。B 線還沒開始：`build.sh` 仍固定 `exit 0`，產生前仍清空整個輸出資料夾，也沒有衍生模式。
+
+評估文件第 7 節列的產生功能缺口（build 腳本不回傳 make 失敗、輸出目錄會被清空等）原本延到 B7 的起點準備才修；v0.8.5 起 P1 的機械替換就要用到，改列在 B 線第 1 階段。
 
 ---
 

@@ -543,7 +543,7 @@ bct_knowledge_base `fedcbdb` 讓匯入讀 DS-5 的 `ws_fw/.cproject`：找出會
 
 這代表：
 
-1. **13.3 第 2 點對 E39 起點已解決**：系列、image、build 設定現在是從起點讀到的，不再是預設值。13.3 第 3 點的前提（能讀 `.cproject`）也具備了；核對每個 target 的必要／排除處置還沒做（[impl/bcgen B8](../../impl/bcgen.md#b8-改-bcgen-的順序與驗收) 第 2 階段）。
+1. **13.3 第 2 點對 E39 起點已解決**：系列、image、build 設定現在是從起點讀到的，不再是預設值。13.3 第 3 點的前提（能讀 `.cproject`）也具備了；核對每個 target 的必要／排除處置還沒做（[impl/bcgen B8](../../impl/bcgen.md#b8-改-bcgen-的順序與驗收) A 線第 4 階段，2026-10-13 起的編號）。
 2. **判斷不出來時照實回報**：另一份 duanyue checkout（`main` @ `aad20b679`）裡，ps2327 的 build 設定只編 `proj/ps2327` 和 `sal`，沒有 duan／yue 資料夾，系列仍是「不知道」。同一份 checkout 的 ps5037、ps5303、ps2327 推出的 target 都和各自的 `.cproject` 一致；Andes 的 ps5032、ps5910、ps5963 匯入結果不變。
 3. **13.3 第 4 點（設定檢查要分模式）更迫切了**：系列判斷出來後，公版 code 包 duan 的開機初始化規則開始生效，要求 `SCAT_MABIAO`、`BCT_DBG_REGION` 等子區域，以及清除 `SCAT_BOOT_BTCM_ZI`。ps5037 沒有前兩個，`SCAT_BOOT_BTCM_ZI` 也不在 BTCM0 裡。新增的 5 個 `INIT-*` 和 PARAM-REQUIRED、EFUSE-BANK-COUNT 一樣，都是產生 code 才需要的條件；不分模式時，盤點 E39 起點會看到 7 個 error，沒有一個是在描述起點本身。
 4. **第 7 節第 1 項沒有變**：命令列仍只有 serve、check、generate；固定輸入、JSON 輸出、`check` 分模式都還沒做。
