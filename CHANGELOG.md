@@ -17,6 +17,20 @@
 | v0.8.2 | 2026-10-13 釐清 P2／P3 與 G1／G2 的權限及退回條件；G1 改稱「需求基準核准」。細節見下方 |
 | v0.8.3 | 2026-10-13 保留專案編號 `records`，避免和紀錄 branch 撞名。細節見下方 |
 | v0.8.4 | 2026-10-13 push 由串接層負責，先推工作 branch 再寫紀錄 branch；觀察者唯讀查詢。細節見下方 |
+| v0.8.5 | 2026-10-13 P1 改為「基底與基線建立」，依生成配方建立新專案的 code base；新增 GB 基底核准。細節見下方 |
+
+## v0.8.5 改了什麼
+
+**框架修訂：P1 建立新專案的 code base**（2026-10-13）
+
+- **為什麼改**：原本 P1 只量起點的基線、禁止改 FW source，E39 被當成「直接在 PS5037 code 上改 CR」的 delta 專案。但每個新專案都要先有一版自己的 code base（換上新 IC 的 register、IC 目錄、build 設定），這不是任何一張 CR 的內容；而 P2 要把範圍對到新專案的 code、P3 要用新 IC 的記憶體用量、M2 要用基底 image 證明判別能力，所以 code base 必須在 P2 之前建立。照原本的規則跑完 E39，產出的會是套了 CR 的 PS5037 FW。
+- **P1 的五個步驟**（[nodes/P1](nodes/P1.md)）：起點檢查（起點是已發佈或已驗證的版本，只要求能 build）→ 機械替換（串接層依生成配方執行 bcgen 或 script，只寫生成區、可重現，獨立 commit）→ 移植（AI 只改移植範圍，每處修改對到配方、register 差異或 HW spec 出處，3 輪上限）→ 移植審查（另一個 session）→ 量基線。沒有生成配方的專案跳過第 2–4 步。
+- **不需要前代 golden log**：改由 GB 逐項處置基線待處理清單（保留的既有功能在基底上 FAIL 的項目）：移植問題退回 P1、這版要改就回 P0 改標「修改」、接受則記錄理由。避免移植改壞的功能被當成「原本就壞」而在 P5 漏掉。
+- **新增 GB 基底核准**：P1 的出口，核准基底 commit、移植審查結果與基線報告。模組與整合 branch 都從 GB 核准的基底 commit 開出；之後的節點不能改生成區。
+- **生成配方與外部來源**：[07](framework/07_project_profile.md) 的「起點」欄位擴充成「起點與生成配方」：外部來源（register、HW spec）可以是 svn、git 或資料夾，只記代號、類型與版本，實際位置與憑證存在本機設定；資料夾沒有版本號，定版時一律做快照與逐檔 hash。生成配方或外部來源換版屬於「改基底」，所有證據過期、重開 G0 與 GB。
+- **檢查**：[05](framework/05_checks.md) 新增起點可 build、機械替換可重現、移植修改都有依據、移植審查；「既有功能跑通」改為「既有功能已量測」（FAIL 不能略過，交 GB 處置）；專案設定完整、來源快照完整、起點版本可取得補上生成配方與外部來源的要求。
+- **同步**：[02](framework/02_workflow.md)、[03](framework/03_artifacts.md)（新增基底 commit、基底建立紀錄）、[04](framework/04_rules.md)（迴圈上限、P1 失敗退回、改基底的關卡）、[01](framework/01_overview.md)、P0、P2、M2、P5 節點卡、gate_signoff 與 ai_node_execution 的關卡清單、[impl/bcgen](impl/bcgen.md)（B1、B5、B7）、[projects/E39](projects/E39.md)（定位、生成配方、待決 13–15）、專案層與變更處理流程圖。
+- **還沒做**：外部來源快照、register 版本辨識與差異查詢、HW spec 查詢、bcgen 衍生模式等工具的實作設計（[08 §8.2](framework/08_open_questions.md#82-實作待決) 第 13 項）。這次修訂不表示 openBCT 或 bcgen 已切換到新版本。
 
 ## v0.8.4 改了什麼
 

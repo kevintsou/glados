@@ -13,7 +13,7 @@ export default {
     { id: "GC", kind: "gate", title: "GC 變更核准", sub: "這一版接不接？" },
     { id: "DEFER", kind: "record", title: "記錄：延後或拒絕" },
     { id: "K", kind: "decision", title: "改到哪一種產出物？" },
-    { id: "E0", kind: "ext", title: "從 P0／P1 重走", sub: ["所有證據過期", "重開 G0"] },
+    { id: "E0", kind: "ext", title: "從 P0／P1 重走", sub: ["所有證據過期", "重開 G0、GB"] },
     { id: "E2", kind: "ext", title: "P2 追加模組", sub: ["G1 → P3 → G2", "新模組從 M1 開始"] },
     { id: "E3", kind: "ext", title: "從 P3 重走", sub: ["依賴的模組從 M3 重走", "重開 G2"] },
     { id: "E4", kind: "ext", title: "該模組從 M1 重走", sub: ["只重走改動條目的鏈", "H1 審差異"] },
@@ -22,7 +22,7 @@ export default {
   edges: [
     ["CR", "C"], ["XS", "C"], ["SF", "C"], ["C", "GC"],
     ["GC", "DEFER", "不接"], ["GC", "K", "接"],
-    ["K", "E0", "專案說明、專案設定\n（基底、平台、toolchain）"],
+    ["K", "E0", "專案說明、專案設定\n（基底、生成配方、平台、toolchain）"],
     ["K", "E2", "差異分析\n（全新功能）"],
     ["K", "E3", "架構\n（介面或記憶體預算）"],
     ["K", "E4", "spec 條目\n（需求改了）"],

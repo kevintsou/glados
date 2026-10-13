@@ -17,12 +17,14 @@
 
 | 產出物 | 檔案位置 | 產出節點 | 會用到的節點 | 改版時從哪裡重走 |
 | :---- | :---- | :---- | :---- | :---- |
-| 來源快照 | `sources/`（Jira CR、Confluence spec 頁，每一項各自有版本與 hash） | 工具（串接層派工） | P0、P2、P3、M1、C | 第一次通過 G1 前由 P0／P2 整理並請工具產生新版；之後經 C＋GC 改版，只有依賴改動項目的那條鏈過期 |
+| 來源快照 | `sources/`（Jira CR、Confluence spec 頁，每一項各自有版本與 hash；生成配方列的外部來源，例如 register、HW spec，大型檔案放證據儲存區，這裡只存位置、版本與逐檔 hash） | 工具（串接層派工） | P0、P1、P2、P3、M1、C | 第一次通過 G1 前由 P0／P2 整理並請工具產生新版；之後經 C＋GC 改版，只有依賴改動項目的那條鏈過期 |
 | 專案說明 | `project.md` | P0 | 全部 | P0／P1；所有證據過期；重開 G0 |
 | 範圍清單 | `scope.md` | P0 | P1、P2、P5、C | 依賴改動項目的鏈過期。第一次通過 G1 前：回 P0，重開 G0（只審差異）；之後：經 C，由 GC 核准，不重開 G0 |
-| 專案設定 | `profile.json` | P0 | 全部 | 依改動的欄位：只有用到該欄位的節點，從最早的那一站重走；改起點、CPU 與 toolchain、build 設定或驗證平台，從 P0／P1 重走、所有證據過期（[07 §7.2](07_project_profile.md#72-填寫規則)）。都要重開 G0（只審差異） |
+| 專案設定 | `profile.json` | P0 | 全部 | 依改動的欄位：只有用到該欄位的節點，從最早的那一站重走；改起點與生成配方、CPU 與 toolchain、build 設定或驗證平台，從 P0／P1 重走、所有證據過期（[07 §7.2](07_project_profile.md#72-填寫規則)）。都要重開 G0（只審差異） |
 | 環境清單 | `environment.json` | P0 | 全部（派工前核對版本） | P0；重開 G0（只審差異）；會過期什麼依項目類別（[04 §4.4](04_rules.md#44-過期與重新進入)） |
-| 基線報告 | `artifacts/baseline/` | P1 | P2、P3、M2、P5 | P1，之後依相依重走 |
+| 基底 commit | 專案層工作 branch（機械替換與移植的 commit；沒有生成配方時就是起點 commit） | P1 | GB、P2、P3、M2、所有模組與整合 branch 的起點 | P1；所有證據過期；重開 GB |
+| 基底建立紀錄 | `artifacts/base/`（生成紀錄、移植項目清單、移植審查報告與發現紀錄） | P1 | GB、P7 | P1；重開 GB |
+| 基線報告 | `artifacts/baseline/`（含基線待處理清單） | P1 | GB、P2、P3、M2、P5 | P1，之後依相依重走；重開 GB |
 | 差異分析 | `artifacts/delta.md` | P2 | P3、M1、P5、C | P2；新模組從 M1 開始；重開 G1 |
 | CR 修訂紀錄 | `artifacts/cr_revisions.md` | P2（P2b 確認） | P3、M1、C | P2；依賴改動 CR 的鏈過期；重開 G1 |
 | 架構文件 | `artifacts/arch.md` | P3 | M1、M3、M4、M6、P4 | P3；依條目追溯，依賴改動介面或記憶體預算的模組從 M3 重走；重開 G2 |
@@ -457,6 +459,7 @@ created_at: <時間>
 - **預設就是 FW repo**。專案設定列有禁止 agent 看到的 branch 時（例如 E39 的對照實驗），工作區必須是另一個只含允許 branch 的 repo（GitLab mirror 或 fork），agent 能用的 GitLab 權限也只限於這個 repo；GLADOS 的產出不推回原 repo，做到雙向隔離。
 - **同一個 repo 可以有多個 GLADOS 專案**，用專案編號、需求範圍與 branch 對應區分。
 - **每個模組一個工作 branch，專案層節點共用一個專案層工作 branch，P4 用整合 branch**。節點把產出與交接清單 commit 在各自 branch 的 `.glados/` 底下。人工 commit 可以穿插，但要經過 S 版本同步核對。
+- **模組與整合 branch 從 GB 核准的基底 commit 開出**。P1 的機械替換與移植 commit 在專案層工作 branch 上；之後的節點不能改專案設定列的生成區，要改就改生成配方、重新建立基底（屬於改基底，[07 §7.2](07_project_profile.md#72-填寫規則)）。
 - **push 由串接層負責**：節點（AI agent、script）只在執行工作區 commit，不 push，使用的 token 也不需要 push 權限；串接層回收產出後才 push 到工作區 repo。人自己的 commit 可以自己 push，一樣由 S 版本同步核對。
 - **先推工作 branch，再寫紀錄 branch**：紀錄 branch 引用的 commit 必須已經在遠端。串接層確認工作 branch push 成功後，才寫入並 push 紀錄 branch；任何一步失敗都標「待同步」（[04 §4.2](04_rules.md#42-派工與放行)），不 force push。建置路線步驟 2 由扮演串接層的人照同樣順序執行。
 - **只在固定時間點 commit 與 push**，不是 `.glados/` 一有變動就推：例如節點回收、放行、送審。時間點與 commit 訊息格式見 [impl/service.md I6.2](../impl/service.md#i62-commit-與-push)。
@@ -466,7 +469,7 @@ created_at: <時間>
 
 | branch | 名稱 | 誰寫 |
 | :---- | :---- | :---- |
-| 專案層工作 branch | `glados/<專案編號>/project` | 專案層節點（P0、P1、P2、P3、P5、P7）與 C |
+| 專案層工作 branch | `glados/<專案編號>/project` | 專案層節點（P0、P1、P2、P3、P5、P7）與 C；P1 的基底 commit 也在這裡 |
 | 模組工作 branch | `glados/<專案編號>/<模組名稱>` | 該模組的 M1–M7 |
 | 整合 branch | `glados/<專案編號>/integration` | P4 |
 | 受保護的紀錄 branch | `glados/records/<專案編號>` | 只有串接層（含它派工的工具，例如抓來源快照） |
@@ -489,7 +492,7 @@ created_at: <時間>
       sources/                 # 來源快照：Jira CR、Confluence spec 頁（工具產生，只在紀錄 branch）
       versions.json            # 已檢查到的 commit、FW 來源快照與內容 hash（串接層寫）
       workflow.json            # 流程版本、節點與執行規則
-      artifacts/               # 產出物（見 §3.1）
+      artifacts/               # 產出物（見 §3.1），含 base/、baseline/
       handoff/                 # 各節點的交接清單、模組交接包
       approvals/               # 核准索引（串接層寫）
       runs/                    # 執行紀錄與證據索引（串接層寫）
