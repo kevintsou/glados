@@ -52,6 +52,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [OBC-025](tasks/OBC-025.md) | B | openBCT / bct_knowledge_base | 完成 P6/P7 交付、收尾與知識回寫 |
 | [OBC-026](tasks/OBC-026.md) | A | openBCT | 補齊 ARM DS-5 ICE backend |
 | [OBC-027](tasks/OBC-027.md) | A | openBCT | 修正 Windows cp950 讀取 UTF-8 profile 的回歸問題 |
+| [OBC-028](tasks/OBC-028.md) | A | openBCT | GitLab 唯讀查詢模式（觀察者不 clone 看進度） |
 
 ## bcgen 改造
 

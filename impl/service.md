@@ -77,6 +77,15 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 | 在本機執行 GitLab 專案 | 有合適的工作區就重用，否則 clone 指定來源並準備節點的 worktree；執行版本同步與環境檢查 | 本機需要可重現的輸入快照 |
 | 開啟本機 repo | 讀取本機的 `.glados/`、branch 與 commit，顯示和遠端的同步情況 | 用既有 repo；有未提交的修改或分岔時，先由版本同步處理 |
 | 查看或驅動遠端執行 | 查詢串接層服務，或由有權限的人要求服務派工 | 查詢端不需要 clone；執行機器負責 clone 或 worktree |
+| 觀察者只看進度 | 和「查詢 GitLab 專案」相同，但不能要求執行、重跑或核准；不需要啟動串接層服務 | 不需要 clone，也不需要本機 repo |
+
+**觀察者（只看進度的人，例如管理者）**：
+
+- 只需要專案工作區 repo 的唯讀權限（例如 GitLab 的 `read_api` token），範圍只限這個 repo；有隔離限制的專案，就是只含允許 branch 的獨立工作區 repo。
+- **找出有哪些專案**：列出 `glados/records/*` branch 取得專案編號；再讀各紀錄 branch 的 `.glados/projects/<專案編號>/`。紀錄 branch 還不存在的專案（例如 P0 草稿還沒推上 GitLab）觀察者看不到，畫面不推定它不存在。
+- **固定讀取版本**：每次更新先取得紀錄 branch 的 commit，之後所有檔案都讀這個 commit；工作 branch 上的產出也各自固定 commit。畫面標示讀到的 commit 與時間，避免把不同時間點的檔案拼成一個狀態。
+- **狀態推導和本機模式共用同一套規則**：本機 git 與 GitLab API 只是兩種讀取來源，節點狀態、過期與擋住原因都由同一份推導邏輯算出，不另寫一套。
+- 連不到串接層服務時，即時狀態標示「無法取得」，不推定已停止（I5）。
 
 - 選好 repo 後，先找 `.glados/projects/` 底下既有的專案編號；還沒初始化時，提供建立流程，不把整個 repo 當成唯一的專案。
 - 建立時選起點、範圍與專案設定範本，依規則產生資料夾、草稿文件與設定，初步檢查後回到 P0／G0；需要寫入 repo 時才準備工作區。再次開啟只讀取與核對，不覆蓋既有文件。
@@ -154,3 +163,5 @@ GLADOS 分頁沿用 view-model 與 service 分離，不把新的流程邏輯塞�
 4. image 載入（remote-ice）和跑測試（openBCT）要串成同一次執行，才能證明測試時跑的是哪個 image（見 [nodes/M5](../nodes/M5.md)）。由 openBCT 補 `ArmICE`、把 remote-ice 包成 openBCT 的外部工具，還是由 GLADOS 服務負責串接，待定。
 5. 設備互斥要涵蓋 FPGA 與 ICE，並且能跨機器。
 6. openBCT 的報告要不要直接補上 image、測試集合、驗證環境的 hash，還是由 GLADOS 服務在外面包一層。
+7. 觀察者怎麼從別台機器看即時狀態：服務提供需要認證的唯讀 API，或定時把狀態摘要發布到不必安裝 openBCT 也能看的地方（例如 GitLab Pages、Confluence）。摘要只是顯示，不能當正式紀錄，也不能觸發 FW 的 CI（[framework/06 §6.6](../framework/06_service.md#66-ci)）。
+8. 通知管道：等待核准、交給人、超過迴圈上限、節點完成時，要不要主動通知（例如 Teams）、通知誰。通知只是提醒，不能當事實來源（I6）。
