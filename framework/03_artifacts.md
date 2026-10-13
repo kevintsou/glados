@@ -469,6 +469,7 @@ created_at: <時間>
 | 受保護的紀錄 branch | `glados/records/<專案編號>` | 只有串接層（含它派工的工具，例如抓來源快照） |
 
 - `project` 與 `integration` 保留給專案層和整合用，模組不能取這兩個名字。
+- `records` 保留給紀錄 branch，專案編號不能取這個名字。否則專案 `records` 的模組工作 branch `glados/records/<模組名稱>`，會和「專案編號等於這個模組名稱」的專案的紀錄 branch 撞名。建立專案時就要拒絕。
 - 有隔離限制的專案，這些 branch 都在只含允許 branch 的獨立工作區 repo 裡。
 
 ### `.glados/` 目錄配置
