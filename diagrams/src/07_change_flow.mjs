@@ -14,7 +14,7 @@ export default {
     { id: "DEFER", kind: "record", title: "記錄：延後或拒絕" },
     { id: "K", kind: "decision", title: "改到哪一種產出物？" },
     { id: "E0", kind: "ext", title: "從 P0／P1 重走", sub: ["所有證據過期", "重開 G0"] },
-    { id: "E2", kind: "ext", title: "P2 追加模組", sub: ["新模組從 M1 開始", "重開 G1"] },
+    { id: "E2", kind: "ext", title: "P2 追加模組", sub: ["G1 → P3 → G2", "新模組從 M1 開始"] },
     { id: "E3", kind: "ext", title: "從 P3 重走", sub: ["依賴的模組從 M3 重走", "重開 G2"] },
     { id: "E4", kind: "ext", title: "該模組從 M1 重走", sub: ["只重走改動條目的鏈", "H1 審差異"] },
     { id: "E5", kind: "ext", title: "該模組在 M2 補 case", sub: ["重現 bug", "再走 M3 → M4"] },
