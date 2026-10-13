@@ -29,6 +29,9 @@
 | 7 | image 載入與跑測試串成同一次執行，才能證明測試時跑的是哪個 image | [nodes/M5](../nodes/M5.md) |
 | 8 | 關卡確認動作要不要改用 AI 拿不到的驗證（例如 Windows Hello、重新輸入密碼）；互動式 session 要不要禁止 AI 操作桌面 | [impl/gate_signoff G7](../impl/gate_signoff.md#g7-待決事項) |
 | 9 | 各產出物（spec、差異分析、架構、計畫…）的完整範本。框架只規定節點卡列的最低結構，完整範本在展開各節點實作時再定 | [nodes/](../nodes/README.md) |
+| 10 | openBCT 的專案建立流程要不要一併開專案層工作 branch 與受保護的紀錄 branch；紀錄 branch 的權限保護由誰設定 | [impl/service.md I4](../impl/service.md#i4-gitlab本機-repo查詢和執行分開)、[03 §3.12](03_artifacts.md#312-存放位置與寫入權限) |
+| 11 | `workflow.json`（流程版本、節點與執行規則）由誰、在什麼時候產生；放在工作 branch 還是紀錄 branch | [03 §3.12](03_artifacts.md#312-存放位置與寫入權限) |
+| 12 | 有禁看 branch 的專案（例如 E39），只含允許 branch 的獨立工作區 repo 是由建立流程產生，還是要事先由人準備好 | [impl/service.md I4](../impl/service.md#i4-gitlab本機-repo查詢和執行分開)、[03 §3.12](03_artifacts.md#312-存放位置與寫入權限) |
 
 其他實作待決：
 
