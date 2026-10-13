@@ -63,7 +63,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [BC-002](tasks/BC-002.md) | A | bct_knowledge_base | 提供唯讀 JSON CLI、版本與來源回報 |
 | [BC-003](tasks/BC-003.md) | A | bct_knowledge_base | 將 check 分為起點盤點與產生模式 |
 | [BC-004](tasks/BC-004.md) | A | bct_knowledge_base | 提供 profile_draft 與 build target 處置核對 |
-| [BC-005](tasks/BC-005.md) | B | bct_knowledge_base | 在共用核心上提供唯讀 MCP 與白名單 |
+| [BC-005](tasks/BC-005.md) | B | bct_knowledge_base | （不做）bcgen 的唯讀 MCP——AI 改用命令列呼叫 |
 | [BC-006](tasks/BC-006.md) | B | bct_knowledge_base | 補足 E39 功能線索與過往問題資料覆蓋 |
 | [BC-007](tasks/BC-007.md) | A | bct_knowledge_base | P1 機械替換前修正生成的失敗傳遞與輸出覆寫 |
 | [BC-008](tasks/BC-008.md) | A | bct_knowledge_base | 以前代 code base 衍生新 IC 的機械替換（含 ARM） |

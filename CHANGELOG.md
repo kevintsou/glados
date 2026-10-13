@@ -32,6 +32,12 @@
 - **同步**：[02](framework/02_workflow.md)、[03](framework/03_artifacts.md)（新增基底 commit、基底建立紀錄）、[04](framework/04_rules.md)（迴圈上限、P1 失敗退回、改基底的關卡）、[01](framework/01_overview.md)、P0、P2、M2、P5 節點卡、gate_signoff 與 ai_node_execution 的關卡清單、[impl/bcgen](impl/bcgen.md)（B1、B5、B7）、[projects/E39](projects/E39.md)（定位、生成配方、待決 13–15）、專案層與變更處理流程圖。
 - **還沒做**：外部來源快照、register 版本辨識與差異查詢、HW spec 查詢、bcgen 衍生模式等工具的實作設計（[08 §8.2](framework/08_open_questions.md#82-實作待決) 第 13 項）。這次修訂不表示 openBCT 或 bcgen 已切換到新版本。
 
+**實作：bcgen 不做 MCP**（2026-10-13）
+
+- [impl/bcgen](impl/bcgen.md)：AI、人、串接層都用同一個唯讀 JSON 命令列；AI 節點的命令允許清單只列唯讀子指令。原本規劃的 MCP 不做：MCP server 通常全機註冊、只指向一個版本，和每個專案固定工具版本的要求衝突，功能也和命令列重複。B1、B2（改為兩個入口）、B3、B4（改為唯讀子指令）、B5、B8 第 3 階段、B9 第 2 項結案。
+- 若之後 AI 節點改走 `openbct-agent`（只能呼叫 MCP tools），由 openBCT adapter 把固定版本的命令列包成 MCP tool（OBC-011）。
+- 同步 impl/tools、P0／P1 節點卡；共用待辦 BC-005 標成不做，BC-002 補上唯讀子指令分開與輸出格式穩定，OBC-011 的白名單改為命令允許清單。框架不變。
+
 ## v0.8.4 改了什麼
 
 **框架修訂：誰 push、什麼順序，以及觀察者**（2026-10-13）
