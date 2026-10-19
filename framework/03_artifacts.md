@@ -459,7 +459,7 @@ created_at: <時間>
 - **預設就是 FW repo**。專案設定列有禁止 agent 看到的 branch 時（例如 E39 的對照實驗），工作區必須是另一個只含允許 branch 的 repo（GitLab mirror 或 fork），agent 能用的 GitLab 權限也只限於這個 repo；GLADOS 的產出不推回原 repo，做到雙向隔離。
 - **同一個 repo 可以有多個 GLADOS 專案**，用專案編號、需求範圍與 branch 對應區分。
 - **每個模組一個工作 branch，專案層節點共用一個專案層工作 branch，P4 用整合 branch**。節點把產出與交接清單 commit 在各自 branch 的 `.glados/` 底下。人工 commit 可以穿插，但要經過 S 版本同步核對。
-- **模組與整合 branch 從 GB 核准的基底 commit 開出**。P1 的機械替換與移植 commit 在專案層工作 branch 上；之後的節點不能改專案設定列的生成區，要改就改生成配方、重新建立基底（屬於改基底，[07 §7.2](07_project_profile.md#72-填寫規則)）。
+- **模組與整合 branch 從 GB 核准的基底 commit 開出**。P1 的機械替換與移植 commit 在專案層工作 branch 上；之後的節點不能改專案設定列的生成區，要改就改生成配方、重新建立基底（屬於改基底，[07 §7.2](07_project_profile.md#72-填寫規則)）；起始複製區在 GB 之後是一般 source，之後的節點依各自的可寫範圍修改。
 - **push 由串接層負責**：節點（AI agent、script）只在執行工作區 commit，不 push，使用的 token 也不需要 push 權限；串接層回收產出後才 push 到工作區 repo。人自己的 commit 可以自己 push，一樣由 S 版本同步核對。
 - **先推工作 branch，再寫紀錄 branch**：紀錄 branch 引用的 commit 必須已經在遠端。串接層確認工作 branch push 成功後，才寫入並 push 紀錄 branch；任何一步失敗都標「待同步」（[04 §4.2](04_rules.md#42-派工與放行)），不 force push。建置路線步驟 2 由扮演串接層的人照同樣順序執行。
 - **只在固定時間點 commit 與 push**，不是 `.glados/` 一有變動就推：例如節點回收、放行、送審。時間點與 commit 訊息格式見 [impl/service.md I6.2](../impl/service.md#i62-commit-與-push)。

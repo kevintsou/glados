@@ -18,7 +18,7 @@
 | 執行端與同步 | 串接層服務與執行端的位址、證據索引位置、派工方式；憑證由本機的安全設定提供 | 操作入口、派工、監控 |
 | 正式紀錄位置 | 受保護的紀錄 branch 名稱或服務資料庫；串接層服務帳號（[03 §3.12](03_artifacts.md#312-存放位置與寫入權限)） | 串接層 |
 | 關卡核准人 | 每個關卡（G0、GB、G1–G3、GC、H1、H2、P7 的人確認）的核准人名單；「交給人」時通知誰 | 串接層、所有關卡 |
-| 起點與生成配方 | **起點**：repo、起點 branch／commit，必須是已發佈或已驗證的版本；**禁止 agent 看到的 branch**（例如同專案的人工開發 branch）。**生成配方**（新 IC 或要換 register 時才有）：外部來源（例如 register、HW spec），每個來源記代號、類型（svn、git、資料夾）與固定版本（revision、commit，或資料夾快照的逐檔 hash）；register 各 block 採用的版本與對到的 code 目錄；機械替換可以寫的生成區；P1 允許 AI 修改的移植範圍；起點與新 IC build 設定的對應。來源的實際位置與憑證存在各機器的本機設定 | P0、P1、串接層 |
+| 起點與生成配方 | **起點**：repo、起點 branch／commit，必須是已發佈或已驗證的版本；**禁止 agent 看到的 branch**（例如同專案的人工開發 branch）。**生成配方**（新 IC 或要換 register 時才有）：外部來源（例如 register、HW spec），每個來源記代號、類型（svn、git、資料夾）與固定版本（revision、commit，或資料夾快照的逐檔 hash）；register 各 block 採用的版本與對到的 code 目錄；機械替換寫入的兩種區域：**生成區**（能由配方重新產生的內容，例如 register header；GB 之後凍結，要改只能改配方、重建基底）與**起始複製區**（機械替換一次性寫入的內容，例如以前代為底複製的 IC 目錄、新增的 build 設定、共用層加入新 IC 的條件；GB 之後是一般 source）；P1 允許 AI 修改的移植範圍（不能落在生成區）；起點與新 IC build 設定的對應。來源的實際位置與憑證存在各機器的本機設定 | P0、P1、串接層 |
 | 隔離方式 | 有禁看 branch 時：獨立工作區 repo 的位置、agent 可用的 GitLab 權限範圍、GLADOS 產出不推回原 repo | P0、串接層、所有節點 |
 | CI 規則 | 只改 `.glados/` 或紀錄 branch 時不跑 pipeline 的設定；哪些節點會明確觸發 CI（[06 §6.6](06_service.md#66-ci)） | 串接層、M4、P5 |
 | CPU 與 toolchain | ARM／Andes，以及對應的 build 方式 | P1、M4 |

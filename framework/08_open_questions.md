@@ -47,6 +47,7 @@
 
 | 版本 | 決定 | 在哪裡 |
 | :---- | :---- | :---- |
+| v0.8.6 | 機械替換寫入的內容分成兩種：生成區只放能由配方重新產生的內容（例如 register header），GB 之後凍結；起始複製區放一次性寫入的內容（以前代為底複製的 IC 目錄、新增的 build 設定、共用層加入新 IC 的條件），GB 之後是一般 source。移植範圍不能落在生成區 | [07](07_project_profile.md)、[03 §3.12](03_artifacts.md#312-存放位置與寫入權限)、[05](05_checks.md)、[nodes/P1](../nodes/P1.md)、[impl/recipe](../impl/recipe.md) |
 | v0.8.5 | P1 改為「基底與基線建立」：起點必須是已發佈或已驗證的版本，只要求能 build；依 G0 核准的生成配方由確定性工具做機械替換，做不到的部分由 AI 在移植範圍內修改，經獨立審查後量基線；不需要前代 golden log，保留的既有功能在基底上 FAIL 時列進待處理清單，由新增的 GB 基底核准逐項處置。外部來源（register、HW spec）可以是 svn、git 或資料夾，一律用快照固定版本；生成配方改版屬於改基底 | [nodes/P1](../nodes/P1.md)、[02 §2.4](02_workflow.md#24-人工關卡)、[07](07_project_profile.md) |
 | v0.8.4 | 節點只在執行工作區 commit，push 由串接層負責；先推工作 branch、確認成功才寫紀錄 branch，失敗標「待同步」、不 force push；只在固定時間點 commit 與 push。觀察者只需唯讀權限就能看正式進度，不能要求執行、重跑或核准 | [03 §3.12](03_artifacts.md#312-存放位置與寫入權限)、[06 §6.5](06_service.md#65-查詢不需要執行環境)、[impl/service.md I6.2](../impl/service.md#i62-commit-與-push) |
 | v0.8.3 | 專案編號不能取 `records`：`glados/records/` 是紀錄 branch 的前綴，否則專案 `records` 的模組工作 branch 會和其他專案的紀錄 branch 撞名；建立專案時就拒絕 | [03 §3.12](03_artifacts.md#312-存放位置與寫入權限) |
