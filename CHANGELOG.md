@@ -19,6 +19,23 @@
 | v0.8.4 | 2026-10-13 push 由串接層負責，先推工作 branch 再寫紀錄 branch；觀察者唯讀查詢。細節見下方 |
 | v0.8.5 | 2026-10-13 P1 改為「基底與基線建立」，依生成配方建立新專案的 code base；新增 GB 基底核准。細節見下方 |
 | v0.8.6 | 2026-10-19 機械替換寫入的內容分成凍結的生成區與 GB 後可改的起始複製區。細節見下方 |
+| v0.9 | 2026-10-19 精簡流程：人參與的節點由人自己開 agent 做、串接層只開工與收件；關卡只留決策；擋關檢查只留會真的出事的；自動判定改成提示。細節見下方 |
+
+## v0.9 改了什麼
+
+**框架修訂：精簡流程**（2026-10-19，依使用者決定）
+
+- **為什麼改**：v0.8 每一步都要求證據、版本、hash 與核准，任何上游改動都要自動傳播。疊起來是 9 個人工關卡、50 項檢查、7 種紀錄、兩組狀態機，以及大量邊界規則；人被叫出來太多次，openBCT 的實作也被這些機制綁住，違背 GLADOS 加速開發的本意。逐項分析見 [v0.9 精簡提案](notes/v0.9_simplification_proposal.md)，使用者同意提案的三條原則與第 9 節的 6 個建議。
+- **兩種執行方式**（[04 §4.2](framework/04_rules.md#42-兩種執行方式)）：需要人參與的節點（P0、P2、M1、C、P7）由人自己開 agent 完成，串接層只開工（工作區、固定輸入、工作包）與收件；不需要人的節點（P1、M2、M4、M5、M6、P4、P5）由串接層派工。
+- **節點**（[02](framework/02_workflow.md)、[nodes/](nodes/README.md)）：16 個減到 13 個。P3 併入 P2「規劃」；M2 的驗收合約移到 M1「需求與驗收」，M2 只剩測試實作；M3 併入 M4「實作」；取消 M7，模組完成由串接層直接判斷。P0a／P0b、P2a／P2b、M1a／M1b 不再分段。節點代號保留原本的，P3、M3、M7 的卡片留作導引。
+- **關卡**（[02 §2.4](framework/02_workflow.md#24-人工關卡)）：G1 與 G2 合併成 G1 規劃核准；H1 與 H2 合併成每模組一次 H；GB 只在保留的既有功能於基底上 FAIL 時才問人；P7 的人確認不再是關卡。核准紀錄綁定核准的人、時間與 commit。
+- **檢查**（[05](framework/05_checks.md)）：擋關檢查只留 20 項錯了會真的出事的（隔離、快照完整、範圍涵蓋所有 CR、build 設定處置、配方沒有待定項目、機械替換可重現、build 零警告、記憶體、基線、只寫在允許範圍內、必要情境有 case、判別能力、測試沒被動過、必要 case PASS、獨立審查、boot flow、靜態分析、授權掃描、測試標準沒放寬、交付相符）；人在場的節點改用收件檢查，只看交齊與結構。其他檢查改由開工方式保證、改成提示、併入其他節點或移除（[提案附錄 A](notes/v0.9_simplification_proposal.md#附錄-a50-項檢查逐項處置)）。
+- **產出物與紀錄**（[03](framework/03_artifacts.md)）：版本靠 git；不要產出物檔頭、逐份內容 hash 與產出物狀態；交接清單改成自由格式的交接說明；新增外部互動節點的工作包；紀錄只留核准與決定、執行、證據、審查發現四種。紀錄 branch 保留（觀察者模式靠它找專案），但多人使用前不要求權限保護。
+- **規則**（[04](framework/04_rules.md)）：節點狀態 6 種；上游改版改成影響提示，只保留兩條自動規則（image 改變時舊測試結果不算、影響 build 的環境改變時重新 build）；失敗在派工節點內重做最多 3 輪，其他交給人；需求變更只用一條規則：G1 核准前在 P0／P2 處理，之後一律 C＋GC；新 commit 與人工修改只提示、不自動分流。
+- **環境清單**（[nodes/P0](nodes/P0.md)、[04 §4.4](framework/04_rules.md#44-上游改版與重做)）：只固定影響 build 的項目；skill、MCP、知識庫只記錄用了哪一版，更新不重開 G0。
+- **同步**：[01](framework/01_overview.md) 的核心概念、原則、建置路線與用語；[06](framework/06_service.md)、[07](framework/07_project_profile.md)、[08](framework/08_open_questions.md)；[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/service](impl/service.md)、[impl/gate_signoff](impl/gate_signoff.md)、[impl/tools](impl/tools.md)、[impl/bcgen](impl/bcgen.md)、[impl/recipe](impl/recipe.md)；[projects/E39](projects/E39.md)；流程圖；共用待辦重排（見 [docs/coordination](docs/coordination/glados-openbct-todo.md)）。
+- **套用時的調整**：提案 §5.7 原本寫「紀錄寫在專案工作 branch」，套用時改成保留紀錄 branch，只是暫不要求權限保護，因為 openBCT 已實作的觀察者模式（OBC-028）靠列出 `glados/records/*` 找專案。
+- **影響**：openBCT、bct-p0 與三個討論 skill 都要跟著改；這次修訂不表示它們已切換到 v0.9。
 
 ## v0.8.6 改了什麼
 
@@ -27,7 +44,7 @@
 - **為什麼改**：v0.8.5 規定機械替換「只寫生成區」，而 GB 之後「不能改生成區」。機械替換要建立新 IC 的目錄、新增 build 設定、在共用層加入新 IC 的條件，所以這些都得列進生成區、全部被凍結。套到 E39，`proj/ps5039/`、`.cproject`、`sal_build_feature.h` 都不能再改，CR 一碰 IC 專屬 HAL、功能開關或 build 設定就要改配方、重建基底，所有證據過期。凍結的本意是「能由配方重新產生的內容不能手改」，不是「機械替換碰過的檔案都不能改」。
 - **改了什麼**：
   - [07](framework/07_project_profile.md)「起點與生成配方」：機械替換寫入的區域分成**生成區**（能由配方重新產生，例如 register header；GB 之後凍結）與**起始複製區**（一次性寫入，例如以前代為底複製的 IC 目錄、新增的 build 設定、共用層的 IC 條件；GB 之後是一般 source）；移植範圍不能落在生成區。
-  - [03 §3.12](framework/03_artifacts.md#312-存放位置與寫入權限)：起始複製區在 GB 之後依各節點的可寫範圍修改。
+  - [03 §3.7](framework/03_artifacts.md#37-存放位置)：起始複製區在 GB 之後依各節點的可寫範圍修改。
   - [05](framework/05_checks.md)：「專案設定完整」加上起始複製區、移植範圍不能落在生成區；「機械替換可重現」改成只寫在生成區與起始複製區。
   - [nodes/P1](nodes/P1.md)、[nodes/P0](nodes/P0.md)、[projects/E39](projects/E39.md)（E2、E7 第 15 項）同步。
 - **同一天的實作決定**（[impl/recipe](impl/recipe.md)，配方格式原本「還沒定」的部分全部定案）：
@@ -82,7 +99,7 @@
 
 **框架修訂：誰 push、什麼順序，以及觀察者**（2026-10-13）
 
-- **為什麼改**：[03 §3.12](framework/03_artifacts.md#312-存放位置與寫入權限) 只寫「節點把產出 commit 在各自 branch」，沒說誰 push、什麼時候 push。openBCT 原型的草稿不 commit 也不 push，只看進度的人（例如管理者）在 GitLab 上看不到任何東西。
+- **為什麼改**：[03 §3.7](framework/03_artifacts.md#37-存放位置) 只寫「節點把產出 commit 在各自 branch」，沒說誰 push、什麼時候 push。openBCT 原型的草稿不 commit 也不 push，只看進度的人（例如管理者）在 GitLab 上看不到任何東西。
 - **改了什麼**：
   - 03 §3.12 加三條：節點只在執行工作區 commit，push 由串接層負責；先推工作 branch、確認成功才寫紀錄 branch，失敗標「待同步」、不 force push；只在固定時間點 commit 與 push。
   - [06 §6.5](framework/06_service.md#65-查詢不需要執行環境) 加觀察者：只需唯讀權限就能看正式進度，不能要求執行、重跑或核准（這兩條在 `e7d7870` 已寫入，這次補記版本）。
@@ -94,7 +111,7 @@
 **框架修訂：保留專案編號 `records`**（2026-10-13）
 
 - **為什麼改**：紀錄 branch 是 `glados/records/<專案編號>`，模組工作 branch 是 `glados/<專案編號>/<模組名稱>`。專案編號如果是 `records`，它的模組工作 branch 就會和別的專案的紀錄 branch 同名。例如專案 `records` 的模組 `E40`，和專案 `E40` 的紀錄 branch 都是 `glados/records/E40`。這是實作 openBCT 的 GitLab 觀察模式（OBC-028）時發現的：觀察者靠列出 `glados/records/*` 找專案，也會被這個撞名誤導。
-- **改了什麼**：[03 §3.12](framework/03_artifacts.md#312-存放位置與寫入權限) 的 branch 名稱規則加一條：`records` 保留給紀錄 branch，專案編號不能取這個名字，建立專案時就要拒絕。[08 §8.3](framework/08_open_questions.md#83-已決定事項) 已決定事項、README 與 [01](framework/01_overview.md) 的狀態同步。
+- **改了什麼**：[03 §3.7](framework/03_artifacts.md#37-存放位置) 的 branch 名稱規則加一條：`records` 保留給紀錄 branch，專案編號不能取這個名字，建立專案時就要拒絕。[08 §8.3](framework/08_open_questions.md#83-已決定事項) 已決定事項、README 與 [01](framework/01_overview.md) 的狀態同步。
 - **影響**：只多一條命名限制，沒有新增節點、關卡、產出物或檢查。openBCT 的 GitLab 觀察模式已經不把 `records` 當成專案；建立專案的流程還沒加上這個檢查，這次修訂不表示 openBCT 已切換到新版本。
 
 ## v0.8.2 改了什麼

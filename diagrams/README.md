@@ -27,10 +27,10 @@ export default {
   direction: "DOWN",                 // DOWN（由上往下）或 RIGHT（由左往右）
   nodes: [
     { id: "M1", tag: "M1", title: "需求釐清", sub: "寫成有編號的 spec 條目" },
-    { id: "H1", kind: "gate", title: "H1 需求核准" },
+    { id: "H", kind: "gate", title: "H 模組需求核准" },
   ],
   edges: [
-    ["M1", "H1"],                              // 正常往下走
+    ["M1", "H"],                               // 正常往下走
     ["M5", "R", "case FAIL", "back"],          // 失敗或退回（紅色虛線）
   ],
 };

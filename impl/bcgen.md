@@ -2,7 +2,7 @@
 
 > **這份文件回答**：bct_knowledge_base 的 bcgen（公版 bootcode 產生工具）在 GLADOS 裡用在哪裡、要改成什麼樣子。2026-10-19 起只用在 P1 的機械替換，由串接層執行；P0 不經 bcgen 盤點。屬於實作。
 >
-> **和框架的關係**：bcgen 是節點用的工具，放在實作層。接進 GLADOS 時發現起點盤點出的 build 設定要逐項處置（E39 的 `.cproject` 有 6 個，專案設定原本只列 4 個），這一點改在框架（v0.8.1：[framework/07 §7.2](../framework/07_project_profile.md#72-填寫規則)、[framework/05 §5.5](../framework/05_checks.md#55-各節點的檢查)），對所有專案都適用。本文件其他每一條限制，都是為了守住框架既有的規則（只認證據、可寫範圍、隔離、環境清單）。
+> **和框架的關係**：bcgen 是節點用的工具，放在實作層。接進 GLADOS 時發現起點盤點出的 build 設定要逐項處置（E39 的 `.cproject` 有 6 個，專案設定原本只列 4 個），這一點改在框架（v0.8.1：[framework/07 §7.2](../framework/07_project_profile.md#72-填寫規則)、[framework/05 §5.4](../framework/05_checks.md#54-擋關檢查)），對所有專案都適用。本文件其他每一條限制，都是為了守住框架既有的規則（只認證據、可寫範圍、隔離、環境清單）。
 >
 > **背景評估**：bcgen 現況、在 P0／P1 能做與不能做的事、缺口與驗收條件，見 [assessments/bcgen-p0-p1](../assessments/bcgen-p0-p1/README.md)（2026-10-08，針對 bct_knowledge_base `4582011`）。用 E39 起點實際跑過的結果見同一份評估的 [§13](../assessments/bcgen-p0-p1/README.md#13-補充e39-起點實測2026-10-12)（2026-10-12，針對 `2b6a8cb`）。評估是針對原本「P0 用 bcgen 盤點」的設計寫的，2026-10-19 後只當歷史參考。
 
@@ -23,7 +23,7 @@
 
 | 入口 | 給誰用 | 用在哪裡 |
 | :---- | :---- | :---- |
-| 網頁精靈（原本就有） | 人 | 新 IC 準備起點（B7）；P0b 討論時人可以自己開來看記憶體與 eFuse 畫面，畫面內容不是 P0 的正式依據 |
+| 網頁精靈（原本就有） | 人 | 新 IC 準備起點（B7）；P0 討論時人可以自己開來看記憶體與 eFuse 畫面，畫面內容不是 P0 的正式依據 |
 | 命令列（產生模式） | 串接層 | P1 機械替換：依 G0 核准的生成配方與固定輸入執行，只寫生成區與起始複製區、可重現（B3） |
 
 ---
@@ -34,8 +34,8 @@
 | :---- | :---- | :---- | :---- |
 | 1 | **AI 不呼叫 bcgen**：P0／P1 AI 節點的命令允許清單不列 bcgen；P1 的機械替換由串接層執行，移植的 AI 只改移植範圍 | P0、P1 的 AI 都不能改 FW code（移植範圍除外），也不能改共用的知識庫；機械替換要可重現，不能由 AI 臨場決定 | [nodes/P0](../nodes/P0.md)、[nodes/P1](../nodes/P1.md) 的可寫範圍 |
 | 2 | **只認串接層執行的結果**：機械替換的輸入、輸出清單與 hash 由串接層記錄，當作基底建立紀錄的證據；人或 AI 自己跑的結果只供參考 | 只認證據：節點自己跑的結果只供參考 | [framework/05 §5.1–5.2](../framework/05_checks.md#51-只認證據) |
-| 3 | **每次都綁定固定的輸入**：版本由串接層固定——依 G0 核准的設定與環境清單準備起點 worktree 與快照，把位置明確傳給 bcgen，正式 hash 由串接層自己計算（OBC-031）。bcgen 只讀傳入的輸入：不讀 `settings.json`、全域 catalog、環境變數或快取，不掃傳入範圍以外的目錄（BC-001）；回報讀到的檔案與 hash，供串接層核對 | 證據要對應目前版本；有隔離限制的專案（E39）不能讓工具讀到禁看的內容 | [framework/03 §3.12](../framework/03_artifacts.md#312-存放位置與寫入權限)、[projects/E39](../projects/E39.md) |
-| 4 | **版本依用途鎖定**：環境清單列 bcgen 程式、功能清單、公版 code 包與生成配方輸入的固定版本與 hash；用來產生基底的工具與輸入屬於「影響 build」 | 換版會讓基底與所有證據過期，屬於改基底 | [framework/04 §4.4](../framework/04_rules.md#44-過期與重新進入) |
+| 3 | **每次都綁定固定的輸入**：版本由串接層固定——依 G0 核准的設定與環境清單準備起點 worktree 與快照，把位置明確傳給 bcgen，正式 hash 由串接層自己計算（OBC-031）。bcgen 只讀傳入的輸入：不讀 `settings.json`、全域 catalog、環境變數或快取，不掃傳入範圍以外的目錄（BC-001）；回報讀到的檔案與 hash，供串接層核對 | 證據要對應目前版本；有隔離限制的專案（E39）不能讓工具讀到禁看的內容 | [framework/03 §3.7](../framework/03_artifacts.md#37-存放位置)、[projects/E39](../projects/E39.md) |
+| 4 | **版本依用途鎖定**：環境清單列 bcgen 程式、功能清單、公版 code 包與生成配方輸入的固定版本與 hash；用來產生基底的工具與輸入屬於「影響 build」 | 換版會讓基底與所有證據過期，屬於改基底 | [framework/04 §4.4](../framework/04_rules.md#44-上游改版與重做) |
 
 另外：
 
@@ -50,9 +50,9 @@
 
 | 原本的子指令 | 原本做什麼 | 改由誰做 |
 | :---- | :---- | :---- |
-| `inspect_start`、`profile_draft` | 盤點起點、轉成專案設定欄位草稿 | P0a 的 AI 直接讀起點 code（bct-p0 skill，SK-007） |
+| `inspect_start`、`profile_draft` | 盤點起點、轉成專案設定欄位草稿 | P0 的 agent 直接讀起點 code（bct-p0 skill，SK-007） |
 | `check_config` | 用 bcgen 的規則檢查設定 | 不在 P0 做；生成前的輸入檢查屬於 P1 機械替換（BC-008），配方缺項時明確失敗 |
-| `feature_dependencies`、`find_references`、`applicable_pitfalls` | P0b 討論時查功能相依、code 參考、過往問題 | P0b 的 AI 直接讀起點 code，或用 bootcode-qa |
+| `feature_dependencies`、`find_references`、`applicable_pitfalls` | P0 討論時查功能相依、code 參考、過往問題 | P0 的 agent 直接讀起點 code，或用 bootcode-qa |
 | `check_build_targets` | 核對每個 target 都已處置 | 串接層的確定性 checker（OBC-030），P0 出口與 P1 開始時用同一個 |
 | `version`、`capabilities` | 回報版本與支援範圍 | 版本由串接層依固定的 bct_knowledge_base commit 自己計算（OBC-031）；支援範圍由生成時明確失敗表達（B3「另外」） |
 
@@ -66,13 +66,13 @@ E39 起點用原本設計實測的結果（ARM `.cproject` 匯入、6 個 build 
 
 - 不用 bcgen 盤點或查詢。AI 直接讀起點 code（[nodes/P0](../nodes/P0.md)）。
 - 定生成配方時直接寫進專案設定的配方區塊（B1、[impl/recipe](recipe.md)）；環境清單列 P1 要用的 bcgen 版本與它支援的配方格式版本（B3 第 4 條）。
-- 起點盤點出的 target 都要在專案設定既有的「build 設定」欄位中處置：列為**必要**，或**明確排除並附理由與範圍依據**。P0a 可先標成待確認，P0b 必須解決後才送 G0；沒找到或不支援的盤點結果不能當成清單已完整（[framework/07 §7.2](../framework/07_project_profile.md#72-填寫規則)）。
+- 起點盤點出的 target 都要在專案設定既有的「build 設定」欄位中處置：列為**必要**，或**明確排除並附理由與範圍依據**。草稿可先標成待確認，送 G0 前必須解決；沒找到或不支援的盤點結果不能當成清單已完整（[framework/07 §7.2](../framework/07_project_profile.md#72-填寫規則)）。
 - 盤點到 target 不代表這一版一定要 build；排除也不代表它 PASS。排除理由不能只是 build 失敗、工具不支援或為了讓基線通過；不得排除專案範圍所需的設定。G0 核准必要清單與排除理由。
 - 「每個 target 都已處置」的正式檢查，由串接層的確定性 checker 獨立列舉固定起點的 build 設定、比對專案設定（OBC-030）；AI 自己盤點的結果只供參考。
 
 **P1 基底與基線建立**
 
-- 開始時，用同一個 checker 以固定的起點重新核對盤點清單和 G0 核准的必要／排除處置。漏列、仍待確認、必要設定不存在於起點，或無法完整盤點時，P1 回報「輸入不足」，由 R 退回 P0（[framework/04 §4.5](../framework/04_rules.md#45-r-失敗分類)）。核准的排除項目不要求 build，也不計入 PASS。
+- 開始時，用同一個 checker 以固定的起點重新核對盤點清單和 G0 核准的必要／排除處置。漏列、仍待確認、必要設定不存在於起點，或無法完整盤點時，P1 回報「輸入不足」，由 R 退回 P0（[framework/04 §4.5](../framework/04_rules.md#45-失敗處理)）。核准的排除項目不要求 build，也不計入 PASS。
 - 機械替換由串接層依生成配方執行 bcgen，輸入固定、只寫生成區與起始複製區、重跑結果相同（OBC-031、BC-007、BC-008）。
 - P1 出口由串接層核對 G0 核准的每個必要設定都有實際 build 成功、0 warning、image hash 的證據。target 盤點或 checker 的 `ok` 不能取代 build 結果；必要設定 build 失敗時依 P1 的失敗規則交給人，不能在 P1 自行改成排除。
 - P1 的基線由實際的 build 與測試建立，bcgen 的產出不能取代 build 與測試的證據。
@@ -86,9 +86,9 @@ E39 起點用原本設計實測的結果（ARM `.cproject` 匯入、6 個 build 
 | 節點 | 用 bcgen 的哪部分 | 怎麼用 |
 | :---- | :---- | :---- |
 | P2 差異分析 | 功能清單、code 參考 | 把範圍項目對到 code 的線索（一樣受隔離限制） |
-| P3 架構 | 記憶體與 linker 檢查 | 定記憶體預算時，核對區域不重疊、有對齊、子區域不超出；預算仍由 P3 決定 |
+| P2 規劃 | 記憶體與 linker 檢查 | 定記憶體預算時，核對區域不重疊、有對齊、子區域不超出；預算仍由 P2 決定 |
 | M1 需求 | 過往問題清單 | 當 spec 條目的知識來源，例如「安全判定出錯一律拒絕」 |
-| M2 驗收 | 過往問題的人工檢查項目 | 轉成必要的壞情境 case |
+| M1、M2 驗收 | 過往問題的人工檢查項目 | 轉成驗收合約的必要壞情境與 case |
 | M6、P5 審查 | 過往問題的自動檢查規則 | 專案設定「必要規則清單」的候選來源；還沒實作的自動檢查不能算通過 |
 | P7 回寫 | 過往問題清單、功能清單 | 這次踩到的新坑寫成新的過往問題條目，經人確認；改了就升級環境清單版本 |
 
@@ -111,7 +111,7 @@ E39 起點用原本設計實測的結果（ARM `.cproject` 匯入、6 個 build 
 
 ## B8. 改 bcgen 的順序與驗收
 
-（2026-10-19 依「bcgen 只用在 P1」改寫）bcgen 只剩 **B 機械替換**一條線；原本的 A 唯讀盤點線除了 A1 以外都不做。固定版本、準備起點 worktree 與快照、計算正式 hash 都是串接層的工作（OBC-031，[framework/04 §4.2](../framework/04_rules.md#42-派工與放行)）；bcgen 只負責「能被固定」：只讀傳入的輸入。每個階段對應[共用待辦](../docs/coordination/glados-openbct-todo.md)的任務，完成條件以任務檔為準，這裡只列順序與要點。
+（2026-10-19 依「bcgen 只用在 P1」改寫）bcgen 只剩 **B 機械替換**一條線；原本的 A 唯讀盤點線除了 A1 以外都不做。固定版本、準備起點 worktree 與快照、計算正式 hash 都是串接層的工作（OBC-031，[framework/04 §4.2](../framework/04_rules.md#42-兩種執行方式)）；bcgen 只負責「能被固定」：只讀傳入的輸入。每個階段對應[共用待辦](../docs/coordination/glados-openbct-todo.md)的任務，完成條件以任務檔為準，這裡只列順序與要點。
 
 **A. 原本的唯讀盤點線**
 

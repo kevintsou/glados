@@ -25,7 +25,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 
 | ID | 優先 | 執行 repo | 待辦 |
 |---|---|---|---|
-| [OBC-001](tasks/OBC-001.md) | A | openBCT | 對齊 GLADOS v0.8.1 與 build 設定處置 |
+| [OBC-001](tasks/OBC-001.md) | A | openBCT | 對齊 GLADOS v0.9 的流程目錄、關卡與檢查 |
 | [OBC-002](tasks/OBC-002.md) | A | openBCT | 實作正式產出物與紀錄的讀取、驗證及寫入 |
 | [OBC-003](tasks/OBC-003.md) | A | openBCT | 加入身分與精確版本的人工簽核 |
 | [OBC-004](tasks/OBC-004.md) | A | openBCT | 從正式紀錄推導狀態、動態解鎖與唯一派工 |
@@ -33,18 +33,18 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [OBC-006](tasks/OBC-006.md) | A | openBCT | 補齊 portable project profile 與本機路徑映射 |
 | [OBC-007](tasks/OBC-007.md) | A | openBCT / bct_knowledge_base | 準備每專案固定版本的 KB、skill、MCP 與工具 |
 | [OBC-008](tasks/OBC-008.md) | A | openBCT | 建立允許 branch/snapshot 的實際隔離 |
-| [OBC-009](tasks/OBC-009.md) | A | openBCT | 補齊 P0 出口與 G0 來源、環境檢查 |
-| [OBC-010](tasks/OBC-010.md) | A | openBCT | 接通 P0a 草擬與 P0b 逐題討論 |
+| [OBC-009](tasks/OBC-009.md) | A | openBCT | P0 收件檢查與擋關檢查 |
+| [OBC-010](tasks/OBC-010.md) | A | openBCT | 外部互動節點的開工工作包與提交收件 |
 | [OBC-011](tasks/OBC-011.md) | A | openBCT | （不做）將唯讀 bcgen CLI 接入 GLADOS adapter——固定輸入與 P1 派工移到 OBC-031，target 核對移到 OBC-030 |
 | [OBC-012](tasks/OBC-012.md) | A | openBCT | 建立 P1 所有必要 build 設定的基線證據 |
 | [OBC-013](tasks/OBC-013.md) | A | openBCT | 建立 P1 功能、啟動與硬體基線 |
 | [OBC-014](tasks/OBC-014.md) | A | openBCT | 完成派工生命週期、恢復與 OS 常駐 |
 | [OBC-015](tasks/OBC-015.md) | A | openBCT | 實作固定輸入的新 AI session 與出口檢查 |
 | [OBC-016](tasks/OBC-016.md) | A | openBCT | 實作 R 失敗分類、退回與迴圈限制 |
-| [OBC-017](tasks/OBC-017.md) | B | openBCT | 實作 S 版本同步與過期傳播 |
+| [OBC-017](tasks/OBC-017.md) | B | openBCT | 影響提示：上游改版、新 commit 與外部來源差異 |
 | [OBC-018](tasks/OBC-018.md) | B | openBCT | 實作 C/GC 需求變更與影響報告 |
-| [OBC-019](tasks/OBC-019.md) | B | openBCT | 建立 M2 保護測試基準與 H2 合約依賴 |
-| [OBC-020](tasks/OBC-020.md) | B | openBCT | 串接 P2/P3 模組展開與 M1–M7 節點 |
+| [OBC-019](tasks/OBC-019.md) | B | openBCT | M2 測試基準（H 併入 M1） |
+| [OBC-020](tasks/OBC-020.md) | B | openBCT | 串接 P2 與模組流程（M1、M2、M4、M5、M6） |
 | [OBC-021](tasks/OBC-021.md) | A | openBCT | 把現有測試報告接為可核對的 GLADOS 證據 |
 | [OBC-022](tasks/OBC-022.md) | A | openBCT | 完成遠端 FPGA/ICE/UART 排程與設備互鎖 |
 | [OBC-023](tasks/OBC-023.md) | B | openBCT | 設定 metadata-only commit 與明確節點 CI 觸發 |
@@ -78,7 +78,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [SK-002](tasks/SK-002.md) | A | bct_knowledge_base | 審閱三個 skills 的 BCT/GLADOS 適用邊界 |
 | [SK-003](tasks/SK-003.md) | B | bct_knowledge_base | 擴充、重跑 skills 的可共用行為評估 |
 | [SK-004](tasks/SK-004.md) | A | bct_knowledge_base | 將審閱後的 skills 納入可固定的 BCT 版本 |
-| [SK-005](tasks/SK-005.md) | A | openBCT | 讓 openBCT 正式節點載入共用 skills |
+| [SK-005](tasks/SK-005.md) | A | openBCT | （不做）讓 openBCT 正式節點載入共用 skills——外部互動節點由人自己開 agent |
 | [SK-006](tasks/SK-006.md) | B | bct_knowledge_base | 維護三包共用契約與封裝一致性 |
 | [SK-007](tasks/SK-007.md) | A | bct_knowledge_base / openBCT | bct-p0 專案啟動 skill（P0a 草擬、P0b 叫用 bct-grill-me、備齊 bcgen 輸入） |
 
