@@ -35,7 +35,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [OBC-008](tasks/OBC-008.md) | A | openBCT | 建立允許 branch/snapshot 的實際隔離 |
 | [OBC-009](tasks/OBC-009.md) | A | openBCT | 補齊 P0 出口與 G0 來源、環境檢查 |
 | [OBC-010](tasks/OBC-010.md) | A | openBCT | 接通 P0a 草擬與 P0b 逐題討論 |
-| [OBC-011](tasks/OBC-011.md) | A | openBCT | 將唯讀 bcgen CLI 接入 GLADOS adapter |
+| [OBC-011](tasks/OBC-011.md) | A | openBCT | （不做）將唯讀 bcgen CLI 接入 GLADOS adapter——固定輸入與 P1 派工移到 OBC-031，target 核對移到 OBC-030 |
 | [OBC-012](tasks/OBC-012.md) | A | openBCT | 建立 P1 所有必要 build 設定的基線證據 |
 | [OBC-013](tasks/OBC-013.md) | A | openBCT | 建立 P1 功能、啟動與硬體基線 |
 | [OBC-014](tasks/OBC-014.md) | A | openBCT | 完成派工生命週期、恢復與 OS 常駐 |
@@ -54,15 +54,17 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [OBC-027](tasks/OBC-027.md) | A | openBCT | 修正 Windows cp950 讀取 UTF-8 profile 的回歸問題 |
 | [OBC-028](tasks/OBC-028.md) | A | openBCT | GitLab 唯讀查詢模式（觀察者不 clone 看進度） |
 | [OBC-029](tasks/OBC-029.md) | A | openBCT | 串接層統一 commit 與 push 工作 branch 及紀錄 branch |
+| [OBC-030](tasks/OBC-030.md) | A | openBCT | 以確定性 checker 核對起點 build 設定的必要／排除處置 |
+| [OBC-031](tasks/OBC-031.md) | A | openBCT | P1 機械替換由串接層固定輸入並執行 bcgen |
 
 ## bcgen 改造
 
 | ID | 優先 | 執行 repo | 待辦 |
 |---|---|---|---|
 | [BC-001](tasks/BC-001.md) | A | bct_knowledge_base | bcgen 只讀明確傳入的輸入（不讀隱藏的全域狀態） |
-| [BC-002](tasks/BC-002.md) | A | bct_knowledge_base | 提供唯讀 JSON CLI、版本與來源回報 |
-| [BC-003](tasks/BC-003.md) | A | bct_knowledge_base | 將 check 分為起點盤點與產生模式 |
-| [BC-004](tasks/BC-004.md) | A | bct_knowledge_base | 提供 profile_draft 與 build target 處置核對 |
+| [BC-002](tasks/BC-002.md) | A | bct_knowledge_base | （不做）提供唯讀 JSON CLI、版本與來源回報——P0 不經 bcgen |
+| [BC-003](tasks/BC-003.md) | A | bct_knowledge_base | （不做）將 check 分為起點盤點與產生模式——P0 不經 bcgen |
+| [BC-004](tasks/BC-004.md) | A | bct_knowledge_base | （不做）提供 profile_draft 與 build target 處置核對——target 核對改由 OBC-030 |
 | [BC-005](tasks/BC-005.md) | B | bct_knowledge_base | （不做）bcgen 的唯讀 MCP——AI 改用命令列呼叫 |
 | [BC-006](tasks/BC-006.md) | B | bct_knowledge_base | 補足 E39 功能線索與過往問題資料覆蓋 |
 | [BC-007](tasks/BC-007.md) | A | bct_knowledge_base | P1 機械替換前修正生成的失敗傳遞與輸出覆寫 |
@@ -78,12 +80,13 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [SK-004](tasks/SK-004.md) | A | bct_knowledge_base | 將審閱後的 skills 納入可固定的 BCT 版本 |
 | [SK-005](tasks/SK-005.md) | A | openBCT | 讓 openBCT 正式節點載入共用 skills |
 | [SK-006](tasks/SK-006.md) | B | bct_knowledge_base | 維護三包共用契約與封裝一致性 |
+| [SK-007](tasks/SK-007.md) | A | bct_knowledge_base / openBCT | bct-p0 專案啟動 skill（P0a 草擬、P0b 叫用 bct-grill-me、備齊 bcgen 輸入） |
 
 ## 已有資產與部分完成，避免重做
 
 - openBCT 已有 GUI 流程圖、P0 草稿、SQLite/revision、獨立本機服務、OS lock、草稿匯出與人工修改保護；正式派工/簽核/紀錄有效性仍未完成。
 - external tools、Orchestrator/results/reports、GitSnapshot、memory、SPI/XMODEM、lab、Andes ICE、本機 DeviceLease 已存在。做 GLADOS adapter 與必要真機驗證，不重造核心能力。
-- bcgen ARM .cproject/burner.scat 匯入已在 fedcbdb 完成；E39 起點已識別 duan、boot＋sandaru、六個 build 設定。context/JSON/version/check 模式與 target 處置仍待做。
+- bcgen ARM .cproject/burner.scat 匯入已在 fedcbdb 完成；E39 起點已識別 duan、boot＋sandaru、六個 build 設定。2026-10-19 起 P0 不經 bcgen，bcgen 只用在 P1 機械替換；唯讀 JSON 命令列與 check 盤點模式不做，target 處置核對改由串接層 checker（OBC-030）。
 - 三包 skills 草稿、references、MIT/來源與合成比較已完成（SK-001）。正式版本、擴充評估及 openBCT 載入未完成。
 - fresh Windows 安裝器修正由 54038fc 提供，不列尚未實作；該 commit 沒修 OBC-027 encoding。
 
