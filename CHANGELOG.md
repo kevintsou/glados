@@ -43,6 +43,14 @@
 - [impl/bcgen](impl/bcgen.md) B8 改寫成兩條線：A 唯讀盤點（A1 只讀傳入的輸入、A2 唯讀 JSON 命令列、A3 `check` 分盤點／產生、A4 P0／P1 對接、A5 E39 資料覆蓋、A6 服務對接），B 機械替換（B1 產生功能的安全性、B2 以前代 code base 衍生含 ARM），每個階段對應共用待辦的 BC 任務。固定版本改由串接層負責（OBC-011），bcgen 只讀傳入的輸入；產生功能的缺口不再延到 B7，改列在 B 線第 1 階段。
 - B1 的 v0.8.5 段落、B4 的實測限制、評估 §13.5 對 B8 階段編號的引用同步更新。框架不變。
 
+**實作：P0 不經 bcgen，bcgen 只用在 P1 的機械替換**（2026-10-19，依使用者決定）
+
+- **改了什麼**：P0 由 AI 直接讀指定起點 commit 的 build 設定、feature 條件與 code 引用來盤點，不再透過 bcgen 的唯讀命令列；bcgen 只用在 P1，由串接層依生成配方執行機械替換。P0 定生成配方時要同步備齊 bcgen 的輸入，不留到 P1 才收資料。
+- **檔案**：[nodes/P0](nodes/P0.md) 與 [nodes/P1](nodes/P1.md) 的實作段、[impl/bcgen](impl/bcgen.md)（B1–B5 改寫，B4 改成原本子指令的去處對照，B8 改成 A 線只剩 A1、新增 C 串接層對接，B9 第 3 項結案、新增第 5 項「bcgen 輸入放哪裡、用什麼格式」）、[impl/tools](impl/tools.md)；[bcgen 評估](assessments/bcgen-p0-p1/README.md)開頭註明第 1 節的建議不採用。
+- **target 處置的正式檢查**：原本由 bcgen `check_build_targets` 做。改成串接層的確定性 checker 獨立列舉固定起點的 build 設定、比對專案設定，P0 出口與 P1 開始用同一個；AI 自己盤點的結果只供參考。
+- **共用待辦**：BC-002、BC-003、BC-004、OBC-011 標成不做；新增 OBC-030（target 處置 checker）、OBC-031（P1 機械替換由串接層固定輸入並執行 bcgen，從 OBC-011 拆出）、SK-007（bct-p0 skill）；OBC-009、OBC-012 改相依，BC-008 併入 BC-002 留下的 import 順序，BC-006 待重新評估範圍。
+- **影響**：框架不變。P0 的四份產出、「build 設定逐項處置」規則（v0.8.1）與各項檢查都不變，只換了執行方式。這次修訂不表示 openBCT、bcgen 或 bct-p0 已切換到新設計。
+
 ## v0.8.4 改了什麼
 
 **框架修訂：誰 push、什麼順序，以及觀察者**（2026-10-13）
