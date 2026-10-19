@@ -1,0 +1,535 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "glados.recipe.v1.schema.json",
+  "title": "GLADOS recipe v1 (BC-008)",
+  "description": "Direct recipe block or the start/recipe section of profile.json. drop.files explicitly enumerates omitted files, using from_start, sha256 and to. Paths ending in / designate directories.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/recipe"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/start"
+        },
+        "recipe": {
+          "$ref": "#/$defs/recipe"
+        }
+      },
+      "required": [
+        "start",
+        "recipe"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\x00-\\x1f]+$"
+    },
+    "directory": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*\\\\)(?!.*:)(?!.*(?:^|/)\\.{1,2}(?:/|$))[^\\x00-\\x1f]+/$"
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$"
+    },
+    "recipe": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "glados.recipe/v1"
+        },
+        "predecessor_ic": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "target_ic": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/sourceId"
+                  },
+                  "kind": {
+                    "const": "folder"
+                  },
+                  "version": {
+                    "type": "object",
+                    "properties": {
+                      "snapshot_sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "snapshot_sha256"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "version"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/sourceId"
+                  },
+                  "kind": {
+                    "const": "svn"
+                  },
+                  "version": {
+                    "type": "object",
+                    "properties": {
+                      "revision": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "peg": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "revision",
+                      "peg"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "version"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/sourceId"
+                  },
+                  "kind": {
+                    "const": "git"
+                  },
+                  "version": {
+                    "type": "object",
+                    "properties": {
+                      "commit": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{40}$"
+                      }
+                    },
+                    "required": [
+                      "commit"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "kind",
+                  "version"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "register_blocks": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "block": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                  },
+                  "action": {
+                    "const": "replace"
+                  },
+                  "source": {
+                    "$ref": "#/$defs/sourceId"
+                  },
+                  "version": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "$ref": "#/$defs/path"
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "to": {
+                          "$ref": "#/$defs/path"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "sha256",
+                        "to"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "block",
+                  "action",
+                  "source",
+                  "version",
+                  "files"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "block": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                  },
+                  "action": {
+                    "const": "keep"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "from_start": {
+                          "$ref": "#/$defs/path"
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "to": {
+                          "$ref": "#/$defs/path"
+                        }
+                      },
+                      "required": [
+                        "from_start",
+                        "sha256",
+                        "to"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "block",
+                  "action",
+                  "reason",
+                  "files"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "block": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                  },
+                  "action": {
+                    "const": "drop"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "from_start": {
+                          "$ref": "#/$defs/path"
+                        },
+                        "sha256": {
+                          "type": "string",
+                          "pattern": "^[0-9a-f]{64}$"
+                        },
+                        "to": {
+                          "$ref": "#/$defs/path"
+                        }
+                      },
+                      "required": [
+                        "from_start",
+                        "sha256",
+                        "to"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "block",
+                  "action",
+                  "reason",
+                  "files"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "ic_dir": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "$ref": "#/$defs/directory"
+            },
+            "to": {
+              "$ref": "#/$defs/directory"
+            }
+          },
+          "required": [
+            "from",
+            "to"
+          ],
+          "additionalProperties": false
+        },
+        "ic_conditions": {
+          "type": "object",
+          "properties": {
+            "id_file": {
+              "$ref": "#/$defs/path"
+            },
+            "file": {
+              "$ref": "#/$defs/path"
+            },
+            "follow": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "add": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+            },
+            "exceptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "macro": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                  },
+                  "scope_item": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "reason": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "macro",
+                  "scope_item",
+                  "reason"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "hw_dependent": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "macro": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                  },
+                  "blocks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "macro",
+                  "blocks"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "id_file",
+            "file",
+            "follow",
+            "add",
+            "exceptions",
+            "hw_dependent"
+          ],
+          "additionalProperties": false
+        },
+        "build_map": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              "to": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "register_entry": {
+          "$ref": "#/$defs/path"
+        },
+        "seed_paths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/path"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "port_paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "$ref": "#/$defs/path"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "path",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "pending": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "format",
+        "predecessor_ic",
+        "target_ic",
+        "sources",
+        "register_blocks",
+        "ic_dir",
+        "ic_conditions",
+        "build_map",
+        "register_entry",
+        "seed_paths",
+        "port_paths",
+        "pending"
+      ],
+      "additionalProperties": false
+    },
+    "start": {
+      "type": "object",
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branch": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "forbidden_branches": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "repo",
+        "branch",
+        "commit",
+        "basis",
+        "forbidden_branches"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

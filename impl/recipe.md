@@ -1,6 +1,6 @@
 # 生成配方的機器格式
 
-> **這份文件回答**：專案設定（`profile.json`）裡「起點與生成配方」寫成機器可讀的格式時長什麼樣子，以及 P0、串接層、P1 的生成工具怎麼使用它。屬於實作。設計已決定（2026-10-19）；欄位型別與 schema 檔等 BC-008 實作時補上，在那之前仍是**草案**。
+> **這份文件回答**：專案設定（`profile.json`）裡「起點與生成配方」寫成機器可讀的格式時長什麼樣子，以及 P0、串接層、P1 的生成工具怎麼使用它。屬於實作。設計已決定（2026-10-19）；欄位型別定在 schema 檔 [`schema/glados.recipe.v1.schema.json`](schema/glados.recipe.v1.schema.json)（2026-10-20，由 BC-008 的實作補上，見下方「格式狀態」）。
 >
 > **和框架的關係**：框架只規定這個欄位要記什麼（[framework/07 §7.1](../framework/07_project_profile.md#71-欄位)：起點、禁止 agent 看到的 branch、外部來源與固定版本、register 各 block 的版本與 code 目錄對照、生成區、移植範圍、新舊 build 設定的對應），以及不放憑證與本機路徑（[§7.2](../framework/07_project_profile.md#72-填寫規則)）。本文件決定「寫成什麼格式」，格式改變時只改本文件，不改框架。
 
@@ -92,12 +92,12 @@
 | `start.forbidden_branches` | 是（可為空） | 禁止 agent 看到的 branch，支援 `*` |
 | `recipe.format` | 是 | 格式版本；工具只接受自己宣告支援的版本 |
 | `predecessor_ic`、`target_ic` | 是 | 前代與新 IC 代號 |
-| `sources[]` | 是 | 外部來源：`id`（代號，配方內唯一）、`kind`（`folder`／`svn`／`git`）、`version`（資料夾記快照逐檔清單的 hash；svn 記 `revision` 與 `peg`；git 記 `commit`）。不放網址或路徑 |
-| `register_blocks[]` | 是 | 每個 block 一筆。`action`：`replace`（採外部來源）、`keep`（沿用起點的檔案）、`drop`（新 IC 不要）。`replace` 要有 `source`、`version` 與逐檔 `files`（`from` 是快照內路徑）；`keep` 的 `files` 用 `from_start`（起點內路徑）；`keep`、`drop` 要有 `reason`。每個檔案都附 `sha256` |
+| `sources[]` | 是 | 外部來源：`id`（代號，配方內唯一）、`kind`（`folder`／`svn`／`git`）、`version`（資料夾記快照逐檔清單的 hash `snapshot_sha256`，算法見下方「格式狀態」；svn 記 `revision` 與 `peg`；git 記 `commit`）。不放網址或路徑 |
+| `register_blocks[]` | 是 | 每個 block 一筆。`action`：`replace`（採外部來源）、`keep`（沿用起點的檔案）、`drop`（新 IC 不要）。`replace` 要有 `source`、`version` 與逐檔 `files`（`from` 是快照內路徑）；`keep` 與 `drop` 的 `files` 用 `from_start`（起點內路徑）；`drop` 也逐檔列出，`to` 是複製前代 IC 目錄後要拿掉的檔案，工具不自行推定 block 的範圍；`keep`、`drop` 要有 `reason`。每個檔案都附 `sha256` |
 | `ic_dir` | 新 IC 時必填 | 以前代 IC 目錄為底建立新 IC 目錄 |
 | `ic_conditions` | 新 IC 時必填 | 共用層依 IC 開關功能的條件怎麼加入新 IC，規則見下方「IC 條件開關」 |
 | `build_map[]` | 是 | 起點的每個 build 設定對到新 IC 的設定；必要／排除的處置仍寫在專案設定的「build 設定」欄位，這裡只記對應 |
-| 生成區（不另列欄位） | — | 就是 `register_blocks` 所有檔案的 `to`，以檔案為單位，GB 之後凍結 |
+| 生成區（不另列欄位） | — | 就是 `register_blocks` 裡 `replace` 與 `keep` 所有檔案的 `to`（`drop` 的不算），以檔案為單位，GB 之後凍結 |
 | `register_entry` | 有 `register_blocks` 時必填 | include register header 的入口檔案（E39 是 `lib/platform.h`），屬於起始複製區，規則見下方「include 入口」 |
 | `seed_paths[]` | 新 IC 時必填 | 起始複製區：機械替換一次性寫入的內容（IC 目錄、新增的 build 設定、共用層的 IC 條件），GB 之後是一般 source |
 | `port_paths[]` | 是（可為空） | P1 允許 AI 移植修改的範圍，每項附理由；不能落在生成區 |
@@ -131,7 +131,12 @@
 
 **記憶體地圖**（2026-10-19，依使用者決定）：配方不描述記憶體。E39 起點的位址與大小都集中在 `scat/scatter.h` 的 `#define`，三個 `.scat` 只用這些巨集描述結構；它們都屬於起始複製區，機械替換原樣複製。新 IC 的記憶體地圖和前代不同時，把 `scatter.h`（必要時連 `.scat`）放進 `port_paths`，由 P1 移植修改，每處都要對到 HW spec 的出處並經移植審查。各區怎麼分給功能是 P3 的記憶體預算，不在配方裡決定。
 
-**格式狀態**：上面幾項設計都已決定。BC-008 實作 bcgen 衍生模式時，依實際需要補細節（例如欄位的型別與檢查訊息）並在 GLADOS 補上 schema 檔；改到既有欄位的意義就升 `format`。
+**格式狀態**：上面幾項設計都已決定。欄位型別、必填與不允許多餘欄位定在 [`schema/glados.recipe.v1.schema.json`](schema/glados.recipe.v1.schema.json)（JSON Schema 2020-12），可以檢查單獨的配方，也可以檢查專案設定的 `start`＋`recipe` 兩段。schema 由 BC-008 的 bcgen 衍生模式實作時寫成（bct_knowledge_base `0b479613`，branch `bcgen/derived-mode`，2026-10-20 尚未 merge），逐 byte 複製到這裡；兩邊要改時一起改。實作時補上的兩個細節：
+
+- **`drop` 逐檔列出**：`files` 和 `keep` 一樣用 `from_start`、`sha256`、`to`。工具依 `ic_dir` 複製前代 IC 目錄後，只拿掉這裡列出的 `to`，不自行推定一個 block 包含哪些檔案；這些檔案也列進 include 差異的比對。
+- **`snapshot_sha256` 的算法**：相對於該來源的快照目錄，把每個檔案寫成 `{"path": ..., "sha256": ...}`，依 `path` 排序成陣列，以 UTF-8、`sort_keys`、不跳脫非 ASCII、分隔符號不加空白（`","`、`":"`）序列化成 JSON，最後加一個 LF，再算 SHA-256。空目錄不列；快照裡不接受 symlink 或 junction。
+
+改到既有欄位的意義就升 `format`。
 
 ---
 
