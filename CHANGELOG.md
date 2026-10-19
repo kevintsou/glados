@@ -51,6 +51,13 @@
 - **共用待辦**：BC-002、BC-003、BC-004、OBC-011 標成不做；新增 OBC-030（target 處置 checker）、OBC-031（P1 機械替換由串接層固定輸入並執行 bcgen，從 OBC-011 拆出）、SK-007（bct-p0 skill）；OBC-009、OBC-012 改相依，BC-008 併入 BC-002 留下的 import 順序，BC-006 待重新評估範圍。
 - **影響**：框架不變。P0 的四份產出、「build 設定逐項處置」規則（v0.8.1）與各項檢查都不變，只換了執行方式。這次修訂不表示 openBCT、bcgen 或 bct-p0 已切換到新設計。
 
+**實作：生成配方就是 P1 生成工具的輸入，格式由 GLADOS 定義**（2026-10-19，依使用者決定）
+
+- **為什麼**：P0 要「備齊 bcgen 的輸入」，但放在哪裡、用什麼格式沒定。bcgen 現有的 `projects/<ic>.json` 是給公版骨架用的，沒有起點 commit、外部來源快照、block 對照、生成區、移植範圍、build 設定對應，還會默默丟掉不認得的欄位；P1 又寫「bcgen 或 script」，配方應該和工具無關。
+- **決定**：專案設定的配方區塊是唯一的輸入，P0 不另存 bcgen 專用檔、不新增產出物；bcgen 衍生模式（BC-008）和 script 都直接、嚴格地讀它；串接層只把來源代號換成快照目錄（OBC-031）。
+- **新增** [impl/recipe](impl/recipe.md)：格式草案 `glados.recipe/v1`（起點、外部來源、register block 的 replace／keep／drop、IC 目錄、共用旗標、build 設定對應、生成區、移植範圍、`pending`），記憶體／scatter、IC 名稱替換規則等留給 BC-008 定稿。
+- **同步**：[impl/bcgen](impl/bcgen.md) B1、B5，B9 第 5 項結案；[nodes/P0](nodes/P0.md)、[nodes/P1](nodes/P1.md) 的實作段；README 文件表；共用待辦 BC-008、OBC-031、OBC-006、OBC-009。框架不變。
+
 ## v0.8.4 改了什麼
 
 **框架修訂：誰 push、什麼順序，以及觀察者**（2026-10-13）
