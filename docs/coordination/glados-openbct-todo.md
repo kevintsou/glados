@@ -69,6 +69,8 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [BC-006](tasks/BC-006.md) | B | bct_knowledge_base | 補足 E39 功能線索與過往問題資料覆蓋 |
 | [BC-007](tasks/BC-007.md) | A | bct_knowledge_base | P1 機械替換前修正生成的失敗傳遞與輸出覆寫 |
 | [BC-008](tasks/BC-008.md) | A | bct_knowledge_base | 以前代 code base 衍生新 IC 的機械替換（含 ARM） |
+| [BC-009](tasks/BC-009.md) | A | bct_knowledge_base | register 版本辨識與差異查詢工具 |
+| [BC-010](tasks/BC-010.md) | A | bct_knowledge_base | DS-5 headless build 的機器可讀包裝 |
 
 ## 共用討論 / spec skills
 
