@@ -12,12 +12,12 @@
 
 | 產出物 | 檔案位置 | 產出節點 | 主要使用者 |
 | :---- | :---- | :---- | :---- |
-| 來源快照 | `sources/`（Jira CR、Confluence spec 頁；生成配方列的外部來源只存位置、版本與逐檔 hash，大型檔案放證據儲存區） | 工具（串接層派工） | P0、P1、P2、M1、C |
+| 來源快照 | `sources/`（Jira CR、Confluence spec 頁；程式碼建立設定列的外部來源只存位置、版本與逐檔 hash，大型檔案放證據儲存區） | 工具（串接層派工） | P0、P1、P2、M1、C |
 | 專案說明 | `project.md` | P0 | 全部 |
 | 範圍清單 | `scope.md` | P0（G1 後經 GC 由 C 改） | P1、P2、P5、C |
 | 專案設定 | `profile.json` | P0 | 全部 |
 | 環境清單 | `environment.json` | P0 | 全部 |
-| 基底 commit | 專案層工作 branch（機械替換與移植的 commit；沒有生成配方時就是起點 commit） | P1 | P2 之後所有節點，模組與整合 branch 的起點 |
+| 基底 commit | 專案層工作 branch（機械替換與移植的 commit；沒有程式碼建立設定時就是起點 commit） | P1 | P2 之後所有節點，模組與整合 branch 的起點 |
 | 基底建立紀錄 | `artifacts/base/`（生成紀錄、移植說明、移植審查報告） | P1 | GB、P7 |
 | 基線報告 | `artifacts/baseline/`（含基線待處理清單） | P1 | GB、P2、M2、P5 |
 | 差異分析 | `artifacts/delta.md` | P2 | M1、P5、C |
@@ -51,7 +51,7 @@ Jira、Confluence 上的內容隨時會被改，不能直接當依據：
 - **AI 寫進產出物的依據要引用快照**：節點可以用 MCP 查線上內容找線索，但依據要引用快照裡的項目；發現快照以外的重要來源，就請工具把它加進快照。
 - **快照每一版都保留**：重抓會產生新版本，不覆蓋舊內容。抓到新版不等於接受新需求，怎麼接受見 [04 §4.6](04_rules.md#46-需求變更)。
 
-生成配方列的外部來源（例如 register、HW spec）也一樣先做快照：svn、git 記 revision 或 commit；資料夾沒有版本號，定版時複製並記錄逐檔 hash（[07 §7.2](07_project_profile.md#72-填寫規則)）。
+程式碼建立設定列的外部來源（例如 register、HW spec）也一樣先做快照：svn、git 記 revision 或 commit；資料夾沒有版本號，定版時複製並記錄逐檔 hash（[07 §7.2](07_project_profile.md#72-填寫規則)）。
 
 ---
 
@@ -246,7 +246,7 @@ created_at: <時間>
 - **預設就是 FW repo**。專案設定列有禁止 agent 看到的 branch 時（例如 E39 的對照實驗），工作區必須是另一個只含允許 branch 的 repo（GitLab mirror 或 fork），agent 能用的 GitLab 權限也只限於這個 repo；GLADOS 的產出不推回原 repo。
 - **同一個 repo 可以有多個 GLADOS 專案**，用專案編號區分。
 - **每個模組一個工作 branch，專案層節點共用一個專案層工作 branch，P4 用整合 branch**。
-- **模組與整合 branch 從基底 commit 開出**（P1 完成，有 GB 時經 GB 處置後）。之後的節點不能改專案設定列的生成區，要改就改生成配方、重新建立基底；起始複製區在基底建立後是一般 source，之後的節點依各自的可寫範圍修改（[07 §7.1](07_project_profile.md#71-欄位)）。
+- **模組與整合 branch 從基底 commit 開出**（P1 完成，有 GB 時經 GB 處置後）。之後的節點不能改專案設定列的生成區，要改就改程式碼建立設定、重新建立基底；起始複製區在基底建立後是一般 source，之後的節點依各自的可寫範圍修改（[07 §7.1](07_project_profile.md#71-欄位)）。
 - 每台機器的本機路徑、憑證與暫存檔另外存在本機，不當成共用的專案資料。
 
 ### branch 名稱

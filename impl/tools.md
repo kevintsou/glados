@@ -6,7 +6,7 @@
 | :---- | :---- |
 | 串接層 | 串接層服務（入口：openBCT GLADOS 分頁、CLI、API）、GitLab／本機 git、影響提示 |
 | P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、bct-grill-me；P0 另用 bct-p0（AI 直接讀起點 code 盤點，不經 bcgen） |
-| P1 | ds5-build／andes-build、remote-ice、bootcode-qa；bcgen 只用於串接層依生成配方執行的機械替換（[bcgen.md](bcgen.md)）；開始時由串接層的 checker 核對 build target 的必要／排除處置；實際 build 證據由串接層核對 |
+| P1 | ds5-build／andes-build、remote-ice、bootcode-qa；bcgen 只用於串接層依程式碼建立設定執行的機械替換（[bcgen.md](bcgen.md)）；開始時由串接層的 checker 核對 build target 的必要／排除處置；實際 build 證據由串接層核對 |
 | P2 | GitLab MCP、bootcode-qa、pyconvert（eFuse／BCFG 欄位與 layout）、subagent 平行分析、CR 撰寫 skill（新做，參考 write-jira-desc）、bct-grill-me、寫回 Jira 的工具 |
 | 人工關卡 | 簽核 skill、簽核指令（系統對話框）、openBCT GLADOS 分頁的核准按鈕（[gate_signoff.md](gate_signoff.md)） |
 | M1 | bct-grill-me、bct-to-spec、bootcode-qa、pyconvert |

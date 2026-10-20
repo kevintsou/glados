@@ -32,7 +32,7 @@
 | 10 | openBCT 的專案建立流程要不要一併開專案層工作 branch 與紀錄 branch；多人、多機同時使用前，紀錄 branch 的權限保護由誰設定 | [impl/service.md I4](../impl/service.md#i4-gitlab本機-repo查詢和執行分開)、[03 §3.7](03_artifacts.md#37-存放位置) |
 | 11 | （v0.9 結案）`workflow.json`：v0.9 不再使用，流程版本記在執行紀錄與工作包 | [03 §3.7](03_artifacts.md#37-存放位置) |
 | 12 | 有禁看 branch 的專案（例如 E39），只含允許 branch 的獨立工作區 repo 是由建立流程產生，還是要事先由人準備好 | [impl/service.md I4](../impl/service.md#i4-gitlab本機-repo查詢和執行分開)、[03 §3.7](03_artifacts.md#37-存放位置) |
-| 13 | 外部來源與生成配方的工具：svn／git／資料夾快照、register 版本辨識（排除 translator 版本與產生時間後比對）、register 結構化差異查詢（解析 RegSpec xml）、HW spec 查詢；bcgen 的「以前代 code base 衍生」模式與 ARM 支援；本機路徑映射接 OBC-006 | [nodes/P1](../nodes/P1.md)、[07](07_project_profile.md)、[impl/bcgen](../impl/bcgen.md) |
+| 13 | 外部來源與程式碼建立設定的工具：svn／git／資料夾快照、register 版本辨識（排除 translator 版本與產生時間後比對）、register 結構化差異查詢（解析 RegSpec xml）、HW spec 查詢；bcgen 的「以前代 code base 衍生」模式與 ARM 支援；本機路徑映射接 OBC-006 | [nodes/P1](../nodes/P1.md)、[07](07_project_profile.md)、[impl/bcgen](../impl/bcgen.md) |
 
 其他實作待決：
 
@@ -53,8 +53,8 @@
 | v0.9 | 自動判定改成提示：上游改版、新 commit 由串接層列出受影響的節點，人決定重做哪裡；只保留兩條自動規則（image 改變時舊測試結果不算、影響 build 的環境改變時重新 build）。失敗在派工節點內重做最多 3 輪，其他交給人。需求變更只用一條規則：G1 核准前在 P0／P2 處理，之後一律 C＋GC | [04](04_rules.md) |
 | v0.9 | 環境清單只固定影響 build 的項目；skill、MCP、知識庫只記錄用了哪一版，更新不重開 G0。紀錄 branch 保留，但多人使用前不要求權限保護 | [04 §4.4](04_rules.md#44-上游改版與重做)、[03 §3.7](03_artifacts.md#37-存放位置)、[nodes/P0](../nodes/P0.md) |
 | v0.9 | 下表 v0.8 以前的決定中，凡是和上面四列衝突的（R 失敗分類、S 版本同步、過期傳播、交接清單格式、受保護紀錄 branch、P0a／P0b 與 P2a／P2b 分段、H2 與測試基準流程、P7 確認關卡、迴圈上限分類），以 v0.9 為準；保留作歷史 | — |
-| v0.8.6 | 機械替換寫入的內容分成兩種：生成區只放能由配方重新產生的內容（例如 register header），GB 之後凍結；起始複製區放一次性寫入的內容（以前代為底複製的 IC 目錄、新增的 build 設定、共用層加入新 IC 的條件），GB 之後是一般 source。移植範圍不能落在生成區 | [07](07_project_profile.md)、[03 §3.7](03_artifacts.md#37-存放位置)、[05](05_checks.md)、[nodes/P1](../nodes/P1.md)、[impl/recipe](../impl/recipe.md) |
-| v0.8.5 | P1 改為「基底與基線建立」：起點必須是已發佈或已驗證的版本，只要求能 build；依 G0 核准的生成配方由確定性工具做機械替換，做不到的部分由 AI 在移植範圍內修改，經獨立審查後量基線；不需要前代 golden log，保留的既有功能在基底上 FAIL 時列進待處理清單，由新增的 GB 基底核准逐項處置。外部來源（register、HW spec）可以是 svn、git 或資料夾，一律用快照固定版本；生成配方改版屬於改基底 | [nodes/P1](../nodes/P1.md)、[02 §2.4](02_workflow.md#24-人工關卡)、[07](07_project_profile.md) |
+| v0.8.6 | 機械替換寫入的內容分成兩種：生成區只放能由建立設定重新產生的內容（例如 register header），GB 之後凍結；起始複製區放一次性寫入的內容（以前代為底複製的 IC 目錄、新增的 build 設定、共用層加入新 IC 的條件），GB 之後是一般 source。移植範圍不能落在生成區 | [07](07_project_profile.md)、[03 §3.7](03_artifacts.md#37-存放位置)、[05](05_checks.md)、[nodes/P1](../nodes/P1.md)、[impl/recipe](../impl/recipe.md) |
+| v0.8.5 | P1 改為「基底與基線建立」：起點必須是已發佈或已驗證的版本，只要求能 build；依 G0 核准的程式碼建立設定由確定性工具做機械替換，做不到的部分由 AI 在移植範圍內修改，經獨立審查後量基線；不需要前代 golden log，保留的既有功能在基底上 FAIL 時列進待處理清單，由新增的 GB 基底核准逐項處置。外部來源（register、HW spec）可以是 svn、git 或資料夾，一律用快照固定版本；程式碼建立設定改版屬於改基底 | [nodes/P1](../nodes/P1.md)、[02 §2.4](02_workflow.md#24-人工關卡)、[07](07_project_profile.md) |
 | v0.8.4 | 節點只在執行工作區 commit，push 由串接層負責；先推工作 branch、確認成功才寫紀錄 branch，失敗標「待同步」、不 force push；只在固定時間點 commit 與 push。觀察者只需唯讀權限就能看正式進度，不能要求執行、重跑或核准 | [03 §3.7](03_artifacts.md#37-存放位置)、[06 §6.5](06_service.md#65-查詢不需要執行環境)、[impl/service.md I6.2](../impl/service.md#i62-commit-與-push) |
 | v0.8.3 | 專案編號不能取 `records`：`glados/records/` 是紀錄 branch 的前綴，否則專案 `records` 的模組工作 branch 會和其他專案的紀錄 branch 撞名；建立專案時就拒絕 | [03 §3.7](03_artifacts.md#37-存放位置) |
 | v0.8.2 | G1 改稱「需求基準核准」，仍核准整理後的來源、差異分析與模組切分；P3 在該需求與切分內定介面及共享資源，架構另由 G2 核准。只修正 P2 模組切分且需求與專案設定不變時，由 R 退回 P2、重開 G1，再做 P3／G2；新增或修改需求、範圍與專案設定仍先走 C＋GC，不能以退回或 G2 代替 | [02 §2.4](02_workflow.md#24-人工關卡)、[02 §2.6](02_workflow.md#26-模組之間)、[nodes/P3](../nodes/P3.md) |
