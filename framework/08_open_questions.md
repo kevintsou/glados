@@ -20,10 +20,10 @@
 
 | # | 事項 | 在哪裡 |
 | :---- | :---- | :---- |
-| 1 | 大型證據（image、log、報告）的保存位置、存取與保留期限 | [03 §3.7](03_artifacts.md#37-存放位置) |
-| 2 | 串接層帳號：個人企業席位，還是組織 API key | [impl/ai_node_execution.md](../impl/ai_node_execution.md) |
+| 1 | 大型證據（image、log、報告）的保存位置、存取與保留期限。（2026-10-20 暫定，依使用者決定：外部來源快照先放紀錄 branch 的 `sources/`，同一個 git 只存一次沒改的檔案；太大再搬到另外的快照庫，git 只放逐檔 hash 清單） | [03 §3.7](03_artifacts.md#37-存放位置) |
+| 2 | 串接層帳號：個人企業席位，還是組織 API key。（2026-10-20 暫定，依使用者決定：先用使用者的企業席位試行，同時向管理員確認合規） | [impl/ai_node_execution.md](../impl/ai_node_execution.md) |
 | 3 | 各專案可用的錯誤注入、受控修改與補驗證手段 | [nodes/M2](../nodes/M2.md) |
-| 4 | 串接層服務部署在哪台機器、跨機器的身分與授權、和 openBCT 的介面 | [impl/service.md I8](../impl/service.md#i8-待決事項) |
+| 4 | 串接層服務部署在哪台機器、跨機器的身分與授權、和 openBCT 的介面。（2026-10-20 暫定，依使用者決定：先在使用者自己的電腦單機跑） | [impl/service.md I8](../impl/service.md#i8-待決事項) |
 | 5 | 各專案 CI 排除規則的具體設定（要和 CI 管理者確認） | [06 §6.6](06_service.md#66-ci) |
 | 6 | 跨機器的設備與資源認領 | [impl/service.md I8](../impl/service.md#i8-待決事項) |
 | 7 | image 載入與跑測試串成同一次執行，才能證明測試時跑的是哪個 image | [nodes/M5](../nodes/M5.md) |

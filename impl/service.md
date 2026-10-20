@@ -148,6 +148,7 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 | GUI 儲存草稿 | 不 commit，只存在服務的資料庫 | — |
 
 - **分享草稿**：草稿要給別人看時，由人明確按「分享草稿」推到專案層工作 branch，畫面與 commit 都標示為草稿。分享不等於送審，也不能當核准依據。
+- **commit 的身分**（2026-10-20，依使用者決定）：多人使用前，串接層的 commit（機械替換、派工產出、紀錄）一律用本機身分「GLADOS orchestrator」，和紀錄 branch 的寫入者相同；等多人、多機使用時，再換成真的服務帳號，和紀錄 branch 的權限保護一起做。
 - **commit 訊息**：用服務帳號 commit，訊息尾端固定帶下列欄位；不是由某次執行產生的 commit（例如送審）省略沒有的欄位。影響提示用 commit 作者與這些欄位區分串接層 commit 和人工 commit。欄位只方便追溯，任何人都能手寫，不能當身分證明。
 
   ```text
@@ -186,7 +187,7 @@ GLADOS 分頁沿用 view-model 與 service 分離，不把新的流程邏輯塞�
 
 ## I8. 待決事項
 
-1. 服務部署在哪台機器；要不要和 openBCT 的 remote worker 同機。
+1. 服務部署在哪台機器；要不要和 openBCT 的 remote worker 同機。（2026-10-20 暫定，依使用者決定：先在使用者自己的電腦單機跑，和目前的原型相同；派工跑順之後再決定要不要搬到共用機）
 2. 跨機器的身分與授權：誰能要求執行、誰能核准、服務帳號怎麼管理。
 3. 服務和 openBCT 之間的 API：跑 case、取報告、借還設備的介面與報告格式。
 4. image 載入（remote-ice）和跑測試（openBCT）要串成同一次執行，才能證明測試時跑的是哪個 image（見 [nodes/M5](../nodes/M5.md)）。由 openBCT 補 `ArmICE`、把 remote-ice 包成 openBCT 的外部工具，還是由 GLADOS 服務負責串接，待定。
