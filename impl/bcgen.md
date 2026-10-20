@@ -153,4 +153,4 @@ E39 起點用原本設計實測的結果（ARM `.cproject` 匯入、6 個 build 
 3. （2026-10-19 結案）盤點報告要不要成為 P0 的正式附件：P0 不用 bcgen 盤點，沒有盤點報告。
 4. 「起點準備」要不要變成正式的一站（等第一個用 bcgen 起點的新 IC 專案）。
 5. （2026-10-19 結案）P0 備齊的 bcgen 輸入放在哪裡、用什麼格式：專案設定的建立設定區塊就是唯一的輸入，bcgen 衍生模式直接讀它，P0 不另存 bcgen 專用檔；格式由 GLADOS 定義，見 [impl/recipe](recipe.md)。
-6. （2026-10-20 結案，依使用者決定）P1 用哪一版 bcgen：串接層從本機的 bct_knowledge_base clone，依環境清單記的 commit 用 `git archive` 匯出 `tools/bcgen` 執行，bcgen 的版本由這個 commit 計算；不用安裝目錄，因為每晚 auto_update 會改它。
+6. （2026-10-20 結案，依使用者決定）P1 用哪一版 bcgen：串接層從本機的 bct_knowledge_base clone，依環境清單記的 commit 用 `git archive` 匯出 `tools/bcgen` 執行，bcgen 的版本由這個 commit 計算；不用安裝目錄，因為每晚 auto_update 會改它。環境清單裡記成 `category: build`、`name: bcgen`、`version` 是那個 bct_knowledge_base commit；本機 clone 的位置放各機器的本機設定（openBCT `local_settings.json`），不進環境清單。

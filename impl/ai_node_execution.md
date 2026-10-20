@@ -79,7 +79,7 @@ claude -p "執行節點 M4（模組 lcp）：讀 nodes/M4.md、spec、驗收合�
 
 - **執行方式**：派工的 AI 節點用 `claude -p`（本節的做法）。openBCT 的 AgentRuntime 與 Codex CLI 暫不用。
 - **帳號**：先用使用者自己的企業席位（在跑服務的機器上用 `claude setup-token` 登入），只跑少量節點試行；同時向管理員確認無人值守自動化是否合規。量大或不合規時，改用組織 API key（[framework/08 §8.2](../framework/08_open_questions.md#82-實作待決) 第 2 項）。token 由使用者自己設定，不進 repo、log 或工作包。
-- **timeout 預設**：工具節點（例如 bcgen）15 分鐘，AI 節點 60 分鐘，由串接層自己計時；專案設定可以覆寫。
+- **timeout 預設**：工具節點（例如 bcgen）15 分鐘，AI 節點 60 分鐘，由串接層自己計時；專案設定的 `dispatch.timeout_minutes.<名稱>`（例如 `dispatch.timeout_minutes.bcgen`）可以覆寫。
 
 ## 另一條路：openBCT 的 AgentRuntime
 

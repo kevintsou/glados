@@ -163,7 +163,7 @@ created_at: <時間>
 
 ```yaml
 format: glados.run/v2
-record_id: <執行編號>.<事件>    # 例如 r-0003.start、r-0003.submit.<尾碼>
+record_id: <執行編號>.<事件>    # 例如 r-0003.start、r-0003.submit.<尾碼>；派工節點是 <執行編號>.<輪次>
 run_id: <執行編號>
 event: submit                   # 只有外部互動節點：start（開工）／submit（提交）／wait（等外部回覆）／resume（恢復）／cancel（取消）
 project_id: <專案編號>
@@ -181,7 +181,7 @@ read_at: { branch: <branch>, commit: <commit SHA> }  # read_paths 是在哪裡�
 workpackage: <工作包路徑>       # 開工時填
 handoff: <交接說明路徑>         # 開工時填（有的話）
 sources: <來源快照的參照>       # 開工時填（有的話）
-environment: <這次用的環境清單 commit>  # 派工節點填；外部互動節點由人自己準備環境，可以省略
+environment: <這次用的環境清單 commit>  # 派工節點填（就是輸入 commit，環境清單在裡面）；外部互動節點由人自己準備環境，可以省略
 evidence: [ <證據編號> ]        # 提交時：這次收件與擋關檢查的證據；交給人時：觸發的證據
 input_changed: [ <檔案> ]       # 提交時發現執行期間輸入被改了的檔案（有的話）
 questions: [ <待確認事項> ]     # 等外部回覆時填
@@ -190,7 +190,7 @@ reason: "..."                   # 交給人的原因（有的話）
 started_at: <時間>
 submitted_at: <時間>            # 提交時填
 ended_at: <時間>
-result: 完成                    # 完成／未通過／交給人／已取消；開工、等待、恢復時是 null
+result: 完成                    # 完成／未通過／交給人／已取消；開工、等待、恢復時是 null；派工節點超過重做上限或遇到環境問題時，另寫一筆 result 為「交給人」的紀錄
 log: <log 位置>                 # 派工節點填；外部互動節點可以省略
 ```
 
