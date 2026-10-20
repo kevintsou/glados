@@ -30,7 +30,7 @@
 
 - **共同規則**：紀錄只新增，同一個編號內容不同就拒絕，更正寫新的一筆；讀到不認得的格式或欄位要列出來。
 - **執行紀錄改成事件式**：派工節點每次嘗試一筆；外部互動節點一次執行的開工、提交（可以多次）、等外部回覆、恢復、取消各寫一筆，用 `event` 區分，`record_id` 是執行編號加事件。開工、等待、恢復時 `result` 是 null。多了 `branch`、`read_at`、`workpackage`、`handoff`、`sources`、`evidence`、`input_changed`、`questions`、`note`、`reason`、`submitted_at`。外部互動節點的 `input_commit` 是開工時 commit 工作包的那個 commit。`read_paths` 的 `*` 表示 `.glados/` 以外的整個 code（例如 P2 讀整個基底 commit）；影響提示只比對那次執行讀的 branch 上的新 commit。
-- **證據紀錄**：收件檢查也寫一筆，用 `kind` 分收件（intake）與擋關（blocking），沒過時用 `missing` 列缺了什麼。進度只從紀錄推導：提交要有寫進紀錄的每一項證據而且都 PASS。
+- **證據紀錄**：收件檢查也寫一筆，用 `kind` 分收件（receiving）與擋關（blocking），沒過時用 `missing` 列缺了什麼。進度只從紀錄推導：提交要有寫進紀錄的每一項證據而且都 PASS。
 - **核准與決定紀錄**：多了 `subject`、`node`、`run_id`、`handoff_id`；`binding` 記這筆核准綁定的東西（G0、G1、H、GC 綁檔案的 blob；GB 綁基底 commit 與待處理清單的 hash；G3 綁 commit 與 image hash），改了就不算數、改回又算數；決定只對最近一次提交有效。對影響提示的決定用 `kind: decision` 加 `impact`，值是 `return`（從指定的站重做）或 `keep`（不用重做），兩者都要寫原因，由「交給人時通知誰」名單上的人做。
 - **節點狀態**（[04 §4.3](framework/04_rules.md#43-節點狀態)）：「等外部回覆」由人標記與解除，記成執行紀錄的 `wait`、`resume`，等待中不能提交；重做是新的一次執行，舊的保留。
 
