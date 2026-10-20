@@ -187,6 +187,7 @@ project_id: <專案編號>
 module: <模組名稱>
 subject: <對象>                 # 例如 C 的變更 CR（有的話）
 node: M4
+step: <步驟>                    # 節點有多個步驟時填（v0.10），例如 P1 的 port、port_review，M2 的 cases、test_review
 mode: dispatch                  # dispatch（串接層執行的工具步驟）／external（外部互動：人＋agent，人或 agent 提交）
 attempt: 2
 executor: { kind: ai, id: <session 或人員識別> }
