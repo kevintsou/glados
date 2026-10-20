@@ -83,6 +83,11 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [SK-005](tasks/SK-005.md) | A | openBCT | （不做）讓 openBCT 正式節點載入共用 skills——外部互動節點由人自己開 agent |
 | [SK-006](tasks/SK-006.md) | B | bct_knowledge_base | 維護三包共用契約與封裝一致性 |
 | [SK-007](tasks/SK-007.md) | A | bct_knowledge_base / openBCT | bct-p0 專案啟動 skill（P0a 草擬、P0b 叫用 bct-grill-me、備齊 bcgen 輸入） |
+| [SK-008](tasks/SK-008.md) | A | bct_knowledge_base | M4 實作 skill |
+| [SK-009](tasks/SK-009.md) | A | bct_knowledge_base | 審查 skill（M2 測試審查、M6、P1 移植審查） |
+| [SK-010](tasks/SK-010.md) | A | bct_knowledge_base | P1 移植 skill |
+| [SK-011](tasks/SK-011.md) | A | bct_knowledge_base | M2 測試實作 skill |
+| [SK-012](tasks/SK-012.md) | A | bct_knowledge_base | P5 安全審查 skill |
 
 ## 已有資產與部分完成，避免重做
 

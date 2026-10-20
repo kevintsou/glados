@@ -39,7 +39,7 @@
 | 操作入口：openBCT GLADOS 分頁、CLI、API | 查詢、送出要求（開工、提交、執行、核准、重跑）；不實作放行規則 | 不能，只能送要求給服務 |
 | 專案工作區 repo | 模組與專案層的工作 branch 放節點產出；紀錄 branch 放紀錄與來源快照 | — |
 | 執行工作區 | 按需 clone 或建 worktree，固定輸入版本，遵守隔離限制 | 不能 |
-| 節點執行 | 外部互動節點：人開的 agent；派工節點：AI 獨立 session、build、script | 不能，只交產出與交接說明 |
+| 節點執行 | 外部互動（含 v0.10 起所有 AI 的工作）：人開的 agent，人或 agent 提交；工具步驟：串接層執行的 build、script、bcgen、上機測試 | 不能，只交產出與交接說明 |
 | openBCT 測試執行與 lab worker | 跑 case、產生報告、管理設備借用 | 不能；報告由服務核對後才採用 |
 | Jira／Confluence | 需求來源。服務派工具抓來源快照、做外部來源同步；專案設定允許時，寫回 P2 定案的 CR 修訂（[framework/03 §3.2](../framework/03_artifacts.md#32-來源快照)） | 不能；快照由工具產生，放在紀錄 branch |
 
@@ -55,7 +55,7 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 | :---- | :---- | :---- |
 | 上方專案區 | repo、專案編號、branch、讀取的 commit、同步時間、服務與執行端的連線狀態、整體狀態 | 選 GitLab 或本機 repo、選既有專案或建立新專案、更新資訊、環境檢查、啟動服務、停止服務或立即停止 |
 | 左側流程區 | P0、P1、P2、P4–P7、C，以及各模組的 M1、M2、M4、M5、M6；被擋住、等人決定、上游有改版的標示 | 選節點、查看擋住的原因與影響提示 |
-| 右側節點詳情 | 輸入與輸出的版本、檢查結果、必要核准、每一輪執行、log 與證據索引 | 外部互動節點：開工、查看工作包、提交；派工節點：有權限且條件滿足時，要求服務執行或重跑；核准人可以在這裡按「核准」親自送出決定（[gate_signoff.md](gate_signoff.md)）；連到 openBCT Scripts 頁的詳細測試結果 |
+| 右側節點詳情 | 輸入與輸出的版本、檢查結果、必要核准、每一輪執行、log 與證據索引 | 外部互動的步驟：開工、查看工作包、提交；工具步驟：有權限且條件滿足時，要求服務執行或重跑；核准人可以在這裡按「核准」親自送出決定（[gate_signoff.md](gate_signoff.md)）；連到 openBCT Scripts 頁的詳細測試結果 |
 
 - 分頁常駐顯示服務狀態、執行位置，以及啟動／停止按鈕。服務狀態至少分成：啟動中、運行中、停止中、已停止、無法連線。**「無法連線」不等於「已停止」**，不能因此重複啟動。
 - 服務停止後仍然可以查詢 GitLab 上保存的正式進度，即時狀態標示為「無法取得」。
@@ -139,7 +139,7 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 
 | 時間點 | commit 與 push 什麼 | 誰觸發 |
 | :---- | :---- | :---- |
-| 派工節點回收後 | 該節點的工作 branch：產出物與交接說明 | 串接層 |
+| 工具步驟回收後 | 該節點的工作 branch：產出物（例如機械替換的結果） | 串接層 |
 | 外部互動節點開工 | 工作 branch：工作包 | 串接層 |
 | 外部互動節點提交 | 人和 agent 的 commit 已在工作 branch；串接層只記下 commit | 人 |
 | 節點完成 | 紀錄 branch：執行與證據紀錄、核准紀錄、進度 | 串接層 |
@@ -178,7 +178,7 @@ openBCT GUI 新增一個分頁，名稱固定為 **GLADOS**，作為建立專案
 | lab diagnostics | 節點的環境檢查 | 還在（`lab/diagnostics.py`）。只檢查設定與工具在不在、不碰 DUT，不代表設備已經連通 |
 | remote worker | 遠端執行 | 工作佇列存在記憶體（`remote/worker.py`，最多保留 500 筆已完成的工作），重啟就消失；API 只有 health、capabilities、jobs 的查詢與送出，**沒有取消，也沒有借還設備** |
 | 設備鎖 `DeviceLease` | FPGA 等設備的互斥 | 在 `core/run_status.py`。它是本機的檔案鎖，以 device path（COM 埠、PhysicalDrive）為單位；`lab/` 沒有用到它，所以**管不到 FPGA 與 ICE，也不跨機器**。I1「設備互斥沿用 openBCT」目前不成立 |
-| `AgentRuntime` | 可以當一種節點執行介面 | 還在；走 CCR 或其他 OpenAI 相容 gateway，和 `claude -p`（[ai_node_execution.md](ai_node_execution.md)）是兩條不同的路。派工節點仍然每次開獨立 session，由服務放行 |
+| `AgentRuntime` | 可以當一種節點執行介面 | 還在；走 CCR 或其他 OpenAI 相容 gateway，和 `claude -p`（[ai_node_execution.md](ai_node_execution.md)）是兩條不同的路。v0.10 起串接層不派工給 AI，兩者都只留給以後的批次模式 |
 | `ArmICE` | 把 image 載進 FPGA | 仍是 stub（`lab/ice.py`）。目前載入 FPGA 靠 bct_knowledge_base 的 remote-ice（DS-5 `debugger.exe`），和 openBCT 是兩個工具（見 [nodes/M5](../nodes/M5.md)） |
 
 GLADOS 分頁沿用 view-model 與 service 分離，不把新的流程邏輯塞進既有的大型 GUI 檔。順序：先接建立／開啟、查詢、外部互動節點的開工與提交、手動派工與回收，再逐步打開自動派工。

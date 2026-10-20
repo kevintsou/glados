@@ -90,7 +90,7 @@ Jira、Confluence 上的內容隨時會被改，不能直接當依據：
 
 ## 3.5 工作包
 
-外部互動節點（P0、P2、M1、C、P7）開工時，串接層準備一份工作包給人與 agent，放在工作區的 `.glados/projects/<專案編號>/runs/<執行編號>/workpackage.md`：
+外部互動的步驟（P0、P2、M1、C、P7，以及 v0.10 起所有 AI 的工作，見 [04 §4.2](04_rules.md#42-兩種執行方式)）開工時，串接層準備一份工作包給人與 agent，放在工作區的 `.glados/projects/<專案編號>/runs/<執行編號>/workpackage.md`：
 
 | 項目 | 內容 |
 | :---- | :---- |
@@ -100,6 +100,9 @@ Jira、Confluence 上的內容隨時會被改，不能直接當依據：
 | 可讀來源 | 允許的快照、知識庫、工具；建議使用的 skill 與版本（例如 P0 的 bct-p0） |
 | 要交的檔案 | 節點卡的輸出，以及交接說明的位置 |
 | 會做的檢查 | 這個節點的收件檢查與擋關檢查（[05](05_checks.md)） |
+| 輪數 | 有重做上限的步驟（例如 M4 的實作、P1 的移植）：這是第幾輪、前幾輪的失敗證據，包括 M5、M6 退回的累計（串接層從紀錄算）。上限 3 輪由 skill 遵守 |
+| 能不能平行 | 模組層的步驟：能不能和其他模組同時做，要等哪個模組（[02 §2.6](02_workflow.md#26-模組之間)） |
+| 接續的工具步驟 | 提交通過後串接層會自動執行的工具步驟（例如 M4 之後的正式 build 與 M5），以及專案設定是否關掉自動接續 |
 | 規則版本 | 這次依據的 GLADOS 版本 |
 
 工作包只是說明，不限制人與 agent 的做法。提交時，串接層以交出檔案當下的 commit 為準。
@@ -159,18 +162,18 @@ created_at: <時間>
 
 ### 執行紀錄
 
-一次執行有一個執行編號。派工節點每次嘗試寫一筆；外部互動節點的一次執行會經過開工、提交（可以多次）、等外部回覆與恢復、取消，每件事各寫一筆，用 `event` 區分，`record_id` 是執行編號加事件（提交、等待、恢復會重複發生，再加一段讓編號不重複的尾碼）。派工節點的紀錄沒有 `event`。
+一次執行有一個執行編號。工具步驟（`mode: dispatch`）每次嘗試寫一筆；外部互動節點的一次執行會經過開工、提交（可以多次）、等外部回覆與恢復、取消，每件事各寫一筆，用 `event` 區分，`record_id` 是執行編號加事件（提交、等待、恢復會重複發生，再加一段讓編號不重複的尾碼）。工具步驟的紀錄沒有 `event`。
 
 ```yaml
 format: glados.run/v2
-record_id: <執行編號>.<事件>    # 例如 r-0003.start、r-0003.submit.<尾碼>；派工節點是 <執行編號>.<輪次>
+record_id: <執行編號>.<事件>    # 例如 r-0003.start、r-0003.submit.<尾碼>；工具步驟是 <執行編號>.<輪次>
 run_id: <執行編號>
 event: submit                   # 只有外部互動節點：start（開工）／submit（提交）／wait（等外部回覆）／resume（恢復）／cancel（取消）
 project_id: <專案編號>
 module: <模組名稱>
 subject: <對象>                 # 例如 C 的變更 CR（有的話）
 node: M4
-mode: dispatch                  # dispatch（串接層派工）／external（外部互動，人提交）
+mode: dispatch                  # dispatch（串接層執行的工具步驟）／external（外部互動：人＋agent，人或 agent 提交）
 attempt: 2
 executor: { kind: ai, id: <session 或人員識別> }
 branch: <工作 branch>
@@ -181,7 +184,7 @@ read_at: { branch: <branch>, commit: <commit SHA> }  # read_paths 是在哪裡�
 workpackage: <工作包路徑>       # 開工時填
 handoff: <交接說明路徑>         # 開工時填（有的話）
 sources: <來源快照的參照>       # 開工時填（有的話）
-environment: <這次用的環境清單 commit>  # 派工節點填（就是輸入 commit，環境清單在裡面）；外部互動節點由人自己準備環境，可以省略
+environment: <這次用的環境清單 commit>  # 工具步驟填（就是輸入 commit，環境清單在裡面）；外部互動節點由人自己準備環境，可以省略
 evidence: [ <證據編號> ]        # 提交時：這次收件與擋關檢查的證據；交給人時：觸發的證據
 input_changed: [ <檔案> ]       # 提交時發現執行期間輸入被改了的檔案（有的話）
 questions: [ <待確認事項> ]     # 等外部回覆時填
@@ -190,8 +193,8 @@ reason: "..."                   # 交給人的原因（有的話）
 started_at: <時間>
 submitted_at: <時間>            # 提交時填
 ended_at: <時間>
-result: 完成                    # 完成／未通過／交給人／已取消；開工、等待、恢復時是 null；派工節點超過重做上限或遇到環境問題時，另寫一筆 result 為「交給人」的紀錄
-log: <log 位置>                 # 派工節點填；外部互動節點可以省略
+result: 完成                    # 完成／未通過／交給人／已取消；開工、等待、恢復時是 null；工具步驟遇到環境問題或要交給人時，另寫一筆 result 為「交給人」的紀錄
+log: <log 位置>                 # 工具步驟填；外部互動可以省略
 ```
 
 - 進度只從紀錄推導：提交要有寫進紀錄的每一項證據，而且都是 PASS，才算收件與擋關通過。
@@ -263,8 +266,8 @@ created_at: <時間>
 
 ### push
 
-- **派工節點**（AI agent、script）只在執行工作區 commit，不 push；串接層回收產出後才 push。
-- **外部互動節點**由人和 agent 在工作區 commit，人可以自己 push；提交時串接層記下當下的 commit。
+- **工具步驟**（script、build、bcgen）只在執行工作區 commit，不 push；串接層回收產出後才 push。
+- **外部互動**（含 v0.10 起所有 AI 的工作）由人和 agent 在工作區 commit，人可以自己 push；提交時串接層記下當下的 commit。
 - **先推工作 branch，再寫紀錄 branch**：紀錄引用的 commit 必須已經在遠端；任何一步失敗都標「待同步」，不 force push。做法見 [impl/service.md I6.2](../impl/service.md#i62-commit-與-push)。
 
 ### `.glados/` 目錄配置
