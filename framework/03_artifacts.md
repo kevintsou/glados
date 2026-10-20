@@ -108,67 +108,106 @@ Jira、Confluence 上的內容隨時會被改，不能直接當依據：
 
 ## 3.6 紀錄
 
-串接層只留四種紀錄。共同規則：每筆都有編號、`project_id`、`created_at`；「誰做的」用 `executor`，種類是 `ai`、`tool`、`human`、`orchestrator`。
+串接層只留四種紀錄。共同規則：
+
+- 每筆都有編號、`project_id`、`created_at`；「誰做的」用 `executor`，種類是 `ai`、`tool`、`human`、`orchestrator`。
+- **只新增**：同一個編號只能有一筆，內容不同就拒絕；要更正就寫新的一筆，舊的保留。
+- 讀取時不認得的格式或欄位要列出來，不能默默略過。下面的欄位都是格式的一部分；標「有的話」的可以省略。
 
 ### 核准與決定紀錄
 
-關卡核准，以及交給人之後人做的決定，用同一種格式：
+關卡核准、交給人之後人做的決定，以及人對影響提示（[04 §4.4](04_rules.md#44-上游改版與重做)）的決定，用同一種格式：
 
 ```yaml
 format: glados.approval/v2
 approval_id: <編號>
 project_id: <專案編號>
-kind: gate                      # gate（關卡核准）／decision（交給人之後的決定）
+kind: gate                      # gate（關卡核准）／decision（交給人之後的決定、對影響提示的決定）
 gate: H                         # kind 為 gate 時填：G0／GB／G1／H／G3／GC
 module: <模組名稱>              # 模組層關卡或決定時填
-approver: <人員>                # 必須在專案設定這個關卡的核准人名單上
+subject: <決定對象>             # 同一關卡同時有幾個在等時區分用，例如 GC 的變更 CR（有的話）
+node: <節點>                    # kind 為 decision 時填：決定的是哪一站
+run_id: <被決定的那次執行>      # 有的話
+handoff_id: <交給人的那次執行>  # 交給人之後的決定時填
+impact:                         # 對影響提示的決定時填：提示的內容
+  run_id: <讀過這些檔案的那次執行>
+  node: <那次執行的節點>
+  branch: <它讀的 branch>
+  files: [ <改了的檔案> ]
+  commits: [ <改到這些檔案的 commit SHA> ]
+  head: <提示時 branch 的 commit SHA>   # 之後再有新 commit 會重新提示
+approver: <人員>                # 必須在專案設定這個關卡的核准人名單上；決定時是「交給人時通知誰」的名單
 confirmed_by: <確認方式>        # 人親自送出決定的方式，見 impl/gate_signoff
 commit: <核准時的 commit SHA>
+binding:                        # 這筆核准綁定的東西；改了核准就不算數
+  branch: <工作 branch>         # 綁檔案的關卡（G0、G1、H、GC）
+  paths: [ <綁定的檔案> ]
+  blobs: { <檔案>: <blob SHA> }
+  # GB 綁 commit（基底）與 pending_sha256（基線待處理清單的 hash）；G3 綁 commit（整合 branch）與 image_hash
 positions:                      # 核准人對關鍵風險的逐項表態（有的話）
   - item: "spec.md#B4 的驗證缺口"
     answer: "這版接受，P5 前補 SIM 驗證"
 decision: approve               # 關卡：approve／reject／defer
                                 # 交給人之後：self（自己做）／return（指定回哪一站）／retry_env（修好環境重跑）／retry（再試一次）／drop（這版不做）
+                                # 影響提示：return（從指定的站重做）／keep（不用重做）
 return_to: <節點>              # decision 為 return 時填
-note: "..."
+note: "..."                     # 影響提示的決定必填：重做或不用重做的原因
 created_at: <時間>
 ```
 
 - 送出決定的動作必須由人親自完成，AI 無法代為完成（[02 §2.4](02_workflow.md#24-人工關卡)）。
-- 核准之後，被核准的檔案又改了，這筆核准就不算數，要重新核准。
+- 核准之後，`binding` 裡的檔案或 commit 又改了，這筆核准就不算數，要重新核准；改回原內容又算數。
+- 決定只對那個節點最近一次執行、最近一次提交有效；重新開工或退回後重新提交，都要重新決定。
 
 ### 執行紀錄
 
-每一次嘗試（節點執行、檢查執行）各一份：
+一次執行有一個執行編號。派工節點每次嘗試寫一筆；外部互動節點的一次執行會經過開工、提交（可以多次）、等外部回覆與恢復、取消，每件事各寫一筆，用 `event` 區分，`record_id` 是執行編號加事件（提交、等待、恢復再加序號）。
 
 ```yaml
 format: glados.run/v2
+record_id: <執行編號>.<事件>    # 例如 r-0003.start、r-0003.submit.2
 run_id: <執行編號>
+event: submit                   # 外部互動節點：start（開工）／submit（提交）／wait（等外部回覆）／resume（恢復）／cancel（取消）
 project_id: <專案編號>
 module: <模組名稱>
+subject: <對象>                 # 例如 C 的變更 CR（有的話）
 node: M4
 mode: dispatch                  # dispatch（串接層派工）／external（外部互動，人提交）
 attempt: 2
 executor: { kind: ai, id: <session 或人員識別> }
-input_commit: <commit SHA>
-output_commit: <commit SHA>
-read_paths: [ <讀過的檔案或目錄> ] # 給影響提示用；外部互動節點填工作包列的輸入
+branch: <工作 branch>
+input_commit: <commit SHA>      # 外部互動節點是開工時 commit 工作包的那個 commit
+output_commit: <commit SHA>     # 提交時人交的 commit
+read_paths: [ <讀過的檔案或目錄> ] # 給影響提示用；外部互動節點填工作包列的輸入；* 表示 .glados/ 以外的整個 code（例如 P2 讀基底 commit）
+read_at: { branch: <branch>, commit: <commit SHA> }  # read_paths 是在哪裡讀的
+workpackage: <工作包路徑>       # 開工時填
+handoff: <交接說明路徑>         # 開工時填（有的話）
+sources: <來源快照的參照>       # 開工時填（有的話）
 environment: <這次用的環境清單 commit>
+evidence: [ <證據編號> ]        # 提交時：這次收件與擋關檢查的證據；交給人時：觸發的證據
+input_changed: [ <檔案> ]       # 提交時發現執行期間輸入被改了的檔案（有的話）
+questions: [ <待確認事項> ]     # 等外部回覆時填
+note: "..."                     # 恢復時寫回覆內容（有的話）
+reason: "..."                   # 交給人的原因（有的話）
 started_at: <時間>
+submitted_at: <時間>            # 提交時填
 ended_at: <時間>
-result: 完成                    # 完成／未通過／交給人／已取消
+result: 完成                    # 完成／未通過／交給人／已取消；開工、等待、恢復時是 null
 log: <log 位置>
 ```
 
+- 進度只從紀錄推導：提交要有寫進紀錄的每一項證據，而且都是 PASS，才算收件與擋關通過。
+
 ### 證據紀錄
 
-每執行一次擋關檢查，留下一筆：
+每執行一次收件檢查或擋關檢查，留下一筆：
 
 ```yaml
 format: glados.evidence/v2
 evidence_id: <編號>
 project_id: <專案編號>
 check: build 零警告             # 檢查名稱，見 05
+kind: blocking                  # intake（收件檢查，05 §5.5）／blocking（擋關檢查，05 §5.4）
 run_id: <產生這筆證據的執行編號>
 executor: { kind: tool, id: <執行端識別> }
 commit: <受檢的 commit SHA>
@@ -176,6 +215,7 @@ image_hash: <hash>              # 用到 image 時才填
 test_baseline: <hash>           # 用到測試基準時才填
 result: PASS                    # PASS／FAIL／未執行／環境錯誤／驗證缺口，見 05 §5.3
 details: <報告或原始 log 的位置>
+missing: [ <缺少的項目> ]       # 沒過時缺了什麼，例如漏掉的檔案或章節（有的話）
 created_at: <時間>
 ```
 
