@@ -25,8 +25,8 @@
 | 3 | 各專案可用的錯誤注入、受控修改與補驗證手段 | [nodes/M2](../nodes/M2.md) |
 | 4 | 串接層服務部署在哪台機器、跨機器的身分與授權、和 openBCT 的介面。（2026-10-20 暫定，依使用者決定：先在使用者自己的電腦單機跑） | [impl/service.md I8](../impl/service.md#i8-待決事項) |
 | 5 | 各專案 CI 排除規則的具體設定（要和 CI 管理者確認） | [06 §6.6](06_service.md#66-ci) |
-| 6 | 跨機器的設備與資源認領 | [impl/service.md I8](../impl/service.md#i8-待決事項) |
-| 7 | image 載入與跑測試串成同一次執行，才能證明測試時跑的是哪個 image | [nodes/M5](../nodes/M5.md) |
+| 6 | 跨機器的設備與資源認領。（2026-10-22：公司的 FPGA 已有 FPGA Queue 機制，應該接它；可用的 bench 清單由使用者整理，細節之後再討論，見 [notes/c2_lab_design](../notes/c2_lab_design.md)） | [impl/service.md I8](../impl/service.md#i8-待決事項) |
+| 7 | image 載入與跑測試串成同一次執行，才能證明測試時跑的是哪個 image。（2026-10-22 決定：把 remote-ice 包成機器可讀的工具，和 openBCT 測試在同一次工具步驟裡依序執行；先用 ICE 讀回 hash 證明，之後再加開機印出的 build ID，見 [notes/c2_lab_design](../notes/c2_lab_design.md)） | [nodes/M5](../nodes/M5.md) |
 | 8 | 關卡確認動作要不要改用 AI 拿不到的驗證（例如 Windows Hello、重新輸入密碼）；互動式 session 要不要禁止 AI 操作桌面 | [impl/gate_signoff G7](../impl/gate_signoff.md#g7-待決事項) |
 | 9 | 各產出物（spec、差異分析、架構、計畫…）的完整範本。框架只規定節點卡列的最低結構，完整範本在展開各節點實作時再定 | [nodes/](../nodes/README.md) |
 | 10 | openBCT 的專案建立流程要不要一併開專案層工作 branch 與紀錄 branch；多人、多機同時使用前，紀錄 branch 的權限保護由誰設定 | [impl/service.md I4](../impl/service.md#i4-gitlab本機-repo查詢和執行分開)、[03 §3.7](03_artifacts.md#37-存放位置) |
