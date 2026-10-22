@@ -71,6 +71,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [BC-008](tasks/BC-008.md) | A | bct_knowledge_base | 以前代 code base 衍生新 IC 的機械替換（含 ARM） |
 | [BC-009](tasks/BC-009.md) | A | bct_knowledge_base | register 版本辨識與差異查詢工具 |
 | [BC-010](tasks/BC-010.md) | A | bct_knowledge_base | DS-5 headless build 的機器可讀包裝 |
+| [BC-011](tasks/BC-011.md) | A | bct_knowledge_base | remote-ice 機器可讀包裝（載入 image 與讀回驗證） |
 
 ## 共用討論 / spec skills
 
