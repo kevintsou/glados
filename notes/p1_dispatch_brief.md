@@ -18,9 +18,9 @@
 | :---- | :---- | :---- |
 | **A** | 派工共用骨架、工具執行端、P1 第 2 步機械替換（OBC-031） | 都已決定，可以開始 |
 | **B** | （v0.10 改寫）AI 步驟的開工、提交、收件：P1 移植與移植審查、M2、M4、M6；工作包的輪數與 skill；審查的 session 核對；審查發現變成紀錄；工具步驟自動接續 | 可以開始 |
-| **C** | P1 第 1、5 步：起點與基底的 build、量基線（OBC-012、OBC-013） | 要等 build 機器與 lab 設計 |
+| **C** | C1：P1 第 1、5 步與 M4 正式 build 接上 ds5build（BC-010）；C2：上機測試（M5、判別能力、既有功能量測、P4、P5） | C1 可以開始；C2 要先設計 lab |
 
-下面是 A、B 兩批的完整說明。C 批等 build 機器定了再寫。
+下面是 A、B、C 三批的完整說明。C 批先做 build 的部分（C1），上機測試（C2）等 lab 設計好再寫。
 
 ---
 
@@ -238,6 +238,100 @@ ruff check src tests、mypy --platform linux、完整 pytest 全綠。
 - 新增測試與完整套件的總數、通過、失敗、skip、花的時間。
 - 和規格不一致或自己做了決定的地方，例如交接說明的欄位格式、`findings.json` 的格式、輪數的算法。
 - 還沒做的和有疑問的地方。
+
+---
+
+## C 批：build 的工具步驟（C1）；上機測試（C2）另外設計
+
+C 批分兩段：
+
+- **C1**（現在就能做）：build 類的工具步驟。工具已經在知識庫 main 上，就是 BC-010 的 `tools/ds5build`。
+- **C2**（要先和使用者設計 lab）：上機測試類的工具步驟，包括 M5、M2 的判別能力、P1 量基線裡的既有功能、P4、P5 的測試執行。這部分需要決定設備認領、image 載入與跑測試串成同一次執行、remote-ice／ArmICE、FPGA／ICE 排程（framework/08 §8.2 第 6、7 項，共用待辦 OBC-022、OBC-026），之後另寫。
+
+### C1 規格依據
+
+- nodes/P1.md：
+  - 第 1 步起點檢查：起點 commit 上，必要 build 設定都 build 得過；同時用 checker 重新核對 build 設定的處置。
+  - 第 5 步量基線：在基底上 build 所有必要設定。
+  - 失敗時：起點本身 build 不過交給人；P1 不自行把失敗的必要設定改成排除。
+- nodes/M4.md：放行看串接層執行的正式 build，記錄 image hash 與記憶體用量。
+- framework/05 §5.4：「build 零警告」記錄每個必要設定的 image hash；「記憶體在預算內」比對 P2 分配的預算與專案設定的上限；「既有功能已量測」（C2）。
+- framework/04 §4.2「工具步驟」與 §4.5：正式 build 沒過，回 M4 的實作並計入輪數；環境問題交給人、不算輪數。
+- framework/03 §3.1、§3.7：image 放證據儲存區。
+- bct_knowledge_base `tools/ds5build/README.md`：
+  - 用法：`--ws-fw`、`--configs`／`--all`、`--output`、`--source-id`。
+  - 輸出：NDJSON 加上 `results.json`。
+  - 退出碼：0、1、2 的意思。
+  - 零警告要看每一筆的 `zero_warning_pass`，不能只看退出碼。
+  - 工具內建序列鎖，同一時間只跑一個 build。
+  - `--timeout` 預設每組 1200 秒。
+
+### C1 要做的事
+
+1. **ds5build 的固定方式**：照決定 4（bcgen）的做法。
+   - 環境清單記成 `category: build`、`name: ds5build`、`version: <bct_knowledge_base commit>`。
+   - 從本機的知識庫 clone，用 `git archive tools/ds5build` 匯出後執行，不用安裝目錄。
+   - DS-5 的版本照環境清單影響 build 的 toolchain 項目（例如 DS-5 v5.28.1），傳給 ds5build（`DS5_PIN`）。偵測到的版本不符就算環境錯誤，交給人。
+2. **共用的 build 步驟**：給定固定的 commit 與一組設定，做以下這些事：
+   - 用 `git archive` 匯出 `ws_fw`。
+   - 呼叫 ds5build，讀它的 `results.json`。
+   - 每個設定寫一筆證據「build 零警告」：`zero_warning_pass` 才算 PASS；`status` 為 environment_error 時記「環境錯誤」。
+   - 證據附上 image（axf、bin）的 sha256、warning 清單摘要、記憶體用量。
+   - ds5build 的 run 目錄很大（sandbox、workspace、image），**整個存到本機證據目錄**（路徑放 `local_settings.json`，例如 `evidence_root`）。紀錄 branch 只存摘要（每個設定的結果、hash、warning 數）與證據目錄裡的相對路徑。
+   - 必要設定的清單，從 G0 核准的專案設定裡標成「必要」的 build 設定取得。ds5build 本身不判斷齊不齊全，由串接層核對。
+   - timeout：每個設定 20 分鐘，整個步驟是設定數乘以 20 分鐘；專案設定的 `dispatch.timeout_minutes.ds5build` 可以覆寫。
+   - Andes 專案（沒有 `.cproject`）明確回報「不支援」，算環境問題交給人。
+3. **P1 第 1 步，起點檢查**：
+   - 在起點 commit 重跑 build 設定核對（OBC-030 的 checker），再 build 所有必要設定。
+   - 任何必要設定 build 不過，或有 warning：照節點卡交給人，附上每組的結果。不自行改成排除。
+   - 全部通過才接到第 2 步。自動接續的開關照 B 批的 `dispatch.auto_chain`。
+4. **P1 第 5 步，量基線的 build 部分**：
+   - 在基底 commit（移植審查通過後）build 所有必要設定。
+   - 每個設定的結果、image hash、記憶體用量寫進 `artifacts/baseline/` 的基線報告。
+   - 「既有功能已量測」在 C2 之前記「未執行」，所以 P1 不能完成，畫面照實顯示「等上機測試（C2）」。
+5. **M4 的正式 build**：
+   - M4 提交通過後自動接續：build 所有必要設定，寫「build 零警告」。
+   - 「記憶體在預算內」：拿 map 的用量比對 P2 架構文件裡這個模組的預算，以及專案設定的上限。量不到就記「驗證缺口」，並寫出原因。
+   - 沒過就回 M4 的實作，計入輪數，並把每組的 warning 和 error 摘要帶進下一輪的工作包。
+   - M4 之後的 M5 屬於 C2，記「未執行」。
+6. **文件**：docs/glados-prototype.md 與共用筆記補上這批。SPEC_COMMIT 指到 GLADOS main 最新的 commit。
+
+### C1 限制
+
+- 在 `claude/glados-dispatch` 上接著 `a5c283c` 開發，不 push、不 merge。
+- 測試用假的 ds5build（fixture 的 `results.json` 與退出碼）驗證流程，CI 不需要 DS-5。
+- 真的 DS-5 只用在一次手動 smoke。
+- 不燒錄、不碰板子。
+
+### C1 完成判斷
+
+新增測試要涵蓋：
+- ds5build 用固定 commit 匯出。
+- DS-5 版本不符算環境錯誤。
+- 證據判斷：
+  - `zero_warning_pass` 為 false 但 `status` 為 success 時，記 FAIL。
+  - environment_error 記「環境錯誤」。
+- 必要設定缺結果時不能 PASS。
+- 起點有任何必要設定不過時交給人，而且不改成排除。
+- 基線報告有每組的 hash 與記憶體用量，P1 停在「等上機測試」。
+- M4 的正式 build：
+  - 沒過時回 M4，計入輪數，工作包帶 warning 摘要。
+  - 記憶體超預算時 FAIL；量不到時記「驗證缺口」。
+- 大檔留在本機證據目錄，紀錄 branch 只有摘要。
+
+手動 smoke：在這台機器用 E39 的起點 `83dc1a65b`，跑 P1 第 1 步。
+- 預期結果和 BC-010 的實跑一致：6 組只有 `ps5037_boot_mask_asic` 成功，但有 2 個 warning，所以 P1 交給人。這是正確的行為，回報給我。
+- 要跑大約 30–40 分鐘，用背景執行。
+
+ruff、`mypy --platform linux` 全綠。最後跑完整 pytest，這台機器的 git 很慢，大約要 2 小時，請用背景執行。
+
+### C1 回報
+
+- 每個 commit 的 hash 和改了什麼。
+- 測試結果。
+- E39 smoke 的結果。
+- 自己做了決定的地方。
+- 還沒做的部分。
 
 ---
 
