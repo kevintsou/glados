@@ -92,7 +92,8 @@
 
 **O【推論】Andes 的三類設定怎麼表達沒有定義**
 - 規格：P0、impl/bcgen C1 只寫了 ARM `.cproject`。openBCT 的 ELF 讀回只處理 ARM ELF32，目前 Andes 在 build 端就明確擋下，不會誤用。
-- 要問：Andes 專案的 ROM 組態、ILM、sandaru 怎麼定義？
+- 已回答（2026-10-29 使用者）：Andes 用 `build.sh` 的不同參數切換；專案設定每個設定記類型、平台、交付或驗證版本、怎麼 build、產出（[07](../framework/07_project_profile.md)）。Andes 的 listing 解析與最深 stack 怎麼算還沒定。
+- 原本的問題：Andes 專案的 ROM 組態、ILM、sandaru 怎麼定義？
 
 **P openBCT 小項**
 - `lab.py` 的 `BOOT_SECONDS = 20` 寫死，各設定的開機時間不一定相同。

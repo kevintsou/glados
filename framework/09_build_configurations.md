@@ -16,7 +16,7 @@
 | SPI ROM／ICE mode | bootcode，從 SPI ROM 或用 ICE 載入 | SRAM：ARM 是 ATCM，Andes 是 ILM（code 也在 RAM） | 從 SPI ROM 載入，或由 ICE 載進 ATCM／ILM 後執行 |
 | sandaru／burner | **另一支程式**：燒錄 FW、開卡用，不是 bootcode。**我們產出的是驗證用的 burner**，量產用的 burner 由其他單位產出（2026-10-28 使用者說明） | SRAM（ATCM／ILM） | 由 ROM 裡的 bootcode 帶入：host tool 下 VUC 給 bootcode，bootcode 把 sandaru／burner 帶進 SRAM；host tool 再下 VUC，讓 bootcode 從 ROM 跳到 SRAM 執行它 |
 
-每一種通常再分 ASIC 與 FPGA 兩個設定。
+每一種通常再分 ASIC 與 FPGA 兩個設定。ARM 專案的設定是 `.cproject` 裡的一個 configuration；Andes 專案用 `build.sh` 的不同參數切換（2026-10-29 使用者確認）。專案設定每個設定記類型、平台、交付或驗證版本、怎麼 build、產出在哪裡（[07](07_project_profile.md)「build 設定」）。
 
 ## 9.2 E39 的對應
 
