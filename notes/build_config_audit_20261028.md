@@ -11,7 +11,7 @@
 - openBCT：`labsteps.py` 的 `verification_target()` 只回傳一個設定（`verification.build_target`，framework/07 沒有這個欄位）。M5、M2 判別能力、P1 既有功能、P4 e2e、P5 都用它。G3 binding 與 manifest 只有一個 `image_hash`。P6 `deliver` 只複製這一個設定的 AXF。
 - 後果：如果 build_target 是 `boot_spice_fpga`，交出去的是 FPGA ICE 版。`boot_mask_asic`（燒進 mask ROM 的那支）和 sandaru 都沒交，也沒上機測過。
 - 連帶：「image 改變，舊結果不算」比的是最新 build 所有設定 hash 的聯集（`impact.py`）；P5 來源檢查也是比聯集（`service.py`）。測試證據沒記是哪個設定。
-- 部分回答（2026-10-28 使用者）：bootcode 與 burner 一起放行，G3 綁兩邊的 image、P6 一次交付；開發時可能要有 burner 才能驗 bootcode（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。
+- 部分回答（2026-10-28 使用者）：bootcode 與 burner 一起放行，G3 綁兩邊的 image；驗證用 burner 不交付，P6 只交 bootcode；開發時可能要有 burner 才能驗 bootcode（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。
 - 要問：G3／P6 要綁哪幾個設定的 hash？「image 改變」要不要按設定分開算？ROM bootcode 變了，sandaru 的結果要不要跟著失效？
 
 **B【矛盾】上機只有「ICE 直接載入、讀回 hash、free run」一條路**
@@ -52,7 +52,7 @@
 
 **H【矛盾】「是否為 mask ROM」是整個專案一個旗標**
 - 規格：07、E39 E2、P5、P6。只有 ROM 組態（ASIC）交出去不能回頭；SPI ROM 與 sandaru 之後還能更新。
-- 已回答（2026-10-28 使用者）：bootcode 與 burner 同一次 P6 交付；tapeout 後改 burner 或 SPI ROM 版開新專案，ROM bootcode 保留且 image 不變（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。旗標改按設定記（07）。
+- 已回答（2026-10-28 使用者）：驗證用 burner 不交付；tapeout 後改 SPI ROM 版開新專案，改 burner 是測試環境的更新；ROM bootcode 保留且 image 不變（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。旗標改按設定記（07）。
 - 原本的問題：哪些設定的交付不可逆？各設定是同一次 P6 交，還是分開交？tapeout 後改 sandaru，要怎麼回到 GLADOS？
 
 **I【矛盾】sandaru 還是「待確認」，CR 卻已經靠它**

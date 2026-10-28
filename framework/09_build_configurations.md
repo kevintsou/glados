@@ -58,7 +58,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 
 > **這一節的 burner 是驗證用的 burner**（2026-10-28 使用者說明）：bootcode 團隊產出的 sandaru／burner 是拿來驗證 bootcode 的，不是量產用的；量產用的 burner 由其他單位產出。所以：
 > - 推論（待確認）：量產 burner 應該也是靠 ROM bootcode 的載入 VUC 帶進 SRAM。果真如此，這組 VUC 不只是我們兩支程式之間的介面，也是**其他單位量產 burner 的介面**，改它要通知那個單位。
-> - 下面「一起放行」「tapeout 之後的更新」寫的交付與更新，對驗證用 burner 代表什麼，還要再確認（[08](08_open_questions.md) 第 16 項）。
+> - **驗證用 burner 不交付，是測試環境**（2026-10-28 使用者決定）：G3 綁它的 hash，只用來證明驗收時用的是哪一版；P6 只交付 bootcode；tapeout 後改它是測試環境的更新，不必開新專案。
 
 2026-10-28 使用者決定，GLADOS 規格要重新討論，把 sandaru／burner 納進來：
 
@@ -125,14 +125,14 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 
 2026-10-28 使用者決定：
 
-- **一起放行**：bootcode 和 burner 走同一套流程（M1～M6、P4、P5、G3、P6）。G3 核准的那一版同時綁 bootcode 與 burner 的 image，P6 一次交付兩邊。
+- **一起放行**：bootcode 和 burner 走同一套流程（M1～M6、P4、P5、G3）。G3 核准的那一版同時綁 bootcode 與 burner 的 image：bootcode 是交付內容，burner 是證明驗收用了哪一版的證據。P6 只交付 bootcode（驗證用 burner 不交付，見本節開頭）。
 - **開發時互相搭配**：M1～M6 的過程中，可能要有 burner 才能驗 bootcode，反過來 burner 也要跑在 bootcode 上（載入 VUC）。兩邊在開發階段要互相搭配，不能各做各的。
 
 這代表：
 
 - **P2 的模組相依要跨兩支程式**：某個 bootcode 模組的 M5 需要 burner 的某個功能時，P2 要把它標成相依，並排好順序（[nodes/P2](../nodes/P2.md)）。
 - **M5 的驗證證據要記用到的另一支程式**：bootcode 的測試用了哪一版 burner image、burner 的測試跑在哪一版 bootcode 上，都要記 hash（[nodes/M5](../nodes/M5.md)）。那一版改了，用到它的結果也要重新判斷，不能只看被測那一支有沒有變。
-- **G3、P6 綁兩邊**：「交付內容與核准版本相符」要比對 bootcode 和 burner 每個必要設定的 image hash。
+- **G3 綁兩邊、P6 只交 bootcode**：G3 核准紀錄記 bootcode 與 burner 每個必要設定的 image hash；「交付內容與核准版本相符」比對 bootcode 的部分。
 
 「要有 burner 才能驗 bootcode」有兩種情況，兩種都有（2026-10-28 使用者確認）：
 
@@ -173,7 +173,7 @@ openBCT 目前的正式 build 已經是這樣：用 `git archive` 匯出一份�
 
 ### tapeout 之後的更新
 
-只有 ROM 組態（ASIC）燒進 mask ROM 後不能改；SPI ROM／ICE mode 與 burner 之後還能更新。2026-10-28 使用者決定：tapeout 後要改 burner 或 SPI ROM 版，**開一個新的 GLADOS 專案**：
+只有 ROM 組態（ASIC）燒進 mask ROM 後不能改；SPI ROM／ICE mode 之後還能更新。2026-10-28 使用者決定：tapeout 後要改 SPI ROM 版，**開一個新的 GLADOS 專案**（驗證用 burner 不是交付物，改它是測試環境的更新，不必開新專案）：
 
 - 起點是上一個專案 P6 交付的版本。
 - 範圍清單裡 ROM bootcode 標「保留」，而且不能改：ROM 組態的 image 必須和交付的一樣（hash 相同），等於在固定的 ROM bootcode 上開發。
