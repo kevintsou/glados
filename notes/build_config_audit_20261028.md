@@ -30,7 +30,7 @@
 
 **D【矛盾】P4「端到端 boot flow」沒說是哪個設定**
 - 規格：05「整合後的 image 整條 boot flow 都通過」、nodes/P4。ROM 組態、SPI ROM、ROM→sandaru 是三條不同的 flow，最後一條跨兩個 image。
-- 要問：P4 要跑哪幾條 flow，各用哪幾個 image？
+- 已回答（2026-10-28 使用者）：照 test plan 寫的步驟驗，GLADOS 不寫死；每種介質要不要各跑一次也看 test plan（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。
 
 **E【矛盾】驗收合約與 case 沒有「適用哪些設定」**
 - 規格：M1、M2、05、P1 基線、P2 regression 範圍都沒有這一欄。E39 的 2258 只在 sandaru，2421 在 bootcode。

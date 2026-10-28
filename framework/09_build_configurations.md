@@ -154,6 +154,16 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **P0 給人確認**：工具算出來的結果在 P0 給人看一遍。不靠人工填，因為人工容易漏掉共用的檔案。
 - **改到共用的檔案，兩邊都要重 build、重驗。**
 
+### P4 驗什麼由 test plan 決定
+
+2026-10-28 使用者決定：P4 的整合驗證項目照 **test plan** 寫的步驟去驗，GLADOS 規格不寫死要跑哪幾條 flow，讓規格保持彈性。
+
+- 開卡（帶入 burner、寫進後端介質）、正常開機、SPI ROM／ICE mode 這些 flow 要不要跑、怎麼跑，都看 test plan。
+- 每一種後端介質要不要各跑一次，也看 test plan。
+- test plan 和 feature list 一樣，由工具依專案設定的來源抓成來源快照（[03 §3.2](03_artifacts.md#32-來源快照)、[07](07_project_profile.md)「test plan 來源」）。
+
+### 檔案歸屬的例子
+
 以 E39 推測：`duan/app/boot` 是 bootcode，`duan/app/sandaru` 是 burner，`proj/ps5037/phal`、`duan/user/back` 和共用 header 是共用；以工具實際算出來的為準。
 
 規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
