@@ -14,7 +14,7 @@
 | :---- | :---- | :---- | :---- |
 | ROM 組態 | bootcode 本體，執行位置是 ROM（mask ROM） | ROM；資料、stack 在 SRAM | 量產時就在晶片的 ROM 裡，上電執行 |
 | SPI ROM／ICE mode | bootcode，從 SPI ROM 或用 ICE 載入 | SRAM：ARM 是 ATCM，Andes 是 ILM（code 也在 RAM） | 從 SPI ROM 載入，或由 ICE 載進 ATCM／ILM 後執行 |
-| sandaru／burner | **另一支程式**：燒錄 FW、開卡用，不是 bootcode | SRAM（ATCM／ILM） | 由 ROM 裡的 bootcode 帶入：host tool 下 VUC 給 bootcode，bootcode 把 sandaru／burner 帶進 SRAM；host tool 再下 VUC，讓 bootcode 從 ROM 跳到 SRAM 執行它 |
+| sandaru／burner | **另一支程式**：燒錄 FW、開卡用，不是 bootcode。**我們產出的是驗證用的 burner**，量產用的 burner 由其他單位產出（2026-10-28 使用者說明） | SRAM（ATCM／ILM） | 由 ROM 裡的 bootcode 帶入：host tool 下 VUC 給 bootcode，bootcode 把 sandaru／burner 帶進 SRAM；host tool 再下 VUC，讓 bootcode 從 ROM 跳到 SRAM 執行它 |
 
 每一種通常再分 ASIC 與 FPGA 兩個設定。
 
@@ -55,6 +55,10 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **同一個模組在不同設定裡份量不同。** 同一個模組可能同時編進 bootcode 和 sandaru，也可能只在其中一邊；模組預算要記是哪個設定的。
 
 ## 9.4 sandaru／burner 是專案的一部分
+
+> **這一節的 burner 是驗證用的 burner**（2026-10-28 使用者說明）：bootcode 團隊產出的 sandaru／burner 是拿來驗證 bootcode 的，不是量產用的；量產用的 burner 由其他單位產出。所以：
+> - 量產 burner 也要靠 ROM bootcode 的載入 VUC 帶進 SRAM。這組 VUC 不只是我們兩支程式之間的介面，也是**其他單位量產 burner 的介面**；改它要通知那個單位。
+> - 下面「一起放行」「tapeout 之後的更新」寫的交付與更新，對驗證用 burner 代表什麼，還要再確認（[08](08_open_questions.md) 第 16 項）。
 
 2026-10-28 使用者決定，GLADOS 規格要重新討論，把 sandaru／burner 納進來：
 
@@ -104,7 +108,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - host tool 是第三方。VUC 的格式一改，openBCT 的 `CommandSpec` 也要跟著改。
 - burner 的上機測試，由 host tool 對跑著 bootcode 的板子下這組 VUC 帶入、再跳轉。這回答了稽核 B 的「sandaru 的測試由誰下 VUC」（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md)）。
 
-- **錯誤注入**（2026-10-28 讀 E39 起點 code 得知，待確認是否通用）：burner 的 `VUC_InjectError` 把要注入的錯誤寫進一個暫存區（`gpBootInfoSimReg`），bootcode 下次開機讀出來照著觸發錯誤。製造壞情境要靠 burner，這段讀取也編進了 ROM 組態（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md) K）。
+- **錯誤注入**（2026-10-28 讀 E39 起點 code 得知，待確認是否通用）：burner 的 `VUC_InjectError` 把要注入的錯誤寫進一個暫存區（`gpBootInfoSimReg`），bootcode 下次開機讀出來照著觸發錯誤。製造壞情境要靠（驗證用的）burner，這段讀取也編進了 ROM 組態（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md) K）。
 - **burner bin 的大小上限**：就是這個專案的 ATCM 大小（2026-10-28 使用者說明）。ATCM 大小依那顆 IC 的 HW memory map；sandaru／burner 設定的記憶體上限照這個數字定。
 
 ### 其他細節在 P0 依 burner feature list 討論

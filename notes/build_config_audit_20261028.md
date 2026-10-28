@@ -70,7 +70,8 @@
   - bootcode 的 `main.c` 開機時呼叫 `phal_update_boot_inject_error()`（`proj/ps5037/phal/phal_sys.c`），讀出這個值交給 flash 流程，然後清成 0。
   - 這段由 `BOOT_INJECT_ERROR_TEST` 控制，而它在共用的 `duan/hal/hal_def.h` 固定 `#define` 成 `1`，所以**每個 bootcode 設定都編進去了，包括燒進 mask ROM 的 `boot_mask_asic`**。
   - 所以錯誤注入也是 bootcode 與 burner 之間的相依：burner 寫、bootcode 下次開機讀。M2「錯誤注入要用隔離的測試版本，不能合入交付版本」的前提，在 E39 不成立。
-- 要問：注入的路徑留在量產 ROM 裡是刻意的嗎？
+- 補充（2026-10-28 使用者）：我們產出的 burner 是驗證用的，量產 burner 由其他單位產出。所以注入的 VUC 只在驗證用 burner 裡；量產時沒有東西會寫 `boot_inject_error`，ROM 裡的讀取路徑讀到的是 0。
+- 要問：注入的讀取路徑留在量產 ROM 裡是刻意的嗎？
 
 **L【推論】FPGA 上的 eFuse 是否真的不可逆**
 - 規格：05、07、E39 的 eFuse 擋關。FPGA 上如果是可以重來的模擬，一律擋住會卡死無人值守的 M5。
