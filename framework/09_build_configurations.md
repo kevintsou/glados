@@ -108,7 +108,22 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - 兩邊同時用 SRAM 的範圍：burner 可以用到整個 ATCM 時，bootcode 在帶入與跳轉期間的資料、stack、收資料的 buffer 放在哪裡。
 - burner 有沒有引用 ROM bootcode 的固定位址或函式（例如 E39 sandaru build 的 `BOOT_ROM_FW_VERSION` 衝突）。
 - 共用的 SDK／HAL 與 header 有哪些。
-- 跨兩支程式的 feature list 項目（例如 `SDKBOOT-1323`）要怎麼分到 bootcode 與 burner。規格要怎麼改，結論會寫回這一節和 [08](08_open_questions.md)。
+- 跨兩支程式的 feature list 項目（例如 `SDKBOOT-1323`）要怎麼分到 bootcode 與 burner。
+
+### 一起開發、一起放行
+
+2026-10-28 使用者決定：
+
+- **一起放行**：bootcode 和 burner 走同一套流程（M1～M6、P4、P5、G3、P6）。G3 核准的那一版同時綁 bootcode 與 burner 的 image，P6 一次交付兩邊。
+- **開發時互相搭配**：M1～M6 的過程中，可能要有 burner 才能驗 bootcode，反過來 burner 也要跑在 bootcode 上（載入 VUC）。兩邊在開發階段要互相搭配，不能各做各的。
+
+這代表：
+
+- **P2 的模組相依要跨兩支程式**：某個 bootcode 模組的 M5 需要 burner 的某個功能時，P2 要把它標成相依，並排好順序（[nodes/P2](../nodes/P2.md)）。
+- **M5 的驗證證據要記用到的另一支程式**：bootcode 的測試用了哪一版 burner image、burner 的測試跑在哪一版 bootcode 上，都要記 hash（[nodes/M5](../nodes/M5.md)）。那一版改了，用到它的結果也要重新判斷，不能只看被測那一支有沒有變。
+- **G3、P6 綁兩邊**：「交付內容與核准版本相符」要比對 bootcode 和 burner 每個必要設定的 image hash。
+
+規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
 
 ## 9.5 還沒照這份知識修正的設計
 
