@@ -48,6 +48,16 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **sandaru 的上機測試要經過 bootcode。** 正式的載入路徑是「ROM bootcode 收 VUC 帶入、再跳轉」，不是直接用 ICE 載進去；只用 ICE 直接載入測到的，不包含這條路徑。
 - **同一個模組在不同設定裡份量不同。** 同一個模組可能同時編進 bootcode 和 sandaru，也可能只在其中一邊；模組預算要記是哪個設定的。
 
-## 9.4 還沒照這份知識修正的設計
+## 9.4 sandaru／burner 是專案的一部分
+
+2026-10-28 使用者決定，GLADOS 規格要重新討論，把 sandaru／burner 納進來：
+
+- sandaru／burner 和 bootcode 有相依性。
+- 專案準備（P0）時，burner 的功能需求也要一起備齊。
+- 進到模組開發階段時，burner 也一起開發。
+
+相依有哪些、規格要怎麼改，正在逐項討論；結論會寫回這一節和 [08](08_open_questions.md)。
+
+## 9.5 還沒照這份知識修正的設計
 
 2026-10-28 依這份文件重新檢查規格與 openBCT，找到一批把所有 build 設定當成同一個 image、或只用 ICE 直接載入測試的設計，逐項列在 [notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md)。每一項等使用者回答後才改規格。
