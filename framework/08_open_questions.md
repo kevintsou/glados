@@ -35,7 +35,7 @@
 | 13 | 外部來源與程式碼建立設定的工具：svn／git／資料夾快照、register 版本辨識（排除 translator 版本與產生時間後比對）、register 結構化差異查詢（解析 RegSpec xml）、HW spec 查詢；bcgen 的「以前代 code base 衍生」模式與 ARM 支援；本機路徑映射接 OBC-006 | [nodes/P1](../nodes/P1.md)、[07](07_project_profile.md)、[impl/bcgen](../impl/bcgen.md) |
 | 14 | 模組記憶體怎麼算（2026-10-28 已決定：上限與預算按 build 設定各定一套）。還沒決定：SRAM 要不要按記憶體區分開算；stack 預算的定義；沒歸到模組的用量（padding、linker 產生的部分）要不要另外擋；sandaru／burner 和 ROM bootcode 同時用 SRAM 的範圍要不要交叉比對；listing 解析放在哪 | [09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事)、[05 §5.4](05_checks.md#54-擋關檢查) |
 | 15 | build 設定稽核（2026-10-28）列出的設計問題：測試、G3、交付只綁一個 image；上機只有 ICE 直接載入；測 FPGA、交 ASIC；P4 端到端 flow 沒指定設定；case 沒有適用設定；mask ROM 只有一個旗標等 | [notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md)、[09](09_build_configurations.md) |
-| 16 | sandaru／burner 納入規格（2026-10-28 討論中）：burner 的 feature list 格式與位置；bootcode 與 burner 的載入協定、SRAM 共用範圍、ROM 固定位址的相依；共用 SDK／HAL 與 header 改動時兩邊怎麼重驗 | [09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分) |
+| 16 | sandaru／burner 納入規格（2026-10-28 討論中）：burner 的 feature list 格式與位置；載入 burner 的 VUC（bootcode 支援、host tool 下）格式與大小上限是否寫死在 ROM、SRAM 共用範圍、ROM 固定位址的相依；共用 SDK／HAL 與 header 改動時兩邊怎麼重驗 | [09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分) |
 
 其他實作待決：
 

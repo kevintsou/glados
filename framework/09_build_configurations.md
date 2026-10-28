@@ -81,7 +81,24 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - 改到共用的 SDK／HAL 或共用 header，bootcode 和 burner 兩邊的設定都要重 build、重驗，影響範圍不能只算改動的那一支。
 - P2 切模組時，共用的 SDK／HAL 和 header 是兩支程式之間的介面，要先定好，就像多顆 IC 共用的 code（[07](07_project_profile.md)「共用層規則」）。
 
-還沒問到的相依：bootcode 怎麼把 burner 帶進 SRAM（VUC 協定、大小上限）、兩邊同時用 SRAM 的範圍、burner 會不會引用 ROM bootcode 的固定位址或函式。規格要怎麼改，結論會寫回這一節和 [08](08_open_questions.md)。
+- **載入 burner 的 VUC**：host PC 上的 tool（例如 openBCT）下 VUC，把 burner 的 bin 送進 IC；bootcode 必須支援這些 VUC。
+
+  openBCT 現有的對應指令（`src/openbct/hal/commands.py`）如下，是不是全部都在 2026-10-28 還待確認：
+
+  | 指令 | 做什麼 |
+  | :---- | :---- |
+  | `ispbnr` | opcode `0xD1`，feature `0x12`，ISP 寫入 BNR image |
+  | `enc_ispbnr` | opcode `0xE1`，加密版 |
+  | `ispbnr2`／`enc_ispbnr2` | 同上，但固定切成 64 KB 封包，而且不 commit（burner 只載入 RAM 執行，不寫進 flash） |
+  | `ispjmp` | opcode `0xD0`，feature `0x02`，讓 bootcode 跳轉或繼續執行 |
+
+這代表：
+
+- 載入 burner 的 VUC 是 **bootcode 的需求**，burner 依賴它。burner 在範圍內，bootcode 的範圍清單就要有對應的 VUC 支援；改這組 VUC，bootcode、burner、host tool 三邊都要一起看。
+- host tool 是第三方。VUC 的格式一改，openBCT 的 `CommandSpec` 也要跟著改。
+- burner 的上機測試，由 host tool 對跑著 bootcode 的板子下這組 VUC 帶入、再跳轉。這回答了稽核 B 的「sandaru 的測試由誰下 VUC」（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md)）。
+
+還沒問到的相依：這組 VUC 的格式與 burner 大小上限，是寫死在 ROM 的固定規格，還是這個專案可以改；兩邊同時用 SRAM 的範圍；burner 會不會引用 ROM bootcode 的固定位址或函式。規格要怎麼改，結論會寫回這一節和 [08](08_open_questions.md)。
 
 ## 9.5 還沒照這份知識修正的設計
 
