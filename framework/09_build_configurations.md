@@ -30,7 +30,11 @@
 
 ROM 的位址每顆 IC 不同，但一定和 ATCM（ITCM）／ILM 是不同的位置（2026-10-28 使用者說明）。
 
-**FPGA 上沒有真的 ROM**：FPGA 版刻意把 ROM 組態放進 ATCM 跑。例如 `ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`（base `0x00080000`，Max `0x4D000`）；ASIC 版的 ROM 在另一個位置（2026-10-28 使用者說明）。
+**FPGA 上的 ROM 組態有兩種做法，因 IC 而異**（2026-10-28 使用者說明）：
+- HW 把 ROM 的區域在 FPGA 實作成**可以寫入的 SRAM**，方便開發與 debug：ROM 組態照真實的 ROM 位址跑。
+- HW 沒有這樣做：只能把 ROM 組態放進 ATCM，在 ATCM 上驗證 bootcode 功能。
+
+PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`（base `0x00080000`，Max `0x4D000`），依 listing 推得，待確認。所以每顆 IC 要在專案設定寫明：FPGA 上的 ROM 組態跑在哪裡。這也決定了 FPGA 驗證和 ASIC 真實執行位置差多少。
 
 **真實的 ROM 位置從 HW memory map 查**：在 svn 上的 hardware spec 裡（[07 §7.1](07_project_profile.md#71-欄位) 程式碼建立設定的外部來源「HW spec」）。要判斷某段用量算 ROM 還是哪一區 SRAM，以那份 memory map 為準。
 

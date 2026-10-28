@@ -19,7 +19,7 @@
 - 後果：
   - ROM 組態（ASIC）的 code 在 mask ROM，ICE 寫不進去，讀回永遠不符，結果是驗證缺口。
   - sandaru 被 ICE 直接載進 ATCM，沒走「ROM bootcode 收 VUC 帶入、跳轉」這條正式路徑。`lab_run` 一次只能吃一個 image，表達不出兩階段。
-- 要問：每種設定怎麼上機？sandaru 的測試由誰下 VUC？下面跑的 bootcode 用哪個設定？讀回比對要在 VUC 帶入之後做嗎？`boot_mask_fpga` 放在 ATCM（FPGA 沒有 ROM，已確認），是不是用 ICE 載入、從 ROM 的 reset 流程開始跑？
+- 要問：每種設定怎麼上機？sandaru 的測試由誰下 VUC？下面跑的 bootcode 用哪個設定？讀回比對要在 VUC 帶入之後做嗎？FPGA 上的 ROM 組態（放在 ATCM，或放在 HW 做成可寫入 SRAM 的 ROM 區）是不是都用 ICE 載入、從 reset 流程開始跑？專案設定要不要加一欄「FPGA 上 ROM 組態跑在哪裡」？
 
 **C【矛盾＋推論】測的是 FPGA 設定，交的是 ASIC 設定**
 - 規格：c2_lab_design 決定 5 寫「目前都用 FPGA（E39 是 `*_fpga` 的設定）」。「交付內容與核准版本相符」只證明交的等於核准的，不證明 `*_asic` 被測過。
@@ -36,7 +36,7 @@
 
 **F【矛盾】E39 的記憶體預算仍是一個數字**
 - 規格：projects/E39 E2「ROM 區 `0x80000`、大小 `0x4D000`（308KB）」。這組數字正好是 `ps5037_boot_mask_fpga` listing 裡 `ATCM_RAM` 的 base 與 Max。
-- 已確認（2026-10-28 使用者）：FPGA 上沒有真的 ROM，FPGA 版刻意把 ROM 組態放進 ATCM；真實 ROM 位置要查 svn 上 hardware spec 的 HW memory map。所以這組數字是 `boot_mask_fpga` 的 ATCM 配置，不是 ASIC mask ROM 的上限。
+- 已確認（2026-10-28 使用者）：FPGA 上的 ROM 組態因 IC 而異。HW 有時把 ROM 區在 FPGA 做成可寫入的 SRAM，沒有的話就放進 ATCM 驗證（PS5037 看起來是這種）；真實 ROM 位置要查 svn 上 hardware spec 的 HW memory map。所以這組數字是 `boot_mask_fpga` 的 ATCM 配置，不是 ASIC mask ROM 的上限。
 - 要問：6 個設定各自的上限是多少？ASIC ROM 的大小直接取 HW memory map，還是另定較小的預算？
 
 **G【矛盾】E39 起點過不了 P1 第 1 步**
