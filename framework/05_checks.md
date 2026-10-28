@@ -70,7 +70,7 @@
 | ASIC 與 FPGA 差異都有處置 | 只在 FPGA 驗過，燒進 mask ROM 的 ASIC 設定有沒驗到的差異 | P5 的差異清單逐項寫明 FPGA 結果為什麼能代表 ASIC，說明不了的登記為驗證缺口交 G3 決定（[09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事)） | P5 | 人＋agent 列出，另一個 session 審查 |
 | 交付內容與核准版本相符 | 交錯版本（不可逆） | release 包裡 bootcode 與 burner 每個必要設定的 image hash，都和 G3 核准時的一致（[09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)） | P6 | 自動核對 |
 
-另外，**不可逆動作**（例如 eFuse 燒錄）一律要人批准，由 hook 擋住；這不是出口檢查，但全程有效。
+另外，**不可逆動作**（例如 eFuse 燒錄）一律要人批准，由 hook 擋住；這不是出口檢查，但全程有效。不可逆動作清單按平台記，在不會真的不可逆的平台上（例如 FPGA 用 BCFG 模擬 eFuse）不擋（[07](07_project_profile.md)）。
 
 ---
 

@@ -50,6 +50,7 @@
 
 | 版本 | 決定 | 在哪裡 |
 | :---- | :---- | :---- |
+| v0.11 | 不可逆動作清單按平台記；暫定 FPGA 上的 eFuse 不擋（BCFG 寫變數模擬，FPGA 可重寫的模擬機制待確認），只有 ASIC 上擋 | [07](07_project_profile.md)、[05](05_checks.md)、[09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事) |
 | v0.11 | image hash 以 BIN 為準（G3、P6、「image 改變」都比 BIN），AXF 保留給 ICE 與 debug；P1 起點檢查 build 兩次確認 BIN 可重現 | [03 §3.3](03_artifacts.md#33-版本與追溯)、[09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事)、[nodes/P1](../nodes/P1.md) |
 | v0.11 | tapeout 後要改 burner 或 SPI ROM 版，開新的 GLADOS 專案：起點是 P6 交付的版本，ROM bootcode 保留且 image hash 不變；「是否為 mask ROM」按 build 設定記 | [09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)、[07](07_project_profile.md)、[nodes/P0](../nodes/P0.md) |
 | v0.11 | G3 要的 ASIC 證據是 FPGA 驗證加上 ASIC 與 FPGA 的差異清單（P5 產出，說明不了的差異登記為驗證缺口交 G3 決定），不靠 HW SIM | [09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事)、[nodes/P5](../nodes/P5.md)、[05 §5.4](05_checks.md#54-擋關檢查) |
