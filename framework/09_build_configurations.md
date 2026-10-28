@@ -164,6 +164,14 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 
 openBCT 目前的正式 build 已經是這樣：用 `git archive` 匯出一份全新的 source，ds5build 對每個設定下 `-cleanBuild`。repo 裡被 git 追蹤的編譯產物（例如 E39 的 `ws_fw/ps5037_boot_mask_asic/` 下的 `.o`）也會被一起匯出，但 clean build 會先清掉，不會被沿用。
 
+### tapeout 之後的更新
+
+只有 ROM 組態（ASIC）燒進 mask ROM 後不能改；SPI ROM／ICE mode 與 burner 之後還能更新。2026-10-28 使用者決定：tapeout 後要改 burner 或 SPI ROM 版，**開一個新的 GLADOS 專案**：
+
+- 起點是上一個專案 P6 交付的版本。
+- 範圍清單裡 ROM bootcode 標「保留」，而且不能改：ROM 組態的 image 必須和交付的一樣（hash 相同），等於在固定的 ROM bootcode 上開發。
+- 不走原專案的 C 變更；原專案交付後就結束。
+
 ### case 要標適用的 build 設定
 
 2026-10-28 使用者決定：驗收合約裡的每個 case 都要標明適用哪些 build 設定，例如只在 ROM 組態、ROM 組態與 SPI ROM／ICE mode 都要，或只在 FPGA、只在 ASIC。

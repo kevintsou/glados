@@ -51,7 +51,8 @@
 
 **H【矛盾】「是否為 mask ROM」是整個專案一個旗標**
 - 規格：07、E39 E2、P5、P6。只有 ROM 組態（ASIC）交出去不能回頭；SPI ROM 與 sandaru 之後還能更新。
-- 要問：哪些設定的交付不可逆？各設定是同一次 P6 交，還是分開交？tapeout 後改 sandaru，要怎麼回到 GLADOS？
+- 已回答（2026-10-28 使用者）：bootcode 與 burner 同一次 P6 交付；tapeout 後改 burner 或 SPI ROM 版開新專案，ROM bootcode 保留且 image 不變（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。旗標改按設定記（07）。
+- 原本的問題：哪些設定的交付不可逆？各設定是同一次 P6 交，還是分開交？tapeout 後改 sandaru，要怎麼回到 GLADOS？
 
 **I【矛盾】sandaru 還是「待確認」，CR 卻已經靠它**
 - 規格：E39 E2 與 E7 #5 說 sandaru 是否在範圍內待確認，但 E4 把 2258 放進 sandaru 模組、E5 把 2258 列為試點候選。
