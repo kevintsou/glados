@@ -53,6 +53,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **sandaru／burner 和 ROM bootcode 會同時用 SRAM。** sandaru 被帶進 SRAM 時，ROM bootcode 還在處理 VUC 與跳轉，它自己的資料、stack、收資料的 buffer 也在 SRAM。兩個設定各自 link 都可能沒事，放在一起卻重疊；只有拿兩份 listing 交叉比對才看得出來。2026-10-29 使用者決定：
   - **自動比對**：P0 標出「帶入與跳轉期間 ROM bootcode 還在用的區域」（例如 symbol 或 section 名稱，各專案自己填，[07](07_project_profile.md)「記憶體預算」）。每次正式 build 之後，工具讀 bootcode 與 burner 的 listing，比對 burner 的載入範圍有沒有和這些區域重疊。
   - **重疊不一定擋，交給人判斷**：重疊可能是刻意的（例如那段資料在跳轉前就用完了）。工具列出重疊的位址與 symbol，由人決定可以接受（記下理由）或要修改。判斷綁定兩邊的 BIN hash，任一邊改了就要重新判斷。
+- **listing 解析放在 KB 的 ds5build**（2026-10-29 使用者決定）：`tools/ds5build/ds5build.py` 已經解析 armlink map 的 region（`parse_map()`）。上面幾項檢查還需要每個模組（檔案）的用量、`--callgraph` 的最深 stack 用量、symbol 與 section 的位址範圍，都擴充在 ds5build，讓 ds5-build skill 與 openBCT 共用同一份解析；openBCT 匯出工具時記下 KB 的 commit，結果追得到是哪一版解析的。Andes 那條線（andes-build）怎麼對應還沒定。
 - **sandaru 的上機測試要經過 bootcode。** 正式的載入路徑是「ROM bootcode 收 VUC 帶入、再跳轉」，不是直接用 ICE 載進去；只用 ICE 直接載入測到的，不包含這條路徑。
 - **驗證跑的 image 不一定是交付的 image。** 例如燒進 mask ROM 的是 ASIC 設定，tapeout 前卻只有 FPGA 可以跑；又例如驗證版開著測試專用的旗標（E39 起點的 `BOOT_INJECT_ERROR_TEST`），量產版關掉。2026-10-28 使用者決定的通用規則：
   - **P0 標明**每個必要設定是交付版本還是驗證版本，並逐項列出兩者的差異（[07](07_project_profile.md)「build 設定」）。某個專案的旗標怎麼切換、差異有哪些，是那個專案 P0 的事。
