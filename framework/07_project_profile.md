@@ -30,7 +30,7 @@
 | 觀察手段 | UART token、tracker step、readsys 等可以當作預期結果的訊號 | M2、M5 |
 | 製造錯誤的手段 | 可以注入錯誤的 VUC 或旗標，用來觸發壞情境 | M2、M5 |
 | 測試框架 | openBCT 等；case 放哪裡、怎麼跑、報告格式 | M2、M5、P5 |
-| code 模組對照 | 目錄 → 模組名稱；衝突熱點檔案 | P2 |
+| code 模組對照 | 目錄 → 模組名稱；衝突熱點檔案；每個檔案屬於 bootcode、burner 或兩邊共用，由工具從 build 設定算出、P0 給人確認（[09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)） | P0、P2、影響提示 |
 | 必要規則清單 | 審查與靜態分析時違反了就一定要擋的規則（例如 MISRA 的必要條目、團隊的 coding rule、硬體特性規則），以及對應的工具設定 | P1、M6、P5 |
 | 共用層規則 | 多顆 IC 共用的 code 及其旗標，改動時額外的 regression 範圍 | P2、P5 |
 | 被 git 追蹤的編譯產物 | repo 裡被 git 追蹤的 build 輸出路徑（核對「只寫在允許範圍內」時要排除） | 串接層 |

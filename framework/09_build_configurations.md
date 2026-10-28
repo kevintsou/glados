@@ -146,6 +146,16 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
   - P4 用完整版本跑這些 case，全部 PASS 才算過；P4 沒驗到的，不能拿 M5 的結果補。
   - 反過來，burner 的 case 要用到這版新 bootcode 功能時，也照同樣規則。
 
+### 哪些 code 屬於哪支程式
+
+每個檔案都要知道屬於 bootcode、burner，還是兩邊共用，才能判斷改了它要重驗哪一邊。2026-10-28 使用者決定：
+
+- **由工具從 build 設定自動算**：build 設定（ARM 的 `.cproject`）記了每個設定編進哪些檔案。只編進 bootcode 設定（ROM 組態、SPI ROM／ICE mode）的檔案屬於 bootcode；只編進 sandaru／burner 設定的屬於 burner；兩種都有的是共用。
+- **P0 給人確認**：工具算出來的結果在 P0 給人看一遍。不靠人工填，因為人工容易漏掉共用的檔案。
+- **改到共用的檔案，兩邊都要重 build、重驗。**
+
+以 E39 推測：`duan/app/boot` 是 bootcode，`duan/app/sandaru` 是 burner，`proj/ps5037/phal`、`duan/user/back` 和共用 header 是共用；以工具實際算出來的為準。
+
 規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
 
 ## 9.5 還沒照這份知識修正的設計
