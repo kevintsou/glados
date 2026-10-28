@@ -46,10 +46,11 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **SRAM 有好幾區，彼此不能借。** 例如 E39 `ps5037_boot_mask_fpga` 的 ATCM_RAM 用了 91%、BTCM1 用了 72%，另一區只用了 5%。總數看不出哪一區快滿。
 - **sandaru／burner 和 ROM bootcode 會同時用 SRAM。** sandaru 被帶進 SRAM 時，ROM bootcode 還在處理 VUC 與跳轉，它自己的資料、stack、收資料的 buffer 也在 SRAM。兩個設定各自 link 都可能沒事，放在一起卻重疊；只有拿兩份 listing 交叉比對才看得出來。要不要做成檢查還沒決定（[08 §8.2](08_open_questions.md#82-實作待決) 第 14 項）。
 - **sandaru 的上機測試要經過 bootcode。** 正式的載入路徑是「ROM bootcode 收 VUC 帶入、再跳轉」，不是直接用 ICE 載進去；只用 ICE 直接載入測到的，不包含這條路徑。
-- **ASIC 設定在 tapeout 前沒有晶片可以跑。** 驗證平台是 FPGA，燒進 mask ROM 的卻是 ASIC 設定。2026-10-28 使用者決定，G3 要的 ASIC 證據是「FPGA 驗證加上 ASIC 與 FPGA 的差異清單」：
-  - ASIC 設定本身要 build 0 warning、記憶體在預算內。
-  - P5 把同一類設定的 ASIC 與 FPGA 版逐項列出差異（例如編譯旗標、記憶體配置、clock、PHY 設定），每一項寫明 FPGA 的結果為什麼能代表 ASIC。
-  - 說明不了的差異登記為驗證缺口，交給 G3 核准人決定；不靠 HW SIM 補驗。
+- **驗證跑的 image 不一定是交付的 image。** 例如燒進 mask ROM 的是 ASIC 設定，tapeout 前卻只有 FPGA 可以跑；又例如驗證版開著測試專用的旗標（E39 起點的 `BOOT_INJECT_ERROR_TEST`），量產版關掉。2026-10-28 使用者決定的通用規則：
+  - **P0 標明**每個必要設定是交付版本還是驗證版本，並逐項列出兩者的差異（[07](07_project_profile.md)「build 設定」）。某個專案的旗標怎麼切換、差異有哪些，是那個專案 P0 的事。
+  - **G3 綁交付版本的 hash**，P6 比對的也是它；驗證版本的結果是證據，不是交付內容。
+  - **P5 產出「交付版本與驗證版本差異清單」**：每一項寫明驗證版本的結果為什麼能代表交付版本；說明不了的登記為驗證缺口，交給 G3 核准人決定。ASIC 與 FPGA 的差異（編譯旗標、記憶體配置、clock、PHY 設定）是其中一類；不靠 HW SIM 補驗。
+  - **交付版本本身也要**過 build 0 warning、記憶體在預算內。
 - **FPGA 上的 eFuse 不一定是真的。** 2026-10-28 使用者說明：eFuse 可以用 BCFG 的機制模擬，就是寫變數，不真的 trim eFuse；FPGA 似乎也有模擬真實 eFuse、可以寫入重來的機制，待確認。暫定：不可逆動作清單按平台記，FPGA 上的 eFuse case 照常自動跑，只有 ASIC 上才擋（[07](07_project_profile.md)「不可逆動作清單」）。
 - **image hash 以 BIN 為準。** AXF 帶 debug 資訊，可能還有 build 時間或路徑，同一個 commit 重 build 的 hash 可能不同，會讓「image 改變、舊結果不算」誤判，也驗不了 tapeout 後的新專案 ROM image 有沒有變。2026-10-28 使用者決定：G3 核准、P6 交付、「image 改變」的判斷都比 BIN 的 hash；AXF 保留給 ICE 載入與 debug。前提是 BIN 能重現，P1 用同一個 commit build 兩次確認。
 - **同一個模組在不同設定裡份量不同。** 同一個模組可能同時編進 bootcode 和 sandaru，也可能只在其中一邊；模組預算要記是哪個設定的。
