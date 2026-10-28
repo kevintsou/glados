@@ -49,6 +49,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
   - armlink `--callgraph` 算出每條呼叫路徑最深用到的 stack，最大值不超過預留大小。
   - 有遞迴或 function pointer、工具算不出深度的路徑，登記為驗證缺口，交給人判斷。
   - Andes toolchain 怎麼算最深 stack 用量，還沒定（[08](08_open_questions.md) 第 14 項）。
+- **沒歸到模組的用量另外留預算**（2026-10-29 使用者決定）：C runtime library、linker 產生的 veneer、對齊用的 padding 等不屬於任何模組。P2 在每個設定的每一區另外留一筆「未歸屬」預算，超過就擋；所有模組預算加上這一筆，不超過那一區的上限。
 - **sandaru／burner 和 ROM bootcode 會同時用 SRAM。** sandaru 被帶進 SRAM 時，ROM bootcode 還在處理 VUC 與跳轉，它自己的資料、stack、收資料的 buffer 也在 SRAM。兩個設定各自 link 都可能沒事，放在一起卻重疊；只有拿兩份 listing 交叉比對才看得出來。要不要做成檢查還沒決定（[08 §8.2](08_open_questions.md#82-實作待決) 第 14 項）。
 - **sandaru 的上機測試要經過 bootcode。** 正式的載入路徑是「ROM bootcode 收 VUC 帶入、再跳轉」，不是直接用 ICE 載進去；只用 ICE 直接載入測到的，不包含這條路徑。
 - **驗證跑的 image 不一定是交付的 image。** 例如燒進 mask ROM 的是 ASIC 設定，tapeout 前卻只有 FPGA 可以跑；又例如驗證版開著測試專用的旗標（E39 起點的 `BOOT_INJECT_ERROR_TEST`），量產版關掉。2026-10-28 使用者決定的通用規則：
