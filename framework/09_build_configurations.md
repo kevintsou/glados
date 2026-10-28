@@ -84,7 +84,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
   - 頁面本身沒有內容，只是一組 Jira 查詢。每個分頁是一類 feature：LCP、SIB、BFM、SYS、UART、SATA、PCIE、SMBUS、SEC、SPI、NAND、UFS_LOAD、SPI_LOAD、OTHERS。
   - 查詢條件是 `project = SDKBOOT AND "Epic Link" = SDKBOOT-786 AND "Test-Case Tag" in ("FEA_<類>")`。Epic `SDKBOOT-786` 是「Verification - SSD」，2026-10-28 共有 155 張，類型都是 Test Case。OTHERS 分頁收沒有 `FEA_` 標記的項目。
   - 每張的 **labels 標出適用哪些 IC**，例如 `5963`、`E37`、`PS5039`、`PS5910`、`SE32`、`X3`。`Test-Case Tag` 除了 `FEA_<類>`，還有 `BCVT_FE`、`BCVT_BE`、`BCVT_SEC`，看起來是前端、後端、安全的分組。
-  - 所以要抓的是這組查詢的結果，不是頁面內容。一個專案取哪些項目，要依 IC label 篩選。
+  - 所以要抓的是這組查詢的結果。專案設定記這個頁面的 ID，工具自動展開頁面裡的 Jira 查詢並抓結果（2026-10-29 使用者決定，[03 §3.2](03_artifacts.md#32-來源快照)）；一個專案取哪些項目，依 IC label 篩選。
   - 已經有跨兩支程式的項目，例如 `SDKBOOT-1323`「Boot infomation to/from FW and Burner」（`FEA_LCP`）。
 - **burner feature list**：之後會建立，格式還沒定。
 - **CR**：照舊，是專案設定的 Jira Epic（[07](07_project_profile.md)）。
