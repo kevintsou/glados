@@ -154,6 +154,12 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **P0 給人確認**：工具算出來的結果在 P0 給人看一遍。不靠人工填，因為人工容易漏掉共用的檔案。
 - **改到共用的檔案，兩邊都要重 build、重驗。**
 
+### build 一律 clean build 全部
+
+2026-10-28 使用者決定：M4 的正式 build 每次都 build 全部必要設定（bootcode 與 burner），而且是 clean build，就算只改到 bootcode 專屬的檔案也一樣。檔案歸屬是從 build 設定算的，改一個 header 可能影響到沒算到的地方，全部 clean build 最直接抓得到。
+
+openBCT 目前的正式 build 已經是這樣：用 `git archive` 匯出一份全新的 source，ds5build 對每個設定下 `-cleanBuild`。repo 裡被 git 追蹤的編譯產物（例如 E39 的 `ws_fw/ps5037_boot_mask_asic/` 下的 `.o`）也會被一起匯出，但 clean build 會先清掉，不會被沿用。
+
 ### P4 驗什麼由 test plan 決定
 
 2026-10-28 使用者決定：P4 的整合驗證項目照 **test plan** 寫的步驟去驗，GLADOS 規格不寫死要跑哪幾條 flow，讓規格保持彈性。
