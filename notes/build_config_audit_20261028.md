@@ -26,7 +26,8 @@
 **C【矛盾＋推論】測的是 FPGA 設定，交的是 ASIC 設定**
 - 規格：c2_lab_design 決定 5 寫「目前都用 FPGA（E39 是 `*_fpga` 的設定）」。「交付內容與核准版本相符」只證明交的等於核准的，不證明 `*_asic` 被測過。
 - openBCT：`lab.py` 固定用 `benches[0]`，bench 沒有平台標記，FPGA 的 image 可能被載到 ASIC 板上。
-- 要問：ASIC 與 FPGA 設定差在哪裡？G3 前 ASIC 設定要哪種證據（SIM、只要 build、還是等價論證）？
+- 已回答（2026-10-28 使用者）：G3 的 ASIC 證據是 FPGA 驗證加上 ASIC／FPGA 差異清單，說明不了的登記為驗證缺口（[09 §9.3](../framework/09_build_configurations.md#93-規劃時不能忽略的事)）。openBCT 固定用 `benches[0]`、bench 沒有平台標記的問題還在。
+- 原本的問題：ASIC 與 FPGA 設定差在哪裡？G3 前 ASIC 設定要哪種證據（SIM、只要 build、還是等價論證）？
 
 **D【矛盾】P4「端到端 boot flow」沒說是哪個設定**
 - 規格：05「整合後的 image 整條 boot flow 都通過」、nodes/P4。ROM 組態、SPI ROM、ROM→sandaru 是三條不同的 flow，最後一條跨兩個 image。
