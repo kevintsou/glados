@@ -104,6 +104,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - host tool 是第三方。VUC 的格式一改，openBCT 的 `CommandSpec` 也要跟著改。
 - burner 的上機測試，由 host tool 對跑著 bootcode 的板子下這組 VUC 帶入、再跳轉。這回答了稽核 B 的「sandaru 的測試由誰下 VUC」（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md)）。
 
+- **錯誤注入**（2026-10-28 讀 E39 起點 code 得知，待確認是否通用）：burner 的 `VUC_InjectError` 把要注入的錯誤寫進一個暫存區（`gpBootInfoSimReg`），bootcode 下次開機讀出來照著觸發錯誤。製造壞情境要靠 burner，這段讀取也編進了 ROM 組態（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md) K）。
 - **burner bin 的大小上限**：就是這個專案的 ATCM 大小（2026-10-28 使用者說明）。ATCM 大小依那顆 IC 的 HW memory map；sandaru／burner 設定的記憶體上限照這個數字定。
 
 ### 其他細節在 P0 依 burner feature list 討論

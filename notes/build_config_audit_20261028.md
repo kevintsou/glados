@@ -65,7 +65,12 @@
 
 **K【推論】錯誤注入用的 VUC 是否編進交付設定**
 - 規格：M2「錯誤注入要用隔離的測試版本……不能合入交付版本」。E39 E2 列的 `VUC_InjectError` 等如果本來就編進量產 ROM，這個前提不成立。
-- 要問：這些 VUC 編進哪些設定？
+- 查證（2026-10-28，讀 E39 起點 `83dc1a65b`）：
+  - `VUC_InjectError`、`VUC_OcpRecoveryErrorInject` 在 `duan/app/sandaru/vuc/`，是 **burner 的 VUC**。`VUC_InjectError.c` 把錯誤種類寫進 `gpBootInfoSimReg->boot_inject_error`（例如 `BOOT_ERROR_IDPG_HARD_RESET`）。
+  - bootcode 的 `main.c` 開機時呼叫 `phal_update_boot_inject_error()`（`proj/ps5037/phal/phal_sys.c`），讀出這個值交給 flash 流程，然後清成 0。
+  - 這段由 `BOOT_INJECT_ERROR_TEST` 控制，而它在共用的 `duan/hal/hal_def.h` 固定 `#define` 成 `1`，所以**每個 bootcode 設定都編進去了，包括燒進 mask ROM 的 `boot_mask_asic`**。
+  - 所以錯誤注入也是 bootcode 與 burner 之間的相依：burner 寫、bootcode 下次開機讀。M2「錯誤注入要用隔離的測試版本，不能合入交付版本」的前提，在 E39 不成立。
+- 要問：注入的路徑留在量產 ROM 裡是刻意的嗎？
 
 **L【推論】FPGA 上的 eFuse 是否真的不可逆**
 - 規格：05、07、E39 的 eFuse 擋關。FPGA 上如果是可以重來的模擬，一律擋住會卡死無人值守的 M5。
