@@ -36,6 +36,7 @@
 | CR 來源 | Jira 的 Epic（不要用標題關鍵字，會漏掉標題沒寫專案代號的 CR）；CR 撰寫範本。工具依此抓來源快照 | P0、P2、C |
 | 寫進 Jira | GLADOS 的內容要不要由工具寫進 Jira，包括 P2 定案的 CR 修訂（定案就寫回，不等 G1），以及節點要問客戶、SOC、HW 的待確認事項。有雙向隔離、不能讓其他團隊看到的專案設成「否」：CR 修訂只留在 GLADOS 內部；待確認事項由人轉問（不透露 GLADOS 的產出），答案記回待確認事項清單（[nodes/P2](../nodes/P2.md)、[nodes/M1](../nodes/M1.md)） | P2、M1、所有會等待外部回覆的節點 |
 | CR 修改決定人 | P2 討論中改變需求內容的 CR 修訂由誰定案。預設是 CR 負責人；不能找 CR 負責人的專案（例如有雙向隔離），改由 G1 核准人決定（[nodes/P2](../nodes/P2.md)） | P2 |
+| feature list 來源 | bootcode 和 sandaru／burner 各一份：Jira 查詢條件（例如 Epic 與 `Test-Case Tag`）、這顆 IC 用哪個 label 篩選。Confluence 的 feature list 頁只是一組 Jira 查詢，工具抓查詢結果，不抓頁面（[09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)） | P0、P2、M1、M2 |
 | spec 來源 | Confluence spec 頁的頁面 ID 清單，每一頁標明要不要連子頁面一起抓。工具依此抓來源快照 | P0、P2、M1、C |
 | 外部來源同步 | 定期比對來源快照和 Jira／Confluence 的間隔（[04 §4.7](04_rules.md#47-新-commit-與人工修改)） | 串接層 |
 | 既有測試項目 | Jira 上的功能或測試項目清單（例如 sub-task），可以當作驗收定義的來源 | M2 |

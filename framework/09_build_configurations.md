@@ -56,7 +56,32 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - 專案準備（P0）時，burner 的功能需求也要一起備齊。
 - 進到模組開發階段時，burner 也一起開發。
 
-相依有哪些、規格要怎麼改，正在逐項討論；結論會寫回這一節和 [08](08_open_questions.md)。
+### P0 的需求來源：feature list＋CR
+
+2026-10-28 使用者說明：P0 用 **bootcode 的 feature list**、**burner 的 feature list** 和 **CR** 三樣東西，建出 bootcode 和 burner 的基本架構。
+
+- **bootcode feature list**：Confluence 頁面 [V&V - feature - SSD](https://confluence2.phison.com:8443/pages/viewpage.action?pageId=1033179968)（IPFWI，頁面 ID `1033179968`）。
+  - 頁面本身沒有內容，只是一組 Jira 查詢。每個分頁是一類 feature：LCP、SIB、BFM、SYS、UART、SATA、PCIE、SMBUS、SEC、SPI、NAND、UFS_LOAD、SPI_LOAD、OTHERS。
+  - 查詢條件是 `project = SDKBOOT AND "Epic Link" = SDKBOOT-786 AND "Test-Case Tag" in ("FEA_<類>")`。Epic `SDKBOOT-786` 是「Verification - SSD」，2026-10-28 共有 155 張，類型都是 Test Case。OTHERS 分頁收沒有 `FEA_` 標記的項目。
+  - 每張的 **labels 標出適用哪些 IC**，例如 `5963`、`E37`、`PS5039`、`PS5910`、`SE32`、`X3`。`Test-Case Tag` 除了 `FEA_<類>`，還有 `BCVT_FE`、`BCVT_BE`、`BCVT_SEC`，看起來是前端、後端、安全的分組。
+  - 所以要抓的是這組查詢的結果，不是頁面內容。一個專案取哪些項目，要依 IC label 篩選。
+  - 已經有跨兩支程式的項目，例如 `SDKBOOT-1323`「Boot infomation to/from FW and Burner」（`FEA_LCP`）。
+- **burner feature list**：之後會建立，格式還沒定。
+- **CR**：照舊，是專案設定的 Jira Epic（[07](07_project_profile.md)）。
+
+### bootcode 和 burner 的相依
+
+2026-10-28 使用者說明：
+
+- **共用底層的 SDK／HAL**：同一份底層 code 會同時編進 bootcode 和 burner。
+- **共用部分 header**：例如 eFuse 的定義。
+
+這代表：
+
+- 改到共用的 SDK／HAL 或共用 header，bootcode 和 burner 兩邊的設定都要重 build、重驗，影響範圍不能只算改動的那一支。
+- P2 切模組時，共用的 SDK／HAL 和 header 是兩支程式之間的介面，要先定好，就像多顆 IC 共用的 code（[07](07_project_profile.md)「共用層規則」）。
+
+還沒問到的相依：bootcode 怎麼把 burner 帶進 SRAM（VUC 協定、大小上限）、兩邊同時用 SRAM 的範圍、burner 會不會引用 ROM bootcode 的固定位址或函式。規格要怎麼改，結論會寫回這一節和 [08](08_open_questions.md)。
 
 ## 9.5 還沒照這份知識修正的設計
 
