@@ -140,6 +140,11 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **M5 用固定的一版**：驗 bootcode 模組時，burner 固定用同一個版本，不跟著 burner 的開發變動，這樣才能把問題隔離在被測的模組。證據照樣記下那一版的 image hash。
 - **固定的那一版就是 P1 基線用的 burner**：在基底上 build 出來、基線報告記了 hash 的那一版，M5 和基線的對照條件因此一致。所以基底上的 burner 設定一定要 build 得過、能用；E39 起點的 sandaru 有 L6291E，是 P1 要先解決的事（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md) G）。
 - **P4 整合時用完整版本**：全部模組開發完、整合之後，用整合出來的 bootcode 與 burner 一起再驗一次。
+- **要用到這版新 burner 功能的 case，延到 P4 驗**（2026-10-28 使用者決定）：固定版本裡沒有那個功能，M5 驗不了。
+  - 哪些 case 延到 P4，在 M1 的驗收合約裡標明，並寫出依賴哪個 burner 功能；經 H 核准，不能在 M5 臨時決定。P2 標出的跨程式相依是 M1 的線索。
+  - M5 驗其餘 case；標了延到 P4 的 case 記「未執行（延到 P4）」，不擋 M5。
+  - P4 用完整版本跑這些 case，全部 PASS 才算過；P4 沒驗到的，不能拿 M5 的結果補。
+  - 反過來，burner 的 case 要用到這版新 bootcode 功能時，也照同樣規則。
 
 規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
 
