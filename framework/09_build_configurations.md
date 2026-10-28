@@ -98,7 +98,17 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - host tool 是第三方。VUC 的格式一改，openBCT 的 `CommandSpec` 也要跟著改。
 - burner 的上機測試，由 host tool 對跑著 bootcode 的板子下這組 VUC 帶入、再跳轉。這回答了稽核 B 的「sandaru 的測試由誰下 VUC」（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md)）。
 
-還沒問到的相依：這組 VUC 的格式與 burner 大小上限，是寫死在 ROM 的固定規格，還是這個專案可以改；兩邊同時用 SRAM 的範圍；burner 會不會引用 ROM bootcode 的固定位址或函式。規格要怎麼改，結論會寫回這一節和 [08](08_open_questions.md)。
+- **burner bin 的大小上限**：就是這個專案的 ATCM 大小（2026-10-28 使用者說明）。ATCM 大小依那顆 IC 的 HW memory map；sandaru／burner 設定的記憶體上限照這個數字定。
+
+### 其他細節在 P0 依 burner feature list 討論
+
+2026-10-28 使用者決定：其他問題不在框架裡統一定，而是每個專案在 P0 討論需求時，用 burner feature list 詳細列出需要的功能，以及每個功能實際怎麼實作。P0 討論 burner 時至少要涵蓋：
+
+- 載入 burner 的 VUC：這個專案沿用哪一組、格式能不能改，改的話 bootcode、burner、host tool 三邊一起看。
+- 兩邊同時用 SRAM 的範圍：burner 可以用到整個 ATCM 時，bootcode 在帶入與跳轉期間的資料、stack、收資料的 buffer 放在哪裡。
+- burner 有沒有引用 ROM bootcode 的固定位址或函式（例如 E39 sandaru build 的 `BOOT_ROM_FW_VERSION` 衝突）。
+- 共用的 SDK／HAL 與 header 有哪些。
+- 跨兩支程式的 feature list 項目（例如 `SDKBOOT-1323`）要怎麼分到 bootcode 與 burner。規格要怎麼改，結論會寫回這一節和 [08](08_open_questions.md)。
 
 ## 9.5 還沒照這份知識修正的設計
 
