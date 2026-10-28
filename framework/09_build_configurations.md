@@ -50,6 +50,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
   - ASIC 設定本身要 build 0 warning、記憶體在預算內。
   - P5 把同一類設定的 ASIC 與 FPGA 版逐項列出差異（例如編譯旗標、記憶體配置、clock、PHY 設定），每一項寫明 FPGA 的結果為什麼能代表 ASIC。
   - 說明不了的差異登記為驗證缺口，交給 G3 核准人決定；不靠 HW SIM 補驗。
+- **image hash 以 BIN 為準。** AXF 帶 debug 資訊，可能還有 build 時間或路徑，同一個 commit 重 build 的 hash 可能不同，會讓「image 改變、舊結果不算」誤判，也驗不了 tapeout 後的新專案 ROM image 有沒有變。2026-10-28 使用者決定：G3 核准、P6 交付、「image 改變」的判斷都比 BIN 的 hash；AXF 保留給 ICE 載入與 debug。前提是 BIN 能重現，P1 用同一個 commit build 兩次確認。
 - **同一個模組在不同設定裡份量不同。** 同一個模組可能同時編進 bootcode 和 sandaru，也可能只在其中一邊；模組預算要記是哪個設定的。
 
 ## 9.4 sandaru／burner 是專案的一部分

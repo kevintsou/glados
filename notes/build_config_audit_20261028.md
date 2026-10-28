@@ -78,7 +78,8 @@
 
 **N【推論】hash 的是哪個檔、能不能重現**
 - openBCT R04 改成記 AXF。AXF 若帶 debug 資訊或 build 時間，同一個 commit 重 build 的 hash 會不同，「image 改變」會誤觸發。而且 ROM／SPI ROM 交付的可能是 BIN／hex。
-- 要問：build 是否 bit-reproducible？要 hash AXF 還是 BIN？交付哪一種？
+- 已回答（2026-10-28 使用者）：以 BIN 為準，AXF 保留給 ICE 與 debug；P1 起點檢查用同一個 commit build 兩次確認 BIN 可重現（[09 §9.3](../framework/09_build_configurations.md#93-規劃時不能忽略的事)）。openBCT R04 改記 AXF 的部分要改回 BIN。
+- 原本的問題：build 是否 bit-reproducible？要 hash AXF 還是 BIN？交付哪一種？
 
 **O【推論】Andes 的三類設定怎麼表達沒有定義**
 - 規格：P0、impl/bcgen C1 只寫了 ARM `.cproject`。openBCT 的 ELF 讀回只處理 ARM ELF32，目前 Andes 在 build 端就明確擋下，不會誤用。
