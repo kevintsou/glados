@@ -57,7 +57,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 ## 9.4 sandaru／burner 是專案的一部分
 
 > **這一節的 burner 是驗證用的 burner**（2026-10-28 使用者說明）：bootcode 團隊產出的 sandaru／burner 是拿來驗證 bootcode 的，不是量產用的；量產用的 burner 由其他單位產出。所以：
-> - 量產 burner 也要靠 ROM bootcode 的載入 VUC 帶進 SRAM。這組 VUC 不只是我們兩支程式之間的介面，也是**其他單位量產 burner 的介面**；改它要通知那個單位。
+> - 推論（待確認）：量產 burner 應該也是靠 ROM bootcode 的載入 VUC 帶進 SRAM。果真如此，這組 VUC 不只是我們兩支程式之間的介面，也是**其他單位量產 burner 的介面**，改它要通知那個單位。
 > - 下面「一起放行」「tapeout 之後的更新」寫的交付與更新，對驗證用 burner 代表什麼，還要再確認（[08](08_open_questions.md) 第 16 項）。
 
 2026-10-28 使用者決定，GLADOS 規格要重新討論，把 sandaru／burner 納進來：
