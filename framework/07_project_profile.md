@@ -25,6 +25,7 @@
 | build 設定 | 盤點出的設定與處置：必要設定清單（全部要過 0 warning）、明確排除的設定及理由與範圍依據。有程式碼建立設定時，處置的對象是基底的 build 設定（例如 `ps5037_*` 對應到 `ps5039_*`），並記下和起點設定的對應 | P0、P1、M4、P4、P5 |
 | 記憶體預算 | **每個必要 build 設定各一套**：ROM、SRAM 各區、stack 的上限與量測方式。設定的執行位置不同，「ROM」「SRAM」的意思就不同，不能共用一套數字（[09](09_build_configurations.md)，2026-10-28 依使用者決定）。sandaru／burner 設定的 bin 大小上限是這個專案的 ATCM 大小 | P2、M4、P4 |
 | 是否為 mask ROM | 決定 P6 交付之後能不能回頭 | P6 |
+| 後端介質 | bootcode 從哪些介質載入 FW：NAND、SPI ROM、UFS 等，依專案而定；決定 burner 要寫什麼、bootcode 要讀什麼、驗證平台要接什麼（[09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)） | P0、P2、M2、M5、P1 |
 | 驗證平台 | FPGA、SIM、ASIC 各有幾台、怎麼連線 | P1、M5、P4、P5 |
 | 觀察手段 | UART token、tracker step、readsys 等可以當作預期結果的訊號 | M2、M5 |
 | 製造錯誤的手段 | 可以注入錯誤的 VUC 或旗標，用來觸發壞情境 | M2、M5 |

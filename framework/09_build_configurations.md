@@ -125,14 +125,15 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 
 「要有 burner 才能驗 bootcode」有兩種情況，兩種都有（2026-10-28 使用者確認）：
 
-1. **burner 準備 bootcode 要讀的東西**：bootcode 要從 NAND 載入 FW，得先用 burner 把 FW、ID page 等寫進 NAND，開機流程才有東西可讀。LCP、NAND 這類 feature 都是這樣。
+1. **burner 準備 bootcode 要讀的東西**：bootcode 要從後端介質載入 FW，得先用 burner 把 FW 和載入需要的資料（例如 NAND 的 ID page）寫進去，開機流程才有東西可讀。後端介質依專案而定，不一定是 NAND，也可能是 SPI ROM、UFS 等（2026-10-28 使用者說明；feature list 也有 NAND、SPI_LOAD、UFS_LOAD 分頁）。從後端介質載入的 feature 都是這樣。
 2. **burner 本身是被驗的對象之一**：bootcode 的 VUC 帶入與跳轉功能，要拿一支真的 burner 來驗。
 
 這代表：
 
 - burner 是 bootcode **測試環境的一部分**，不只是另一個交付物。
 - **P1 量基線**時要有一版能用的 burner，基線報告記下用的是哪一版（[nodes/P1](../nodes/P1.md)）。
-- **P2 排順序**時，bootcode 模組要用到的 burner 功能（例如寫入 FW、ID page）如果這版也要改，就要排在那個 bootcode 模組的 M5 之前。
+- **後端介質是專案設定**：這個專案從哪些介質載入，決定 burner 要寫什麼、bootcode 要讀什麼、驗證平台要接什麼（[07](07_project_profile.md)「後端介質」）。
+- **P2 排順序**時，bootcode 模組要用到的 burner 功能（例如把 FW 寫進後端介質）如果這版也要改，就要排在那個 bootcode 模組的 M5 之前。
 
 規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
 
