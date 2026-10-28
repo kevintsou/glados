@@ -138,6 +138,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 **驗證時用哪一版另一支程式**（2026-10-28 使用者決定）：
 
 - **M5 用固定的一版**：驗 bootcode 模組時，burner 固定用同一個版本，不跟著 burner 的開發變動，這樣才能把問題隔離在被測的模組。證據照樣記下那一版的 image hash。
+- **固定的那一版就是 P1 基線用的 burner**：在基底上 build 出來、基線報告記了 hash 的那一版，M5 和基線的對照條件因此一致。所以基底上的 burner 設定一定要 build 得過、能用；E39 起點的 sandaru 有 L6291E，是 P1 要先解決的事（[notes/build_config_audit_20261028](../notes/build_config_audit_20261028.md) G）。
 - **P4 整合時用完整版本**：全部模組開發完、整合之後，用整合出來的 bootcode 與 burner 一起再驗一次。
 
 規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
