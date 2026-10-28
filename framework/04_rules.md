@@ -94,7 +94,7 @@ P1 的起點檢查、機械替換、量基線；M2 的判別能力；M4 的正�
 
 | 什麼改變 | 自動怎麼處理 |
 | :---- | :---- |
-| image 改變 | 用舊 image 跑出來的 M5、P4、P5 測試結果不算，要用新 image 重跑。spec、合約、case 的定義不受影響 |
+| image 改變 | 用舊 image 跑出來的 M5、P4、P5 測試結果不算，要用新 image 重跑。spec、合約、case 的定義不受影響。**有 bootcode 與 burner 兩支程式時，照改到的檔案判斷**（2026-10-28 使用者決定，[09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)）：改到只屬於 bootcode 的檔案，bootcode 的結果過期；只屬於 burner 的，burner 的結果過期；改到共用的檔案，兩邊都過期。P4、P5 的結果用了兩邊的完整版本，任一邊過期就跟著過期；M5 用的是固定的 P1 基線版本，不因另一支程式的開發而過期。不在 build 輸入範圍內的檔案（[07](07_project_profile.md)「版本與 hash 規則」）不讓結果過期 |
 | 影響 build 的環境項目改變（toolchain、生成工具） | 照「改基底、平台或 toolchain」處理：重新 build，之前的 build 與測試結果不算；生成工具或程式碼建立設定改變時重新建立基底 |
 
 skill、MCP、知識庫只影響 AI，更新後不讓任何結果失效；之後的執行用新版本，執行紀錄記下用了哪一版。

@@ -165,6 +165,7 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **由工具從 build 設定自動算**：build 設定（ARM 的 `.cproject`）記了每個設定編進哪些檔案。只編進 bootcode 設定（ROM 組態、SPI ROM／ICE mode）的檔案屬於 bootcode；只編進 sandaru／burner 設定的屬於 burner；兩種都有的是共用。
 - **P0 給人確認**：工具算出來的結果在 P0 給人看一遍。不靠人工填，因為人工容易漏掉共用的檔案。
 - **改到共用的檔案，兩邊都要重 build、重驗。**
+- **哪些結果過期照改到的檔案判斷**（2026-10-28 使用者決定）：只屬於 bootcode 的檔案讓 bootcode 的結果過期，只屬於 burner 的讓 burner 的結果過期，共用的讓兩邊都過期；P4、P5 的結果任一邊過期就跟著過期；M5 用固定的 P1 基線版本，不受另一支程式的開發影響。不用等 build 完就能判斷；改了 header 實際上沒影響 BIN 時會多重跑，寧可多跑。規則寫在 [04 §4.4](04_rules.md#44-上游改版與重做)。
 
 ### build 一律 clean build 全部
 
