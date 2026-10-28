@@ -35,7 +35,7 @@
 **E【矛盾】驗收合約與 case 沒有「適用哪些設定」**
 - 規格：M1、M2、05、P1 基線、P2 regression 範圍都沒有這一欄。E39 的 2258 只在 sandaru，2421 在 bootcode。
 - 已回答（2026-10-28 使用者）：要標，在 M1 合約寫，預設值從 feature list 或 test plan 帶過來（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。
-- 還要問：P1 基線要在哪幾個設定上跑既有測項？
+- 已回答（2026-10-28 使用者）：P1 基線照同樣規則，既有測項在每個適用設定上各跑一次。
 
 **F【矛盾】E39 的記憶體預算仍是一個數字**
 - 規格：projects/E39 E2「ROM 區 `0x80000`、大小 `0x4D000`（308KB）」。這組數字正好是 `ps5037_boot_mask_fpga` listing 裡 `ATCM_RAM` 的 base 與 Max。
