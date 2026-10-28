@@ -21,7 +21,8 @@
   - ROM 組態（ASIC）的 code 在 mask ROM，ICE 寫不進去，讀回永遠不符，結果是驗證缺口。
   - sandaru 被 ICE 直接載進 ATCM，沒走「ROM bootcode 收 VUC 帶入、跳轉」這條正式路徑。`lab_run` 一次只能吃一個 image，表達不出兩階段。
 - 部分回答（2026-10-28 使用者）：host tool（例如 openBCT）下 VUC 把 burner 的 bin 送進 IC，bootcode 要支援這組 VUC（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。
-- 要問：每種設定怎麼上機？下面跑的 bootcode 用哪個設定？讀回比對要在 VUC 帶入之後做嗎？FPGA 上的 ROM 組態（放在 ATCM，或放在 HW 做成可寫入 SRAM 的 ROM 區）是不是都用 ICE 載入、從 reset 流程開始跑？專案設定要不要加一欄「FPGA 上 ROM 組態跑在哪裡」？
+- 已回答（2026-10-28 使用者）：每種設定怎麼載入、怎麼開始跑，由 test plan 決定，規格不寫死（[09 §9.4](../framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）。openBCT 要支援 test plan 用到的載入方式，目前只有 ICE 直接載入後 free run。
+- 原本的問題：每種設定怎麼上機？下面跑的 bootcode 用哪個設定？讀回比對要在 VUC 帶入之後做嗎？FPGA 上的 ROM 組態（放在 ATCM，或放在 HW 做成可寫入 SRAM 的 ROM 區）是不是都用 ICE 載入、從 reset 流程開始跑？專案設定要不要加一欄「FPGA 上 ROM 組態跑在哪裡」？
 
 **C【矛盾＋推論】測的是 FPGA 設定，交的是 ASIC 設定**
 - 規格：c2_lab_design 決定 5 寫「目前都用 FPGA（E39 是 `*_fpga` 的設定）」。「交付內容與核准版本相符」只證明交的等於核准的，不證明 `*_asic` 被測過。

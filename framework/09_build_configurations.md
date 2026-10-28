@@ -180,6 +180,7 @@ openBCT 目前的正式 build 已經是這樣：用 `git archive` 匯出一份�
 - 在 M1 的驗收合約裡寫，預設值從 feature list 或 test plan 帶過來，經 H 核准。
 - M5 對每個適用的設定各跑一次，結果分開記，各自綁那個設定的 image hash。
 - 沒標的 case 不能當成「所有設定都驗過」。
+- **怎麼載入、怎麼開始跑也看 test plan**（2026-10-28 使用者決定）：每種設定在驗證平台上怎麼載入（ICE 直接載入後 free run、ICE 載入後從 reset 開始、先寫進 SPI ROM 再 reset、host tool 下 VUC 帶入 burner 等），GLADOS 規格不寫死，由 test plan 決定；case 照著寫在驗收合約裡。驗證環境因此要支援 test plan 用到的每一種載入方式；openBCT 目前只有「ICE 直接載入 AXF 後 free run」一種（`lab.py` 的 `run_iceload`）。
 - **P1 基線照同樣規則**（2026-10-28 使用者決定）：既有測項也標適用的設定，預設值從 feature list 或 test plan 帶過來，在每個適用設定上各跑一次；標不出來的在 P0 問人。這樣基線和 M5 的條件一致，M5 在某個設定上 FAIL 時，才分得出是這次改壞的還是基底原本就這樣。
 
 ### P4 驗什麼由 test plan 決定
