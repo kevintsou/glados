@@ -123,6 +123,17 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **M5 的驗證證據要記用到的另一支程式**：bootcode 的測試用了哪一版 burner image、burner 的測試跑在哪一版 bootcode 上，都要記 hash（[nodes/M5](../nodes/M5.md)）。那一版改了，用到它的結果也要重新判斷，不能只看被測那一支有沒有變。
 - **G3、P6 綁兩邊**：「交付內容與核准版本相符」要比對 bootcode 和 burner 每個必要設定的 image hash。
 
+「要有 burner 才能驗 bootcode」有兩種情況，兩種都有（2026-10-28 使用者確認）：
+
+1. **burner 準備 bootcode 要讀的東西**：bootcode 要從 NAND 載入 FW，得先用 burner 把 FW、ID page 等寫進 NAND，開機流程才有東西可讀。LCP、NAND 這類 feature 都是這樣。
+2. **burner 本身是被驗的對象之一**：bootcode 的 VUC 帶入與跳轉功能，要拿一支真的 burner 來驗。
+
+這代表：
+
+- burner 是 bootcode **測試環境的一部分**，不只是另一個交付物。
+- **P1 量基線**時要有一版能用的 burner，基線報告記下用的是哪一版（[nodes/P1](../nodes/P1.md)）。
+- **P2 排順序**時，bootcode 模組要用到的 burner 功能（例如寫入 FW、ID page）如果這版也要改，就要排在那個 bootcode 模組的 M5 之前。
+
 規格要怎麼改的其他結論，會寫回這一節和 [08](08_open_questions.md)。
 
 ## 9.5 還沒照這份知識修正的設計
