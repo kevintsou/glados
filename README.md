@@ -22,6 +22,7 @@ bootcode FW 開發流程平台。目前是 **v0.10**（2026-10-20）：AI 的工
 | 串接層服務必須做到的事 | [framework/06 串接層服務的要求](framework/06_service.md) |
 | 專案要填哪些設定 | [framework/07 專案設定](framework/07_project_profile.md) |
 | 還沒決定的事、已經決定的事 | [framework/08 待決事項](framework/08_open_questions.md) |
+| bootcode 有哪幾種 build 設定、各跑在哪裡、怎麼載入（規劃前必讀） | [framework/09 build 設定](framework/09_build_configurations.md) |
 | 每個節點的介面與實作構想 | [nodes/](nodes/README.md) |
 | E39 怎麼套用 GLADOS | [projects/E39](projects/E39.md) |
 | 實作設計（框架確認後才開始） | [impl/service](impl/service.md)、[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/gate_signoff](impl/gate_signoff.md)、[impl/bcgen](impl/bcgen.md)、[impl/recipe](impl/recipe.md)、[impl/tools](impl/tools.md) |
