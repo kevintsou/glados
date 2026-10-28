@@ -44,6 +44,11 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 - **「ROM 用量」的意思跟著設定變。** armlink 的 ROM 是「image 要載入的內容」：ROM 組態燒在真的 ROM 上，SPI ROM／ICE mode 卻是吃 ATCM／ILM。所以記憶體上限與模組預算要**按 build 設定各定一套**（[07 §7.1](07_project_profile.md#71-欄位)，2026-10-28 依使用者決定）。
 - **不能從 region 名稱判斷是 ROM 還是 SRAM。** ROM 的位址因 IC 而異，scatter 的 region 名稱也可能沿用；要判斷某段用量算 ROM 還是哪一區 SRAM，要照那顆 IC 的 HW memory map，不能猜。同一個 ROM 組態，FPGA 版和 ASIC 版的記憶體配置也不同，上限要各自定。
 - **SRAM 有好幾區，彼此不能借。** 例如 E39 `ps5037_boot_mask_fpga` 的 ATCM_RAM 用了 91%、BTCM1 用了 72%，另一區只用了 5%。總數看不出哪一區快滿。所以 SRAM **分區檢查**（2026-10-29 使用者決定）：每一區各定上限，區的大小以 HW memory map 為準，listing 裡每一區的用量各自比對；模組預算也照區分配（[07](07_project_profile.md)「記憶體預算」）。
+- **stack 查兩層**（2026-10-29 使用者決定）：stack 超過預留大小不會在 build 時報錯，要到執行時才壞，bootcode 承受不起。
+  - 預留的 stack 大小（scatter 或 linker 定的）不超過預算。
+  - armlink `--callgraph` 算出每條呼叫路徑最深用到的 stack，最大值不超過預留大小。
+  - 有遞迴或 function pointer、工具算不出深度的路徑，登記為驗證缺口，交給人判斷。
+  - Andes toolchain 怎麼算最深 stack 用量，還沒定（[08](08_open_questions.md) 第 14 項）。
 - **sandaru／burner 和 ROM bootcode 會同時用 SRAM。** sandaru 被帶進 SRAM 時，ROM bootcode 還在處理 VUC 與跳轉，它自己的資料、stack、收資料的 buffer 也在 SRAM。兩個設定各自 link 都可能沒事，放在一起卻重疊；只有拿兩份 listing 交叉比對才看得出來。要不要做成檢查還沒決定（[08 §8.2](08_open_questions.md#82-實作待決) 第 14 項）。
 - **sandaru 的上機測試要經過 bootcode。** 正式的載入路徑是「ROM bootcode 收 VUC 帶入、再跳轉」，不是直接用 ICE 載進去；只用 ICE 直接載入測到的，不包含這條路徑。
 - **驗證跑的 image 不一定是交付的 image。** 例如燒進 mask ROM 的是 ASIC 設定，tapeout 前卻只有 FPGA 可以跑；又例如驗證版開著測試專用的旗標（E39 起點的 `BOOT_INJECT_ERROR_TEST`），量產版關掉。2026-10-28 使用者決定的通用規則：
