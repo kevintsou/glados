@@ -160,6 +160,14 @@ PS5037 看起來是第二種：`ps5037_boot_mask_fpga` 的 image 在 `ATCM_RAM`�
 
 openBCT 目前的正式 build 已經是這樣：用 `git archive` 匯出一份全新的 source，ds5build 對每個設定下 `-cleanBuild`。repo 裡被 git 追蹤的編譯產物（例如 E39 的 `ws_fw/ps5037_boot_mask_asic/` 下的 `.o`）也會被一起匯出，但 clean build 會先清掉，不會被沿用。
 
+### case 要標適用的 build 設定
+
+2026-10-28 使用者決定：驗收合約裡的每個 case 都要標明適用哪些 build 設定，例如只在 ROM 組態、ROM 組態與 SPI ROM／ICE mode 都要，或只在 FPGA、只在 ASIC。
+
+- 在 M1 的驗收合約裡寫，預設值從 feature list 或 test plan 帶過來，經 H 核准。
+- M5 對每個適用的設定各跑一次，結果分開記，各自綁那個設定的 image hash。
+- 沒標的 case 不能當成「所有設定都驗過」。
+
 ### P4 驗什麼由 test plan 決定
 
 2026-10-28 使用者決定：P4 的整合驗證項目照 **test plan** 寫的步驟去驗，GLADOS 規格不寫死要跑哪幾條 flow，讓規格保持彈性。
