@@ -22,6 +22,20 @@
 | v0.9 | 2026-10-19 精簡流程：人參與的節點由人自己開 agent 做、串接層只開工與收件；關卡只留決策；擋關檢查只留會真的出事的；自動判定改成提示。細節見下方 |
 | v0.9.1 | 2026-10-20 紀錄格式照 openBCT 實作補齊：事件式的執行紀錄、收件檢查也寫證據、核准綁定的內容、影響提示的決定。細節見下方 |
 | v0.10 | 2026-10-20 AI 的工作改由人觸發：串接層不派工給 AI，只開工與收件；確定性的工具步驟仍由串接層執行；3 輪上限寫進 skill。細節見下方 |
+| v0.11 | 2026-10-28～29 sandaru／burner 與 build 設定：burner 是專案的一部分但不交付；image hash 以 BIN 為準；交付版本與驗證版本分開；記憶體按設定與分區；來源快照展開 Jira macro。細節見下方 |
+
+## v0.11 改了什麼
+
+**框架修訂：sandaru／burner 與 build 設定**（2026-10-28～29，依使用者逐題決定；新增 [09 build 設定](framework/09_build_configurations.md)，決定逐項記在 [08 §8.3](framework/08_open_questions.md#83-已決定事項) 標 v0.11 的列）
+
+- **為什麼改**：[build 設定稽核](notes/build_config_audit_20261028.md) 發現測試、G3、交付都只綁一個 image，上機只有 ICE 直接載入，測 FPGA、交 ASIC 沒有規則，sandaru／burner 也沒寫進流程。
+- **sandaru／burner**（[09 §9.4](framework/09_build_configurations.md#94-sandaruburner-是專案的一部分)）：是專案的一部分，P0 用 bootcode 與 burner 的 feature list 加 CR 建基本架構，模組階段一起開發；我們產出的 burner 是驗證用的，不交付，G3 綁它的 hash 當證據。M5 用 P1 基線那一版 burner，P4 用完整的一對驗證；case 可標「延到 P4」。檔案歸屬（bootcode／burner／共用）由工具從 build 設定算，過期照改到的檔案判斷。
+- **image 與交付**（[03 §3.3](framework/03_artifacts.md#33-版本與追溯)、[09 §9.3](framework/09_build_configurations.md#93-規劃時不能忽略的事)）：image hash 以 BIN 為準，AXF 留給 ICE 與 debug；P1 起點檢查 build 兩次確認 BIN 可重現。P0 標明每個設定是交付版本還是驗證版本，G3 綁交付版本的 hash，P5 產出兩者的差異清單；P6 只交付 bootcode 的交付版本。
+- **記憶體**：上限按設定、SRAM 按分區；stack 查預留大小與最深用量兩層；沒歸到模組的用量由 P2 另留「未歸屬」預算；bootcode 與 burner 的 SRAM 由工具交叉比對，重疊交人判斷。
+- **測什麼、怎麼載入**：case 標適用的 build 設定；每種設定的載入方式與驗證步驟由 test plan 決定，不寫死在規格裡；test plan 和 feature list 一樣用來源快照取得。
+- **來源快照**（[03 §3.2](framework/03_artifacts.md#32-來源快照)）：只有 Jira 查詢與 Confluence 頁面兩種，頁面裡的 Jira macro 由工具展開。
+- **其他**：不可逆動作清單按平台記，FPGA 上的 eFuse 暫定不擋；tapeout 後改 SPI ROM 版開新專案；專案自己的值（例如 E39 的 feature list 篩選）丟進該專案 P0 待決（[projects/E39 E7](projects/E39.md#e7-e39-待決事項)）。
+- **跟著改**：05、07、08，節點卡 P0、P1、P2、P4、P5、M1、M4、M5。openBCT 的實作狀態見 [notes/openbct_impl_gaps_20261029](notes/openbct_impl_gaps_20261029.md)。
 
 ## v0.10 改了什麼
 
