@@ -2,7 +2,7 @@
 
 > 2026-10-28～29 和使用者討論 sandaru／burner 與 build 設定後，GLADOS 規格改了很多（[framework/09](../framework/09_build_configurations.md)、[08 §8.3](../framework/08_open_questions.md#83-已決定事項) v0.11）。這份清單列出 openBCT（`src/openbct/glados/`，基準 `bedc16c`）和 KB `tools/ds5build` 還沒跟上的地方，依優先順序排。
 >
-> 使用者 2026-10-29 交代「能做的都直接做完」；實作在 openBCT branch `claude/glados-f-sandaru`（gitlab），KB 在 branch `claude/ds5build-listing`（gitlab），merge 進 main 前要使用者確認。每項的狀態記在「狀態」欄。
+> 使用者 2026-10-29 交代「能做的都直接做完」；實作在 openBCT branch `claude/glados-f-sandaru`（gitlab），KB 在 branch `claude/ds5build-listing`（gitlab）；2026-10-29 使用者確認後兩個都 fast-forward 併入 gitlab main（openBCT `bedc16c..80ef733`、KB `1f921b3e..46a7bd2e`）。每項的狀態記在「狀態」欄。
 >
 > 2026-10-29 整組測試 1737 通過；跑出的 2 個失敗（sources 的 kind 被誤當 build 設定檢查、測試仍期望 AXF hash）已修（`58c8068`、`80ef733`）。
 >
