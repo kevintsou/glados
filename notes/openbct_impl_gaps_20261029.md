@@ -8,7 +8,7 @@
 >
 > 還沒做的 F5、F10、F16 與 F7 的模組預算，都要上機的載入方式或模組歸屬，假的證據會誤導，所以留著。
 >
-> 2026-10-30：F7 的模組預算與 F5 的解析、檢查、預設值做完，在 openBCT branch `claude/glados-doable`（gitlab，還沒併入 main）。還沒做的是 F5 按設定分開跑、F10、F16，都要上機。
+> 2026-10-30：F7 的模組預算與 F5 的解析、檢查、預設值做完，在 openBCT branch `claude/glados-doable`（2026-10-30 使用者確認後併入 gitlab main `dee814a..37474b4`）。還沒做的是 F5 按設定分開跑、F10、F16，都要上機。
 
 ## 優先 1：證據與交付會綁錯東西
 
@@ -29,7 +29,7 @@
 | F8 | bootcode 與 burner 的 SRAM 自動交叉比對，重疊交人判斷（05、09 §9.3） | 沒有 | 讀兩份解析結果比對「ROM bootcode 還在用的區域」；重疊產生待判斷項目，判斷紀錄綁兩邊 BIN hash | 已做（`cf8d004`）：專案設定 `sram_cross_check` 指定兩個設定與 bootcode 還在用的區域／symbol，P4 比對；重疊記驗證缺口交人，不直接擋 |
 | F9 | bench 要和設定的平台相符（稽核 C） | `lab.py` 固定用 `benches[0]` | bench 設定加平台標記，挑和設定平台相符的 bench；找不到記環境錯誤 | 已做（`5607b9a`）：本機 `lab.bench_platforms` 標 bench 平台，依 `build_targets[].platform` 挑 |
 | F10 | 每種設定怎麼載入由 test plan 決定（09 §9.4） | 只有 ICE 載入 AXF 後 free run（`run_iceload`） | 載入方式做成可選（ICE＋free run、ICE＋reset、SPI ROM＋reset、VUC 帶入 burner）；要上機才驗得了 | 待做（要硬體） |
-| F11 | listing 解析擴充在 KB ds5build（09 §9.3） | `parse_map()` 只有 region | 加每個檔案（模組）的用量、`--callgraph` 最深 stack、symbol／section 範圍 | 已做（KB `46a7bd2`）；2026-10-30 用真的 E39 armlink 輸出（`83dc1a65b`，`ps5037_boot_mask_asic`）驗過。修掉 callgraph 漏掉沒有呼叫別人的函式（KB branch `claude/ds5build-leaf-stack` `fd76ae7c`，還沒併入 main）；E39 算不出深度的路徑 36 條 |
+| F11 | listing 解析擴充在 KB ds5build（09 §9.3） | `parse_map()` 只有 region | 加每個檔案（模組）的用量、`--callgraph` 最深 stack、symbol／section 範圍 | 已做（KB `46a7bd2`）；2026-10-30 用真的 E39 armlink 輸出（`83dc1a65b`，`ps5037_boot_mask_asic`）驗過。修掉 callgraph 漏掉沒有呼叫別人的函式（KB branch `claude/ds5build-leaf-stack` `fd76ae7c`，已 merge 進 KB gitlab main `d8fe38d4`）；E39 算不出深度的路徑 36 條 |
 | F12 | 檔案歸屬（bootcode／burner／共用）由工具從 build 設定算（09 §9.4） | 沒有 | 讀 `.cproject` 每個設定編進的檔案，算出歸屬 | 已做（`f9a212b`）：`ownership.py` 讀 `.cproject`，E39 實測 376 共用、32 bootcode、30 burner |
 | F13 | 哪些結果過期照改到的檔案判斷（04 §4.4） | `impact.voided_evidence()` 比 image hash 的聯集 | 依 F12 的歸屬：bootcode／burner／共用分別讓對應結果過期 | 已做（`f9a212b`）：`impact.ownership_voids()` |
 | F14 | 來源快照只有 Jira 查詢與 Confluence 頁面，頁面裡的 Jira macro 自動展開；feature list、test plan（03 §3.2、07） | `sources.take_snapshot()` 只抓一個 Epic 與 spec 頁 | 展開 Confluence 頁面裡的 Jira macro，抓每條 JQL 的結果與總數；專案設定加 feature list、test plan 來源與 IC label 篩選 | 已做（`90ec523`）：`take_snapshot(feature_lists=, test_plan=)` 展開 macro、manifest 記 `queries`；還沒對真的 Confluence／Jira 跑過 |
