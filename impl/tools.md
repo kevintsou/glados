@@ -5,16 +5,16 @@
 | 節點 | 工具 |
 | :---- | :---- |
 | 串接層 | 串接層服務（入口：openBCT GLADOS 分頁、CLI、API）、GitLab／本機 git、影響提示 |
-| P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、bct-grill-me；P0 另用 bct-p0（AI 直接讀起點 code 盤點，不經 bcgen） |
-| P1 | ds5-build／andes-build、remote-ice、bootcode-qa；bcgen 只用於串接層依程式碼建立設定執行的機械替換（[bcgen.md](bcgen.md)）；開始時由串接層的 checker 核對 build target 的必要／排除處置；實際 build 證據由串接層核對 |
+| P0、P2、C | 來源快照 script（直接呼叫 Jira／Confluence REST API）、Atlassian MCP（討論時查線索）、bootcode-qa、bct-grill-me；P0 另用 bct-p0（AI 直接讀起點 code 盤點，不經 bcgen）；C 用 bct-to-spec 寫 decision.md |
+| P1 | bct-p1-port（第 3 步移植）、bct-review（第 4 步移植審查）、ds5-build／andes-build、remote-ice、bootcode-qa；bcgen 只用於串接層依程式碼建立設定執行的機械替換（[bcgen.md](bcgen.md)）；開始時由串接層的 checker 核對 build target 的必要／排除處置；實際 build 證據由串接層核對 |
 | P2 | GitLab MCP、bootcode-qa、pyconvert（eFuse／BCFG 欄位與 layout）、subagent 平行分析、CR 撰寫 skill（新做，參考 write-jira-desc）、bct-grill-me、寫回 Jira 的工具 |
 | 人工關卡 | 簽核 skill、簽核指令（系統對話框）、openBCT GLADOS 分頁的核准按鈕（[gate_signoff.md](gate_signoff.md)） |
 | M1 | bct-grill-me、bct-to-spec、bootcode-qa、pyconvert |
-| M2 | write-openbct-test、openBCT；測試審查用另一個模型 |
-| M4 | ds5-build／andes-build |
+| M2 | bct-m2（寫 case）、bct-review（測試審查，用另一個模型）、write-openbct-test、openBCT |
+| M4 | bct-m4、ds5-build／andes-build |
 | M5 | remote-ice、openBCT、bootcode-qa（log 判讀）、logic-analyzer（實體訊號）、pps-log-verify（以已知通過的 log 當標準比對） |
-| M6 | corvia-code-review、另一個模型 |
-| P4、P5 | openBCT、ci-owner（Coverity／cppcheck／Black Duck）、corvia-code-review |
+| M6 | bct-review、corvia-code-review、另一個模型 |
+| P4、P5 | openBCT、ci-owner（Coverity／cppcheck／Black Duck）、corvia-code-review；P5 的差異清單用 bct-p5-variants，安全審查用 bct-p5-security |
 | P6 | sim-release |
 | P7 | vault-smith（寫知識庫）、the-validator（驗知識庫沒退步）、skill-creator |
 
@@ -23,5 +23,5 @@
 - `write-openbct-test`、`write-jira-desc` 在 openBCT 的 `.agents/skills/`。
 - `grill-me` 被 openBCT 的 write-jira-desc 引用，但 openBCT 與 bct_knowledge_base 兩個 repo 裡都沒有它的本體，來源與版本待確認。
 - bcgen 在 bct_knowledge_base 的 `tools/bcgen/`（公版 bootcode 產生工具＋公版 code 包）。2026-10-19 起只用在 P1 的機械替換，由串接層執行；不做給 AI 用的唯讀命令列，也不做 MCP（[bcgen.md](bcgen.md)）。
-- bct-p0、bct-grill-me 在 bct_knowledge_base 的 `Skills/`；bct-p0 是 0.1.0 試用版，還沒 commit 成固定版本（共用待辦 SK-007）。
+- GLADOS 的 skill 都在 bct_knowledge_base 的 `Skills/`（2026-10-30，KB main `87ec516a`，對照 GLADOS v0.11.1 與 openBCT 的收件格式）：bct-p0 0.4.0、bct-grill-me／bct-grill-with-docs／bct-to-spec 0.4.0、bct-p1-port 0.2.0、bct-m2 0.2.0、bct-m4 0.2.0、bct-review 0.2.0、bct-p5-security 0.2.0、bct-p5-variants 0.1.0（共用待辦 SK-006～SK-013）。都只驗過格式，受測 agent 的行為評估還沒用新版重跑。
 - 其他 skill（bootcode-qa、remote-ice、ds5-build、andes-build、pyconvert、logic-analyzer、pps-log-verify、corvia-code-review、ci-owner、sim-release、vault-smith、the-validator）都在 bct_knowledge_base 的 `Skills/`。
