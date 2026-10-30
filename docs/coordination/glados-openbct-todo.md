@@ -89,6 +89,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [SK-010](tasks/SK-010.md) | A | bct_knowledge_base | P1 移植 skill |
 | [SK-011](tasks/SK-011.md) | A | bct_knowledge_base | M2 測試實作 skill |
 | [SK-012](tasks/SK-012.md) | A | bct_knowledge_base | P5 安全審查 skill |
+| [SK-013](tasks/SK-013.md) | A | bct_knowledge_base / openBCT | P5 差異清單 skill |
 
 ## 已有資產與部分完成，避免重做
 
