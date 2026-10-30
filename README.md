@@ -27,6 +27,7 @@ bootcode FW 開發流程平台。目前是 **v0.11.1**（2026-10-30，服務跑�
 | E39 怎麼套用 GLADOS | [projects/E39](projects/E39.md) |
 | 實作設計（框架確認後才開始） | [impl/service](impl/service.md)、[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/gate_signoff](impl/gate_signoff.md)、[impl/bcgen](impl/bcgen.md)、[impl/recipe](impl/recipe.md)、[impl/tools](impl/tools.md) |
 | 討論筆記、v0.9 精簡提案 | [notes/](notes/playbook_kit_review.md)、[v0.9 精簡提案](notes/v0.9_simplification_proposal.md) |
+| P0 的需求來源：V&V feature 表能不能當 baseline | [V&V feature 為 P0 baseline 的可行性](notes/vnv_feature_as_p0_baseline_20261030.md) |
 | openBCT／bcgen／skills 的待辦、認領與跨 agent 接續 | [共用 To-do List](docs/coordination/glados-openbct-todo.md)、[認領規則](docs/coordination/README.md) |
 | 版本紀錄、和 v0.6 的章節對照 | [CHANGELOG](CHANGELOG.md) |
 
