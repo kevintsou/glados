@@ -1,6 +1,6 @@
 # GLADOS
 
-bootcode FW 開發流程平台。目前是 **v0.11**（2026-10-29）：sandaru／burner 與 build 設定寫進規格（[09](framework/09_build_configurations.md)），image hash 以 BIN 為準，交付版本與驗證版本分開。v0.10（2026-10-20）：AI 的工作一律由人開 agent 照 skill 完成，串接層只開工、收件，自己只執行確定性的工具步驟（見 [v0.10 提案](notes/v0.10_human_triggered_ai_proposal.md)）。v0.9（2026-10-19）精簡流程：需要人參與的節點由人自己開 agent 完成、串接層只開工與收件；關卡只留真正的決策；擋關檢查只留錯了會真的出事的；上游改版、失敗與需求變更改成「提示，人決定」（見 [CHANGELOG](CHANGELOG.md) 與 [v0.9 精簡提案](notes/v0.9_simplification_proposal.md)）。接下來一個節點一個節點展開實作。
+bootcode FW 開發流程平台。目前是 **v0.11.1**（2026-10-30，服務跑在使用者登入的工作階段，登出時跟著結束）。v0.11（2026-10-29）：sandaru／burner 與 build 設定寫進規格（[09](framework/09_build_configurations.md)），image hash 以 BIN 為準，交付版本與驗證版本分開。v0.10（2026-10-20）：AI 的工作一律由人開 agent 照 skill 完成，串接層只開工、收件，自己只執行確定性的工具步驟（見 [v0.10 提案](notes/v0.10_human_triggered_ai_proposal.md)）。v0.9（2026-10-19）精簡流程：需要人參與的節點由人自己開 agent 完成、串接層只開工與收件；關卡只留真正的決策；擋關檢查只留錯了會真的出事的；上游改版、失敗與需求變更改成「提示，人決定」（見 [CHANGELOG](CHANGELOG.md) 與 [v0.9 精簡提案](notes/v0.9_simplification_proposal.md)）。接下來一個節點一個節點展開實作。
 
 **GLADOS 在做什麼**：從需求（spec、CR）出發，經過需求釐清、驗收定義、實作、驗證、整合與全量驗收，產出一版功能正常的 bootcode FW。工作由 AI、工具與人分工：AI 的工作一律由人開 agent 照 skill 完成，確定性的工具步驟（機械替換、build、上機測試）由「串接層」執行；只有錯了會真的出事的檢查才擋關；人只在關卡核准真正的決策。
 
