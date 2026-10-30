@@ -50,6 +50,7 @@
 
 | 版本 | 決定 | 在哪裡 |
 | :---- | :---- | :---- |
+| v0.11.2（2026-10-30） | 重新建立基底時，P1 的移植修改不自動存活：生成區以新來源覆蓋，舊的移植說明是下一輪第 3 步的輸入而不是結論；第 3 步逐項對新版本重新查證並寫出依據（嚴格但容許批次：同一個 register block 的多處修改可共用一條紀錄，不能只寫「同前版」）；輪數從 0 重算；第 4 步審查基底到移植後的完整 diff，不是這次變動的部分；基線重量；舊的 GB 決定不自動沿用，但審查包要列出上一輪每一項的決定與理由當參考，只能並列呈現、不得預填。共同原則：綁定 hash 的隨 hash 失效，記錄了理由的成為下一輪的輸入 | [nodes/P1](../nodes/P1.md)、[04 §4.4](04_rules.md#44-上游改版與重做)、[impl/gate_signoff G4](../impl/gate_signoff.md#g4-審查包) |
 | v0.11 | 不可逆動作清單按平台記；暫定 FPGA 上的 eFuse 不擋（BCFG 寫變數模擬，FPGA 可重寫的模擬機制待確認），只有 ASIC 上擋 | [07](07_project_profile.md)、[05](05_checks.md)、[09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事) |
 | v0.11 | image hash 以 BIN 為準（G3、P6、「image 改變」都比 BIN），AXF 保留給 ICE 與 debug；P1 起點檢查 build 兩次確認 BIN 可重現 | [03 §3.3](03_artifacts.md#33-版本與追溯)、[09 §9.3](09_build_configurations.md#93-規劃時不能忽略的事)、[nodes/P1](../nodes/P1.md) |
 | v0.11 | 我們產出的 sandaru／burner 是驗證用的（量產 burner 由其他單位產出），不交付、是測試環境：G3 綁它的 hash 當證據，P6 只交付 bootcode。tapeout 後要改 SPI ROM 版，開新的 GLADOS 專案：起點是 P6 交付的版本，ROM bootcode 保留且 image hash 不變；「是否為 mask ROM」按 build 設定記 | [09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)、[07](07_project_profile.md)、[nodes/P0](../nodes/P0.md) |
