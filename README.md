@@ -30,6 +30,7 @@ bootcode FW 開發流程平台。目前是 **v0.11.3**（2026-11-02，一輪是�
 | P0 的需求來源：V&V feature 表能不能當 baseline | [V&V feature 為 P0 baseline 的可行性](notes/vnv_feature_as_p0_baseline_20261030.md) |
 | openBCT／bcgen／skills 的待辦、認領與跨 agent 接續 | [共用 To-do List](docs/coordination/glados-openbct-todo.md)、[認領規則](docs/coordination/README.md) |
 | 版本紀錄、和 v0.6 的章節對照 | [CHANGELOG](CHANGELOG.md) |
+| 怎麼把文件同步到 Confluence | [tools/confluence_sync](tools/confluence_sync/README.md) |
 
 ## 文件分三層
 
