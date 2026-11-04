@@ -52,6 +52,7 @@
 | 來源快照完整 | 漏抓 CR | 快照的 CR 張數等於查詢 Epic 回傳的總數；專案設定列的每個 spec 頁都在；程式碼建立設定列的每個外部來源都有快照與版本 | P0 | 工具 |
 | 範圍清單涵蓋所有 CR | 漏掉 CR | 來源快照裡的每一張 CR 都在範圍清單裡 | P0 | 自動核對 |
 | build 設定都有處置 | build 設定被漏掉，功能悄悄消失 | 起點盤點出的每個 build 設定，在專案設定裡都列為必要，或附理由與範圍依據明確排除；沒有待確認 | P0、P1 開始時 | 自動核對（串接層 checker） |
+| 必要 IP 控制參考可取得 | 缺少已決定必要的控制依據 | 只檢查 `reference_sources` 中 `required: true` 的來源：有固定 commit 與可讀快照／hash；明確非必要的無來源／暫缺不因此擋 G0（[10](10_ip_control_references.md)，自動串接待 OBC-032） | P0 | 工具（待實作） |
 | 建立設定是否齊全 | P1 生成到一半缺資料 | 有程式碼建立設定時，建立設定的必填欄位齊全、`pending` 是空的、移植範圍沒有落在生成區（[impl/recipe](../impl/recipe.md)） | P0 | 自動核對 |
 | 機械替換可重現 | 生成區不可再生 | 用同一份程式碼建立設定、同一版工具和外部來源快照重跑，產出和機械替換 commit 逐檔相同；只寫在生成區與起始複製區 | P1 | 工具 |
 | build 零警告 | 編不過、有 warning | 專案設定列的每一個必要 build 設定都實際 build 成功、0 warning；記錄每個設定的 image hash。每次都 clean build 全部必要設定（bootcode 與 burner），不只 build 改到的那一邊，不沿用舊的編譯產物（2026-10-28 使用者決定，[09 §9.4](09_build_configurations.md#94-sandaruburner-是專案的一部分)）。起點、基底、模組、整合都要跑；核准的排除項目不計為 PASS | P1、M4、P4 | 工具 |
@@ -81,7 +82,7 @@
 
 | 節點 | 收件檢查 |
 | :---- | :---- |
-| P0 | project.md、scope.md、profile.json、environment.json 都在；專案設定的必填欄位有值，沒有密碼、token 或本機路徑；影響 build 的環境項目有固定版本；範圍清單每一項都有標記，「移除」與「這版不做」有理由；有交接說明 |
+| P0 | project.md、scope.md、profile.json、environment.json 都在；專案設定的必填欄位有值，沒有密碼、token 或本機路徑；影響 build 的環境項目有固定版本；環境清單有 ICV FW 參考來源的詢問結果、必要性與狀態，available 有邏輯 repo 與完整 commit（[10](10_ip_control_references.md)，自動檢查待 OBC-032）；範圍清單每一項都有標記，「移除」與「這版不做」有理由；有交接說明 |
 | P2 | 範圍清單裡標成新增、修改、移除的每一項都對到模組；每個模組的 code 範圍列到檔案；模組相依沒有循環；每個必要 build 設定的記憶體預算總和不超過該設定的上限；regression 範圍有列；有交接說明 |
 | M1 | spec 條目有編號、每條有來源；沒有未回答的待確認事項；驗收合約每一條對到 spec 條目；有交接說明 |
 | C | 寫明接或不接；接的話寫明要改哪些產出物、從哪一站重做；有交接說明 |

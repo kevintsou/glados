@@ -55,6 +55,7 @@ openBCT 有另一個 agent 修改；本表不代認領其工作。未明確記�
 | [OBC-028](tasks/OBC-028.md) | A | openBCT | GitLab 唯讀查詢模式（觀察者不 clone 看進度） |
 | [OBC-029](tasks/OBC-029.md) | A | openBCT | 串接層統一 commit 與 push 工作 branch 及紀錄 branch |
 | [OBC-030](tasks/OBC-030.md) | A | openBCT | 以確定性 checker 核對起點 build 設定的必要／排除處置 |
+| [OBC-032](tasks/OBC-032.md) | B | openBCT | P0 ICV FW 參考來源收件、固定快照與下游工作包（尚未實作） |
 | [OBC-031](tasks/OBC-031.md) | A | openBCT | P1 機械替換由串接層固定輸入並執行 bcgen |
 
 ## bcgen 改造

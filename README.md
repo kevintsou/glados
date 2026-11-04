@@ -1,6 +1,6 @@
 # GLADOS
 
-bootcode FW 開發流程平台。目前是 **v0.11.3**（2026-11-02，一輪是獨立的檢查擋下一次，session 內的重做不算輪）。v0.11.2（2026-10-30）：重新建立基底時 P1 的移植修改不自動存活。v0.11.1（2026-10-30）：服務跑在使用者登入的工作階段，登出時跟著結束。v0.11（2026-10-29）：sandaru／burner 與 build 設定寫進規格（[09](framework/09_build_configurations.md)），image hash 以 BIN 為準，交付版本與驗證版本分開。v0.10（2026-10-20）：AI 的工作一律由人開 agent 照 skill 完成，串接層只開工、收件，自己只執行確定性的工具步驟（見 [v0.10 提案](notes/v0.10_human_triggered_ai_proposal.md)）。v0.9（2026-10-19）精簡流程：需要人參與的節點由人自己開 agent 完成、串接層只開工與收件；關卡只留真正的決策；擋關檢查只留錯了會真的出事的；上游改版、失敗與需求變更改成「提示，人決定」（見 [CHANGELOG](CHANGELOG.md) 與 [v0.9 精簡提案](notes/v0.9_simplification_proposal.md)）。接下來一個節點一個節點展開實作。
+bootcode FW 開發流程平台。目前是 **v0.11.4**（2026-11-04，P0 必問 ICV FW Git 參考來源，記入環境資訊並供下游引用；openBCT 自動串接待 OBC-032）。v0.11.3（2026-11-02，一輪是獨立的檢查擋下一次，session 內的重做不算輪）。v0.11.2（2026-10-30）：重新建立基底時 P1 的移植修改不自動存活。v0.11.1（2026-10-30）：服務跑在使用者登入的工作階段，登出時跟著結束。v0.11（2026-10-29）：sandaru／burner 與 build 設定寫進規格（[09](framework/09_build_configurations.md)），image hash 以 BIN 為準，交付版本與驗證版本分開。v0.10（2026-10-20）：AI 的工作一律由人開 agent 照 skill 完成，串接層只開工、收件，自己只執行確定性的工具步驟（見 [v0.10 提案](notes/v0.10_human_triggered_ai_proposal.md)）。v0.9（2026-10-19）精簡流程：需要人參與的節點由人自己開 agent 完成、串接層只開工與收件；關卡只留真正的決策；擋關檢查只留錯了會真的出事的；上游改版、失敗與需求變更改成「提示，人決定」（見 [CHANGELOG](CHANGELOG.md) 與 [v0.9 精簡提案](notes/v0.9_simplification_proposal.md)）。接下來一個節點一個節點展開實作。
 
 **GLADOS 在做什麼**：從需求（spec、CR）出發，經過需求釐清、驗收定義、實作、驗證、整合與全量驗收，產出一版功能正常的 bootcode FW。工作由 AI、工具與人分工：AI 的工作一律由人開 agent 照 skill 完成，確定性的工具步驟（機械替換、build、上機測試）由「串接層」執行；只有錯了會真的出事的檢查才擋關；人只在關卡核准真正的決策。
 
@@ -23,6 +23,7 @@ bootcode FW 開發流程平台。目前是 **v0.11.3**（2026-11-02，一輪是�
 | 專案要填哪些設定 | [framework/07 專案設定](framework/07_project_profile.md) |
 | 還沒決定的事、已經決定的事 | [framework/08 待決事項](framework/08_open_questions.md) |
 | bootcode 有哪幾種 build 設定、各跑在哪裡、怎麼載入（規劃前必讀） | [framework/09 build 設定](framework/09_build_configurations.md) |
+| ICV FW 等 IP 控制參考如何詢問、記錄版本與交給下游 | [framework/10 IP 控制實作參考](framework/10_ip_control_references.md) |
 | 每個節點的介面與實作構想 | [nodes/](nodes/README.md) |
 | E39 怎麼套用 GLADOS | [projects/E39](projects/E39.md) |
 | 實作設計（框架確認後才開始） | [impl/service](impl/service.md)、[impl/ai_node_execution](impl/ai_node_execution.md)、[impl/gate_signoff](impl/gate_signoff.md)、[impl/bcgen](impl/bcgen.md)、[impl/recipe](impl/recipe.md)、[impl/tools](impl/tools.md) |
